@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Destiny 2 — Command Center v10.0</title>
+    <title>Destiny 2 — Command Center v12.0</title>
     <style>
         :root {
             --bg-dark: #06090e;
@@ -26,7 +26,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             max-width: 1520px;
             margin: 0 auto;
-            padding: 16px 20px;
+            padding: 16px 20px 80px 20px;
         }
         .topbar {
             background: var(--bg-panel);
@@ -69,6 +69,9 @@
         button.btn-ghost:hover { color: white; border-color: var(--muted); }
         button.btn-green { background: #15803d; color: #fff; }
         button.btn-green:hover { background: #16a34a; }
+        button.btn-compare { background: #1e293b; border: 1px solid var(--accent); color: var(--accent); }
+        button.btn-compare:hover { background: #0c4a6e; color: #fff; }
+        button.btn-compare.has-items { background: #0284c7; color: #fff; border-color: #7dd3fc; }
         button.btn-toggle { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); }
         button.btn-toggle.active { background: #431407; border-color: var(--gold); color: var(--gold); }
 
@@ -123,7 +126,7 @@
         .char-meta span { color: var(--gold); font-weight: 700; font-size: 0.8rem; }
 
         .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-        .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 14px; }
+        .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 13px; }
         .tab-btn.active { border-color: var(--accent); color: var(--accent); background: #132036; }
 
         .guardian-stats-panel {
@@ -201,6 +204,71 @@
             margin-bottom: 14px;
         }
 
+        /* --- VUE JALONS & ACTIVITÉS DE LA SEMAINE --- */
+        .reset-banner {
+            background: linear-gradient(90deg, #0f172a, #162238);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .reset-timer {
+            background: #06090e;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.92rem;
+            letter-spacing: 0.4px;
+        }
+        .milestone-group-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--accent);
+            margin: 18px 0 10px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .milestone-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .milestone-card.pinnacle { border-left-color: var(--gold); }
+        .milestone-card.completed { opacity: 0.6; border-left-color: var(--green); }
+        .milestone-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 6px;
+            background: #090d14;
+            border: 1px solid #26334d;
+            flex-shrink: 0;
+            padding: 3px;
+        }
+        .phases-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .phase-dot { width: 12px; height: 12px; border-radius: 3px; background: #1e293b; border: 1px solid #475569; }
+        .phase-dot.done { background: var(--green); border-color: #86efac; }
+        .milestone-obj { margin-top: 7px; font-size: 0.74rem; color: #cbd5e1; }
+        .badge-pinnacle { background: #713f12; color: #fde047; border: 1px solid var(--gold); }
+        .badge-powerful { background: #3b0764; color: #e9d5ff; border: 1px solid var(--purple); }
+        .badge-done { background: #14532d; color: #86efac; }
+
+        /* --- ESPACE ÉQUIPEMENT & COFFRE --- */
         .loadout-workspace {
             display: grid;
             grid-template-columns: 1.55fr 1fr;
@@ -229,11 +297,54 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            align-items: center;
+            align-items: flex-start;
+            align-content: flex-start;
             transition: all 0.15s;
         }
-        .drop-zone.equipped-zone { border: 1px solid #283650; background: #0b111c; padding: 8px 10px; }
+        .drop-zone.equipped-zone { border: 1px solid #283650; background: #0b111c; padding: 8px 10px; align-items: center; }
         .drop-zone.drag-over { border-color: var(--gold) !important; background: rgba(234, 179, 8, 0.12) !important; }
+
+        /* Groupes par type d'arme dans le Sac & le Coffre */
+        .bag-type-cluster {
+            background: #0d131f;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 5px 7px 7px 7px;
+            display: inline-flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .bag-type-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+        .bag-type-tiles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .vault-type-group {
+            margin-bottom: 10px;
+            padding-left: 6px;
+            border-left: 2px solid #1e293b;
+        }
+        .vault-type-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .vault-type-label span {
+            color: #475569;
+            font-weight: 600;
+        }
 
         .equipped-detail-card { width: 100%; cursor: grab; user-select: none; }
         .eq-top { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
@@ -284,6 +395,7 @@
         .gear-tile.tier-Exotic { border-color: var(--gold); }
         .gear-tile.tier-Superior { border-color: var(--purple); }
         .gear-tile.tier-Rare { border-color: var(--blue); }
+        .gear-tile.in-compare { box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(56, 189, 248, 0.6); }
         .gear-tile img { width: 100%; height: 100%; border-radius: 4px; display: block; pointer-events: none; }
         .tile-power {
             position: absolute;
@@ -328,13 +440,14 @@
             border-color: var(--gold) !important;
             background: rgba(234, 179, 8, 0.08) !important;
         }
-        .vault-slot-group { margin-bottom: 14px; }
-        .vault-slot-group h5 { margin: 0 0 6px 0; font-size: 0.78rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+        .vault-slot-group { margin-bottom: 16px; }
+        .vault-slot-group h5 { margin: 0 0 8px 0; font-size: 0.8rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
 
+        /* --- INSPECTEUR FLOTTANT --- */
         #itemInspector {
             position: fixed;
             z-index: 9999;
-            width: 360px;
+            width: 365px;
             background: #0b0f17;
             border: 1px solid #38bdf8;
             border-radius: 10px;
@@ -372,11 +485,125 @@
         }
         .insp-actions button { flex: 1 1 45%; padding: 7px 8px; font-size: 0.75rem; }
 
+        /* --- PANNEAU COMPARATEUR CÔTE-À-CÔTE --- */
+        #compareDrawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 9500;
+            background: #090d14;
+            border-top: 2px solid var(--accent);
+            box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            max-height: 78vh;
+        }
+        #compareDrawer.open { display: flex; }
+        .compare-header {
+            background: #0f1624;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .compare-header h3 { margin: 0; font-size: 1rem; color: var(--accent); }
+        .compare-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 14px 20px 18px 20px;
+            align-items: stretch;
+        }
+        .compare-col {
+            min-width: 255px;
+            max-width: 275px;
+            flex-shrink: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .compare-col.tier-Exotic { border-top: 3px solid var(--gold); }
+        .compare-col.tier-Superior { border-top: 3px solid var(--purple); }
+        .compare-col.tier-Rare { border-top: 3px solid var(--blue); }
+        .compare-col-head {
+            padding: 10px 12px;
+            background: #111826;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+        }
+        .compare-col-head img { width: 44px; height: 44px; border-radius: 5px; border: 1px solid #475569; flex-shrink: 0; }
+        .compare-col-title { flex: 1; min-width: 0; padding-right: 18px; }
+        .compare-col-title h4 { margin: 0; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .compare-col-title small { color: var(--muted); font-size: 0.72rem; display: block; }
+        .compare-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: transparent;
+            color: #64748b;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+        }
+        .compare-remove:hover { color: #ef4444; background: transparent; }
+        .compare-stats-list { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .cmp-stat-row {
+            display: grid;
+            grid-template-columns: 98px 1fr 30px;
+            gap: 6px;
+            align-items: center;
+            font-size: 0.74rem;
+            margin-bottom: 5px;
+        }
+        .cmp-stat-bar { height: 5px; background: #1e293b; border-radius: 2px; overflow: hidden; }
+        .cmp-stat-fill { height: 100%; background: #cbd5e1; }
+        .cmp-stat-val { text-align: right; font-weight: 700; }
+        .cmp-best .cmp-stat-val { color: #4ade80; }
+        .cmp-best .cmp-stat-fill { background: #22c55e; }
+        .cmp-worst .cmp-stat-val { color: #f87171; }
+        .cmp-worst .cmp-stat-fill { background: #ef4444; }
+        .compare-perks-list {
+            padding: 10px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .cmp-perk-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: #0c121e;
+            border: 1px solid #1e293b;
+            border-radius: 5px;
+            padding: 4px 7px;
+            font-size: 0.74rem;
+            color: #e2e8f0;
+        }
+        .cmp-perk-row img { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
+        .compare-col-actions {
+            padding: 8px 10px;
+            background: #0d131f;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+        }
+        .compare-col-actions button { flex: 1; padding: 5px 6px; font-size: 0.72rem; }
+
         .vendor-section { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
         .vendor-header { display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px; }
         .vendor-icon { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--accent); }
         .vendor-cat-title { font-size: 0.78rem; text-transform: uppercase; color: var(--gold); margin: 10px 0 8px 0; font-weight: 700; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
         .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
         .item-card:hover { border-color: var(--accent); }
         .item-card.tier-Exotic { border-left: 4px solid var(--gold); }
@@ -389,8 +616,8 @@
         .item-icon.red-border { border: 2px solid var(--red-deepsight); }
         .item-info { flex: 1; min-width: 0; }
         .item-info h4 { margin: 0 0 3px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-info p { margin: 0; font-size: 0.74rem; color: var(--muted); }
-        .badge { display: inline-block; font-size: 0.66rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-top: 4px; background: #0c4a6e; color: #7dd3fc; }
+        .item-info p { margin: 0; font-size: 0.74rem; color: var(--muted); line-height: 1.3; }
+        .badge { display: inline-block; font-size: 0.66rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-top: 5px; margin-right: 4px; background: #0c4a6e; color: #7dd3fc; }
         .badge.craft-ok { background: #14532d; color: #86efac; }
         .badge.craft-pending { background: #431407; color: #fdba74; border: 1px solid var(--red-deepsight); }
         .badge.cat-progress { background: #0c4a6e; color: #7dd3fc; border: 1px solid var(--accent); }
@@ -416,7 +643,8 @@
             <h2>▲ DESTINY 2 COMMAND CENTER</h2>
             <span id="userBadge" class="user-pill" style="display:none;">Non connecté</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button class="btn-compare" id="btnOpenCompare" onclick="basculerComparateur()">⚖️ Comparateur (<span id="count-compare">0</span>)</button>
             <button class="btn-login" id="btnMainLogin" onclick="connexionRapideBungie()">Se connecter avec Bungie.net</button>
             <button onclick="lancerAnalyse()">↻ Actualiser</button>
             <button class="btn-ghost" onclick="basculerConfig()">⚙️ Config</button>
@@ -443,6 +671,7 @@
         <div id="charBar" class="char-bar"></div>
         <div class="tabs">
             <button class="tab-btn active" id="btn-loadout" onclick="changerOnglet('loadout')">Équipement & Coffre</button>
+            <button class="tab-btn" id="btn-milestones" onclick="changerOnglet('milestones')">📅 Jalons & Semaine (<span id="count-milestones">0</span>)</button>
             <button class="tab-btn" id="btn-crafting" onclick="changerOnglet('crafting')">🟥 Modèles (<span id="count-crafting">0</span>)</button>
             <button class="tab-btn" id="btn-catalysts" onclick="changerOnglet('catalysts')">✨ Catalyseurs (<span id="count-catalysts">0</span>)</button>
             <button class="tab-btn" id="btn-vendors" onclick="changerOnglet('vendors')">Marchands (<span id="count-vendors">0</span>)</button>
@@ -485,6 +714,21 @@
     <div id="mainView"></div>
     <div id="itemInspector"></div>
 
+    <!-- Panneau Comparateur Côte-à-Côte -->
+    <div id="compareDrawer">
+        <div class="compare-header">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <h3>⚖️ Comparateur d'équipement (<span id="compareHeaderCount">0</span>)</h3>
+                <small style="color:#94a3b8;">Vert = meilleure stat • Rouge = plus faible</small>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-ghost" onclick="viderComparateur()">🗑️ Tout vider</button>
+                <button onclick="fermerComparateur()">✕ Fermer</button>
+            </div>
+        </div>
+        <div id="compareContent" class="compare-scroll"></div>
+    </div>
+
     <script>
         const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
         const DEFAULT_CLIENT_ID = "56923";
@@ -503,9 +747,18 @@
         const BUCKETS_CONNUS = new Set(SLOTS_DESTINY.map(s => s.hash));
 
         const STATS_ARMES_ORDRE = [
-            4043523819, 1240592695, 155624089, 943549884,
-            4188031367, 4284893193, 2961396640, 447667954, 3871231066
+            4043523819, // Impact
+            1240592695, // Portée
+            155624089,  // Stabilité
+            943549884,  // Maniement
+            4188031367, // Rechargement
+            4284893193, // Cadence (CPM)
+            2961396640, // Temps de charge (plus bas = mieux)
+            447667954,  // Temps de tension (plus bas = mieux)
+            3871231066  // Chargeur
         ];
+        const STATS_BAS_MEILLEUR = new Set([2961396640, 447667954]);
+
         const STATS_GARDIEN_6 = [
             { hash: 2996146975, nom: "Mobilité" },
             { hash: 392767087,  nom: "Résistance" },
@@ -532,6 +785,7 @@
         let listeExotiques = [];
         let listeTriomphes = [];
         let registreObjets = {};
+        let comparateurKeys = [];
         let objetGlisse = null;
         let inspecteurVerrouille = false;
 
@@ -664,13 +918,29 @@
             return searchData.Response[0];
         }
 
+        function calculerCompteAReboursReset() {
+            const now = new Date();
+            const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 17, 0, 0, 0));
+            const day = now.getUTCDay();
+            let joursRestants = (2 - day + 7) % 7;
+            if (joursRestants === 0 && now.getTime() >= target.getTime()) {
+                joursRestants = 7;
+            }
+            target.setUTCDate(target.getUTCDate() + joursRestants);
+            const diffMs = Math.max(0, target.getTime() - now.getTime());
+            const d = Math.floor(diffMs / 86400000);
+            const h = Math.floor((diffMs % 86400000) / 3600000);
+            const m = Math.floor((diffMs % 3600000) / 60000);
+            return `${d}j ${h}h ${m}m`;
+        }
+
         function extrairePerksDetails(instanceId, itemPerks) {
             const liste = [];
             if (instanceId && itemPerks[instanceId]?.perks && dictGlobal.perks) {
                 const dejaVu = new Set();
                 itemPerks[instanceId].perks.forEach(p => {
                     const pDef = dictGlobal.perks[p.perkHash];
-                    if (p.visible && pDef?.displayProperties?.name && !dejaVu.has(pDef.displayProperties.name) && liste.length < 5) {
+                    if (p.visible && pDef?.displayProperties?.name && !dejaVu.has(pDef.displayProperties.name) && liste.length < 6) {
                         dejaVu.add(pDef.displayProperties.name);
                         liste.push({
                             nom: pDef.displayProperties.name,
@@ -750,7 +1020,6 @@
             return obj;
         }
 
-        // Collecte récursive des hashes de Triomphes dans un nœud de présentation (ex: Catalyseurs exotiques)
         function collecterRecordsDansNoeud(nodeHash, visited = new Set()) {
             const res = [];
             if (!nodeHash || visited.has(nodeHash)) return res;
@@ -762,6 +1031,132 @@
                 res.push(...collecterRecordsDansNoeud(child.presentationNodeHash, visited));
             });
             return res;
+        }
+
+        function extraireJalonsPerso(milestonesData) {
+            const jalons = [];
+            if (!milestonesData || !dictGlobal.milestones) return jalons;
+
+            const motsRaidDonjon = [
+                'raid', 'donjon', 'caveau', 'chute du roi', 'serment', 'racine', 'cropta',
+                'bord du salut', 'dualisme', 'flèche', 'fantômes', 'ruine', 'hôte', 'vesper',
+                'doctrine', 'prophétie', 'fosse', 'trône brisé', 'emprise', 'dernier vœu', 'jardin', 'crypte'
+            ];
+            const motsRituels = ['nuit noire', 'avant-garde', 'épreuve', 'gambit', 'jugement', 'bannière', 'assaut', 'osiris', 'compétitif'];
+
+            for (const [mHash, mLive] of Object.entries(milestonesData)) {
+                const mDef = dictGlobal.milestones[mHash];
+                if (!mDef || !mDef.displayProperties?.name) continue;
+
+                const nomJalon = mDef.displayProperties.name;
+                let descJalon = mDef.displayProperties.description || "";
+                let icone = mDef.displayProperties.icon ? 'https://www.bungie.net' + mDef.displayProperties.icon : '';
+
+                let recompenseLabel = "";
+                if (mDef.rewards) {
+                    for (const rCat of Object.values(mDef.rewards)) {
+                        for (const entry of Object.values(rCat.rewardEntries || {})) {
+                            const rName = entry.displayProperties?.name || "";
+                            if (rName) { recompenseLabel = rName; break; }
+                        }
+                        if (recompenseLabel) break;
+                    }
+                }
+
+                const objectifs = [];
+                const objVus = new Set();
+                let phases = [];
+                let nomActiviteAssociee = "";
+
+                if (mLive.availableQuests) {
+                    mLive.availableQuests.forEach(q => {
+                        (q.status?.stepObjectives || []).forEach(o => {
+                            if (objVus.has(o.objectiveHash)) return;
+                            objVus.add(o.objectiveHash);
+                            const oDef = dictGlobal.objectives?.[o.objectiveHash];
+                            objectifs.push({
+                                texte: oDef?.progressDescription || "Objectif hebdomadaire",
+                                progress: o.progress || 0,
+                                max: o.completionValue || 1,
+                                complete: !!o.complete
+                            });
+                        });
+                    });
+                }
+
+                if (mLive.activities) {
+                    mLive.activities.forEach(act => {
+                        const actDef = dictGlobal.activities?.[act.activityHash];
+                        if (actDef?.displayProperties?.name && !nomActiviteAssociee) {
+                            nomActiviteAssociee = actDef.displayProperties.name;
+                        }
+                        if (!icone && actDef?.displayProperties?.icon) {
+                            icone = 'https://www.bungie.net' + actDef.displayProperties.icon;
+                        }
+                        if (act.phases && act.phases.length > phases.length) {
+                            phases = act.phases.map(ph => ({ complete: !!ph.complete }));
+                        }
+                        (act.challenges || []).forEach(ch => {
+                            const o = ch.objective;
+                            if (!o || objVus.has(o.objectiveHash)) return;
+                            objVus.add(o.objectiveHash);
+                            const oDef = dictGlobal.objectives?.[o.objectiveHash];
+                            objectifs.push({
+                                texte: oDef?.progressDescription || "Défi hebdomadaire",
+                                progress: o.progress || 0,
+                                max: o.completionValue || 1,
+                                complete: !!o.complete
+                            });
+                        });
+                    });
+                }
+
+                let rewardEntriesLive = [];
+                if (mLive.rewards) {
+                    mLive.rewards.forEach(r => {
+                        (r.entries || []).forEach(e => rewardEntriesLive.push(e));
+                    });
+                }
+
+                if (objectifs.length === 0 && phases.length === 0 && rewardEntriesLive.length === 0) continue;
+
+                let complete = false;
+                if (objectifs.length > 0) complete = objectifs.every(o => o.complete);
+                else if (phases.length > 0) complete = phases.every(p => p.complete);
+                else if (rewardEntriesLive.length > 0) complete = rewardEntriesLive.every(e => e.earned || e.redeemed);
+
+                const texteRecherche = `${nomJalon} ${descJalon} ${nomActiviteAssociee}`.toLowerCase();
+                let groupe = 'weekly';
+                if (phases.length > 0 || motsRaidDonjon.some(m => texteRecherche.includes(m))) {
+                    groupe = 'raid_dungeon';
+                } else if (motsRituels.some(m => texteRecherche.includes(m))) {
+                    groupe = 'ritual';
+                }
+
+                const estPrestige = `${recompenseLabel} ${descJalon}`.toLowerCase().includes('prestige') || `${recompenseLabel} ${descJalon}`.toLowerCase().includes('pinnacle');
+                const estPuissant = `${recompenseLabel} ${descJalon}`.toLowerCase().includes('puissant') || `${recompenseLabel} ${descJalon}`.toLowerCase().includes('powerful');
+
+                jalons.push({
+                    nom: nomJalon,
+                    sousTitre: nomActiviteAssociee && nomActiviteAssociee !== nomJalon ? nomActiviteAssociee : descJalon,
+                    desc: descJalon,
+                    icone: icone || 'https://www.bungie.net/img/misc/missing_icon_d2.png',
+                    recompense: recompenseLabel || (estPrestige ? 'Équipement de prestige' : (estPuissant ? 'Équipement puissant' : 'Récompense hebdomadaire')),
+                    estPrestige,
+                    estPuissant,
+                    groupe,
+                    objectifs,
+                    phases,
+                    possede: complete
+                });
+            }
+
+            jalons.sort((a, b) => {
+                if (a.possede !== b.possede) return a.possede ? 1 : -1;
+                if (a.estPrestige !== b.estPrestige) return a.estPrestige ? -1 : 1;
+                return a.nom.localeCompare(b.nom);
+            });
+            return jalons;
         }
 
         async function lancerAnalyse() {
@@ -784,20 +1179,23 @@
                     const manifestData = await manifestResp.json();
                     const cheminsFR = manifestData.Response.jsonWorldComponentContentPaths.fr;
 
-                    const [items, collectibles, records, perks, vendors, stats, nodes] = await Promise.all([
+                    const [items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities] = await Promise.all([
                         fetch('https://www.bungie.net' + cheminsFR.DestinyInventoryItemDefinition).then(r => r.json()),
                         fetch('https://www.bungie.net' + cheminsFR.DestinyCollectibleDefinition).then(r => r.json()),
                         fetch('https://www.bungie.net' + cheminsFR.DestinyRecordDefinition).then(r => r.json()),
                         fetch('https://www.bungie.net' + cheminsFR.DestinySandboxPerkDefinition).then(r => r.json()),
                         fetch('https://www.bungie.net' + cheminsFR.DestinyVendorDefinition).then(r => r.json()),
                         fetch('https://www.bungie.net' + cheminsFR.DestinyStatDefinition).then(r => r.json()),
-                        fetch('https://www.bungie.net' + cheminsFR.DestinyPresentationNodeDefinition).then(r => r.json())
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyPresentationNodeDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyMilestoneDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyObjectiveDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyActivityDefinition).then(r => r.json())
                     ]);
-                    dictGlobal = { items, collectibles, records, perks, vendors, stats, nodes };
+                    dictGlobal = { items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities };
                 }
 
-                setStatus("3/3 — Lecture en direct : Personnages, Coffre, Doublons, Modèles et Catalyseurs...");
-                const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,205,300,302,304,800,900`;
+                setStatus("3/3 — Lecture en direct : Personnages, Coffre, Jalons et Collections...");
+                const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,202,205,300,302,304,800,900`;
                 const headers = { 'X-API-Key': DEFAULT_API_KEY };
                 if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
@@ -808,6 +1206,7 @@
                 const instances = resp.itemComponents?.instances?.data || {};
                 const itemPerks = resp.itemComponents?.perks?.data || {};
                 const itemStatsMap = resp.itemComponents?.stats?.data || {};
+                const charProgressions = resp.characterProgressions?.data || {};
                 registreObjets = {};
                 compteDoublons = {};
 
@@ -818,6 +1217,7 @@
 
                 mapPersos = {};
                 for (const [cId, c] of Object.entries(resp.characters?.data || {})) {
+                    const jalonsPerso = extraireJalonsPerso(charProgressions[cId]?.milestones);
                     mapPersos[cId] = {
                         id: cId,
                         classeNom: classesNom[c.classType] || 'Gardien',
@@ -826,7 +1226,8 @@
                         emblem: c.emblemPath ? 'https://www.bungie.net' + c.emblemPath : '',
                         equipped: [],
                         inventory: [],
-                        postmaster: []
+                        postmaster: [],
+                        milestones: jalonsPerso
                     };
                 }
                 if (!persoActifId || !mapPersos[persoActifId]) {
@@ -873,7 +1274,6 @@
                 });
                 listeCoffre.sort((a, b) => (b.power || 0) - (a.power || 0));
 
-                // Compter le nombre total d'exemplaires en doublon
                 let nbDoublons = 0;
                 Object.values(compteDoublons).forEach(cnt => { if (cnt > 1) nbDoublons += cnt; });
                 document.getElementById('count-dupes').textContent = nbDoublons;
@@ -916,13 +1316,12 @@
                     listeExotiques.push(obj);
                 }
 
-                // Triomphes, Modèles (Crafting) & Catalyseurs Exotiques (Composant 900)
+                // Triomphes, Modèles (Crafting) & Catalyseurs Exotiques (900)
                 const recordsJoueur = { ...(resp.profileRecords?.data?.records || {}) };
                 for (const cId in (resp.characterRecords?.data || {})) {
                     Object.assign(recordsJoueur, resp.characterRecords.data[cId].records);
                 }
 
-                // Repérer les hashes officiels des Catalyseurs Exotiques dans DestinyPresentationNodeDefinition
                 const hashesCatalyseurs = new Set();
                 for (const n of Object.values(dictGlobal.nodes || {})) {
                     const nNom = (n.displayProperties?.name || "").toLowerCase();
@@ -944,12 +1343,10 @@
                     const descRec = def.displayProperties.description || "";
                     const complete = (rec.state & 4) === 0;
 
-                    // 1. Détection Catalyseur Exotique
                     const estCatalyseur = hashesCatalyseurs.has(String(hash)) || nomRec.toLowerCase().startsWith('catalyseur');
                     if (estCatalyseur && !nomsCatVus.has(nomRec)) {
                         nomsCatVus.add(nomRec);
                         const objs = rec.objectives || [];
-                        // On choisit l'objectif chiffré principal (celui avec la plus grande cible, ex: 500 frags)
                         let mainObj = objs[0] || { progress: 0, completionValue: 1 };
                         objs.forEach(o => { if ((o.completionValue || 0) >= (mainObj.completionValue || 0)) mainObj = o; });
                         const prog = mainObj.progress || 0;
@@ -979,7 +1376,6 @@
                         continue;
                     }
 
-                    // 2. Détection Modèle d'arme façonnable (Crafting)
                     const armeMatch = mapArmesParNom[nomRec];
                     const objZero = rec.objectives && rec.objectives.length > 0 ? rec.objectives[0] : null;
                     const estModeleArme = armeMatch && objZero && objZero.completionValue >= 1 && objZero.completionValue <= 5 && !nomsCraftingVus.has(nomRec);
@@ -1020,19 +1416,22 @@
                     }
                 }
 
-                // Tri Modèles : En cours en premier, puis non commencés, puis débloqués
                 listeCrafting.sort((a, b) => {
                     if (a.possede !== b.possede) return a.possede ? 1 : -1;
                     return (b.progActuel / b.progMax) - (a.progActuel / a.progMax);
                 });
 
-                // Tri Catalyseurs : En cours en premier, puis manquants, puis complétés
                 listeCatalyseurs.sort((a, b) => {
                     const score = (x) => x.enCours ? 0 : (!x.possede ? 1 : 2);
                     if (score(a) !== score(b)) return score(a) - score(b);
                     return (b.progActuel / b.progMax) - (a.progActuel / a.progMax);
                 });
 
+                // Nettoyer les clés du comparateur qui n'existeraient plus et mettre à jour le tiroir s'il est ouvert
+                comparateurKeys = comparateurKeys.filter(k => registreObjets[k]);
+                mettreAJourComparateurUI();
+
+                mettreAJourCompteurJalons();
                 document.getElementById('count-crafting').textContent = listeCrafting.length;
                 document.getElementById('count-catalysts').textContent = listeCatalyseurs.length;
                 document.getElementById('count-quests').textContent = listeQuetes.length;
@@ -1042,8 +1441,8 @@
                 if (!resp.profileInventory?.data) {
                     setStatus("⚠️ Clique sur 'Se connecter avec Bungie.net' en haut à droite pour accéder au Coffre.");
                 } else {
-                    const nbCatOk = listeCatalyseurs.filter(c => c.possede).length;
-                    setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — ${listeCoffre.length} objets au Coffre • ${nbCatOk}/${listeCatalyseurs.length} Catalyseurs complétés.`);
+                    const jalonsRestants = (mapPersos[persoActifId]?.milestones || []).filter(m => !m.possede).length;
+                    setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — ${listeCoffre.length} objets au Coffre • ${jalonsRestants} jalons restants sur ton ${mapPersos[persoActifId]?.classeNom}.`);
                 }
 
                 if (ongletActif === 'vendors') {
@@ -1055,6 +1454,189 @@
             } catch (err) {
                 setStatus("Info : " + err.message);
             }
+        }
+
+        // =========================================================================
+        // COMPARATEUR CÔTE-À-CÔTE
+        // =========================================================================
+        function basculerComparateur() {
+            const drawer = document.getElementById('compareDrawer');
+            drawer.classList.toggle('open');
+            mettreAJourComparateurUI();
+        }
+
+        function fermerComparateur() {
+            document.getElementById('compareDrawer').classList.remove('open');
+        }
+
+        function viderComparateur() {
+            comparateurKeys = [];
+            mettreAJourComparateurUI();
+            afficherVue();
+        }
+
+        function ajouterAuComparateur(ukey, ouvrir = true) {
+            fermerInspecteur(true);
+            if (!registreObjets[ukey]) return;
+            const idx = comparateurKeys.indexOf(ukey);
+            if (idx === -1) {
+                comparateurKeys.push(ukey);
+            } else if (!ouvrir) {
+                comparateurKeys.splice(idx, 1);
+            }
+            if (ouvrir) document.getElementById('compareDrawer').classList.add('open');
+            mettreAJourComparateurUI();
+            afficherVue();
+        }
+
+        function retirerDuComparateur(ukey) {
+            comparateurKeys = comparateurKeys.filter(k => k !== ukey);
+            if (comparateurKeys.length === 0) fermerComparateur();
+            mettreAJourComparateurUI();
+            afficherVue();
+        }
+
+        function comparerDoublonsObjet(itemHash) {
+            fermerInspecteur(true);
+            const copies = Object.values(registreObjets).filter(o => o.itemHash === itemHash && o.itemInstanceId);
+            copies.sort((a, b) => (b.power || 0) - (a.power || 0));
+            comparateurKeys = copies.map(c => c.ukey);
+            document.getElementById('compareDrawer').classList.add('open');
+            mettreAJourComparateurUI();
+            afficherVue();
+        }
+
+        function comparerMemeTypeObjet(ukey) {
+            fermerInspecteur(true);
+            const ref = registreObjets[ukey];
+            if (!ref) return;
+            const memesTypes = Object.values(registreObjets).filter(o =>
+                o.itemInstanceId && o.typeNom === ref.typeNom && o.bucketHash === ref.bucketHash
+            );
+            memesTypes.sort((a, b) => (b.power || 0) - (a.power || 0));
+            comparateurKeys = memesTypes.slice(0, 12).map(c => c.ukey);
+            document.getElementById('compareDrawer').classList.add('open');
+            mettreAJourComparateurUI();
+            afficherVue();
+        }
+
+        function libelleLieu(item) {
+            if (item.lieuType === 'vault') return '🏦 Coffre';
+            if (item.lieuType === 'postmaster') return '📬 Commis';
+            const cls = mapPersos[item.charIdOwner]?.classeNom || 'Perso';
+            return item.lieuType === 'equipped' ? `⚡ Équipé (${cls})` : `🎒 Sac (${cls})`;
+        }
+
+        function mettreAJourComparateurUI() {
+            const items = comparateurKeys.map(k => registreObjets[k]).filter(Boolean);
+            document.getElementById('count-compare').textContent = items.length;
+            document.getElementById('compareHeaderCount').textContent = items.length;
+            document.getElementById('btnOpenCompare').classList.toggle('has-items', items.length > 0);
+
+            const conteneur = document.getElementById('compareContent');
+            if (items.length === 0) {
+                conteneur.innerHTML = `<p style="color:#64748b; font-size:0.86rem; margin:10px 0;">Clique sur n'importe quelle arme ou armure puis sur <b>⚖️ + Comparer</b> (ou <b>⚖️ Comparer les copies</b>) pour comparer leurs statistiques et perks côte-à-côte.</p>`;
+                return;
+            }
+
+            // Construire l'union ordonnée des statistiques présentes sur les objets comparés
+            const statsMetaMap = new Map();
+            items.forEach(it => {
+                (it.stats || []).forEach(s => {
+                    if (!statsMetaMap.has(s.hash)) {
+                        statsMetaMap.set(s.hash, { hash: s.hash, nom: s.nom, isBar: s.isBar, isTotal: s.isTotal });
+                    }
+                });
+            });
+
+            const ordreGlobal = [...STATS_ARMES_ORDRE, ...STATS_ARMURES_ORDRE, 0];
+            const toutesStats = Array.from(statsMetaMap.values()).sort((a, b) => {
+                const ia = ordreGlobal.indexOf(a.hash);
+                const ib = ordreGlobal.indexOf(b.hash);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+
+            // Calculer min et max par stat si >= 2 objets
+            const bornesStats = {};
+            toutesStats.forEach(st => {
+                const valeurs = items
+                    .map(it => (it.stats || []).find(x => x.hash === st.hash)?.val)
+                    .filter(v => v !== undefined);
+                if (valeurs.length >= 2) {
+                    const min = Math.min(...valeurs);
+                    const max = Math.max(...valeurs);
+                    if (min !== max) {
+                        const basMeilleur = STATS_BAS_MEILLEUR.has(st.hash);
+                        bornesStats[st.hash] = { best: basMeilleur ? min : max, worst: basMeilleur ? max : min };
+                    }
+                }
+            });
+
+            const nomPersoActif = mapPersos[persoActifId]?.classeNom || 'Perso';
+
+            conteneur.innerHTML = items.map(item => {
+                const statsRowsHtml = toutesStats.map(st => {
+                    const found = (item.stats || []).find(x => x.hash === st.hash);
+                    const val = found ? found.val : null;
+                    let clsDiff = '';
+                    if (val !== null && bornesStats[st.hash]) {
+                        if (val === bornesStats[st.hash].best) clsDiff = 'cmp-best';
+                        else if (val === bornesStats[st.hash].worst) clsDiff = 'cmp-worst';
+                    }
+                    return `
+                        <div class="cmp-stat-row ${clsDiff}">
+                            <span style="color:${st.isTotal ? 'var(--gold)' : '#94a3b8'}; font-weight:${st.isTotal ? '700' : '400'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${st.nom}</span>
+                            ${st.isBar && val !== null
+                                ? `<div class="cmp-stat-bar"><div class="cmp-stat-fill" style="width:${Math.min(100, val)}%;"></div></div>`
+                                : `<span></span>`}
+                            <span class="cmp-stat-val">${val !== null ? val : '—'}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                const perksHtml = (item.perks || []).length > 0
+                    ? item.perks.map(p => `
+                        <div class="cmp-perk-row" title="${(p.desc || '').replace(/"/g, '&quot;')}">
+                            ${p.icone ? `<img src="${p.icone}">` : ''}
+                            <span>${p.nom}</span>
+                        </div>
+                    `).join('')
+                    : `<small style="color:#475569; font-size:0.74rem;">Aucun perk actif affiché</small>`;
+
+                let actionsHtml = '';
+                if (item.itemInstanceId && item.lieuType !== 'postmaster') {
+                    actionsHtml = `
+                        <div class="compare-col-actions">
+                            ${item.lieuType !== 'equipped' ? `<button class="btn-green" onclick="executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', '${item.charIdOwner || ''}')">⚡ Équiper</button>` : ''}
+                            ${item.lieuType === 'vault' ? `<button onclick="executerMouvement('inventory', ${item.itemHash}, '${item.itemInstanceId}', 'vault', '')">🎒 Sac ${nomPersoActif}</button>` : ''}
+                            ${item.lieuType === 'inventory' ? `<button onclick="executerMouvement('vault', ${item.itemHash}, '${item.itemInstanceId}', 'inventory', '${item.charIdOwner || ''}')">🏦 Coffre</button>` : ''}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="compare-col tier-${item.tier}">
+                        <div class="compare-col-head">
+                            <img src="${item.icone}">
+                            <div class="compare-col-title">
+                                <h4 title="${item.nom}">${item.nom}</h4>
+                                <small>${item.typeNom} ${item.power ? `• <b style="color:var(--gold);">✦ ${item.power}</b>` : ''}</small>
+                                <small style="color:#7dd3fc;">${libelleLieu(item)}</small>
+                            </div>
+                            <button class="compare-remove" onclick="retirerDuComparateur('${item.ukey}')" title="Retirer">✕</button>
+                        </div>
+                        <div class="compare-stats-list">${statsRowsHtml || '<small style="color:#64748b;">Aucune stat</small>'}</div>
+                        <div class="compare-perks-list">${perksHtml}</div>
+                        ${actionsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function mettreAJourCompteurJalons() {
+            const p = mapPersos[persoActifId];
+            const restants = (p?.milestones || []).filter(m => !m.possede).length;
+            document.getElementById('count-milestones').textContent = restants;
         }
 
         function afficherStatsGlobalesGardien() {
@@ -1277,15 +1859,27 @@
             let actionsHtml = '';
             if (inspecteurVerrouille) {
                 const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
+                const estDansComp = comparateurKeys.includes(item.ukey);
+                const nbCopies = compteDoublons[item.itemHash] || 0;
+
+                const btnComparer = (item.stats && item.stats.length > 0)
+                    ? `<button class="btn-compare" onclick="ajouterAuComparateur('${item.ukey}', true)">${estDansComp ? '⚖️ Voir Comparateur' : '⚖️ + Comparer'}</button>`
+                    : '';
+                const btnCompCopies = (nbCopies > 1 && item.itemInstanceId)
+                    ? `<button class="btn-compare" onclick="comparerDoublonsObjet(${item.itemHash})">⚖️ Comparer ×${nbCopies} copies</button>`
+                    : (item.categorie === 'weapon' && item.itemInstanceId
+                        ? `<button class="btn-compare" onclick="comparerMemeTypeObjet('${item.ukey}')">⚖️ Tous les ${item.typeNom}s</button>`
+                        : '');
+
                 if (item.lieuType === 'postmaster') {
                     actionsHtml = `
                         <div class="insp-actions">
                             <button class="btn-green" onclick="recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})">📥 Récupérer</button>
+                            ${btnComparer}
                             <button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button>
                         </div>
                     `;
                 } else if (item.itemInstanceId) {
-                    // Boutons de transfert direct vers les autres personnages
                     let autresPersosHtml = '';
                     if (item.lieuType === 'inventory' || item.lieuType === 'vault') {
                         autresPersosHtml = Object.entries(mapPersos)
@@ -1296,15 +1890,17 @@
 
                     actionsHtml = `
                         <div class="insp-actions">
-                            ${item.lieuType !== 'equipped' ? `<button class="btn-green" onclick="executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}')">⚡ Équiper (${nomPerso})</button>` : ''}
-                            ${item.lieuType === 'vault' ? `<button onclick="executerMouvement('inventory', ${item.itemHash}, '${item.itemInstanceId}', 'vault')">🎒 Sac (${nomPerso})</button>` : ''}
-                            ${item.lieuType === 'inventory' ? `<button onclick="executerMouvement('vault', ${item.itemHash}, '${item.itemInstanceId}', 'inventory')">🏦 Coffre</button>` : ''}
+                            ${item.lieuType !== 'equipped' ? `<button class="btn-green" onclick="executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', '${item.charIdOwner || ''}')">⚡ Équiper (${nomPerso})</button>` : ''}
+                            ${item.lieuType === 'vault' ? `<button onclick="executerMouvement('inventory', ${item.itemHash}, '${item.itemInstanceId}', 'vault', '')">🎒 Sac (${nomPerso})</button>` : ''}
+                            ${item.lieuType === 'inventory' ? `<button onclick="executerMouvement('vault', ${item.itemHash}, '${item.itemInstanceId}', 'inventory', '${item.charIdOwner || ''}')">🏦 Coffre</button>` : ''}
                             ${autresPersosHtml}
+                            ${btnComparer}
+                            ${btnCompCopies}
                             <button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button>
                         </div>
                     `;
                 } else {
-                    actionsHtml = `<div class="insp-actions"><button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button></div>`;
+                    actionsHtml = `<div class="insp-actions">${btnComparer}<button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button></div>`;
                 }
             }
 
@@ -1355,6 +1951,7 @@
         function selectionnerPerso(charId) {
             persoActifId = charId;
             afficherBarrePersos();
+            mettreAJourCompteurJalons();
             if (ongletActif === 'vendors') chargerMarchandsPerso(charId);
             else afficherVue();
         }
@@ -1378,12 +1975,13 @@
 
         function changerOnglet(onglet) {
             ongletActif = onglet;
-            ['loadout', 'crafting', 'catalysts', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
+            ['loadout', 'milestones', 'crafting', 'catalysts', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
                 document.getElementById('btn-' + t).classList.toggle('active', t === onglet);
             });
             document.getElementById('btnFiltreDoublons').style.display = onglet === 'loadout' ? 'inline-block' : 'none';
             document.getElementById('filtreMarchand').style.display = onglet === 'vendors' ? 'inline-block' : 'none';
-            document.getElementById('filtreEtat').style.display = ['crafting', 'catalysts', 'exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
+            document.getElementById('filtreEtat').style.display = ['milestones', 'crafting', 'catalysts', 'exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
+            document.getElementById('filtreCategorie').style.display = onglet === 'milestones' ? 'none' : 'inline-block';
 
             if (onglet === 'vendors' && Object.keys(groupesMarchands).length === 0 && persoActifId) {
                 chargerMarchandsPerso(persoActifId);
@@ -1456,6 +2054,9 @@
                         totalObjets++;
                     }
 
+                    // Trier les armes des marchands par type d'arme (Revolver, Pistolet, etc.)
+                    armes.sort((a, b) => a.typeNom.localeCompare(b.typeNom, 'fr') || a.nom.localeCompare(b.nom, 'fr'));
+
                     if (armes.length + armures.length + autres.length > 0) {
                         groupesMarchands[nomMarchand] = { nom: nomMarchand, icone: iconeMarchand, desc: descMarchand, armes, armures, autres };
                     }
@@ -1473,7 +2074,6 @@
             } catch (e) { setStatus("Erreur Marchands : " + e.message); }
         }
 
-        // --- GLISSER-DÉPOSER (Y COMPRIS DIRECTEMENT VERS UN AUTRE PERSONNAGE) ---
         function onDragStartItem(ev, itemHash, itemInstanceId, lieuType, bucketHash, charIdOwner) {
             fermerInspecteur(true);
             objetGlisse = {
@@ -1516,37 +2116,25 @@
                     throw new Error("Déséquipe d'abord cet objet avant de l'envoyer sur un autre personnage.");
                 }
 
-                // Étape 1 : Si l'objet est dans le sac d'un personnage, passage automatique par le Coffre
                 if (lieuActuel === 'inventory' && sourceCharId) {
                     setStatus(`Transfert vers ${nomCible} (1/2 — Passage par le Coffre)...`);
                     const toVault = await appelActionBungie('TransferItem', {
-                        itemReferenceHash: itemHash,
-                        stackSize: 1,
-                        transferToVault: true,
-                        itemId: itemInstanceId,
-                        characterId: sourceCharId,
-                        membershipType: mType
+                        itemReferenceHash: itemHash, stackSize: 1, transferToVault: true,
+                        itemId: itemInstanceId, characterId: sourceCharId, membershipType: mType
                     });
                     if (toVault.ErrorCode !== 1) throw new Error(toVault.Message);
                 }
 
-                // Étape 2 : Envoi du Coffre vers le personnage cible
                 setStatus(`Transfert vers ${nomCible} (2/2 — Livraison dans le Sac)...`);
                 const toTarget = await appelActionBungie('TransferItem', {
-                    itemReferenceHash: itemHash,
-                    stackSize: 1,
-                    transferToVault: false,
-                    itemId: itemInstanceId,
-                    characterId: targetCharId,
-                    membershipType: mType
+                    itemReferenceHash: itemHash, stackSize: 1, transferToVault: false,
+                    itemId: itemInstanceId, characterId: targetCharId, membershipType: mType
                 });
                 if (toTarget.ErrorCode !== 1) throw new Error(toTarget.Message);
 
                 setStatus(`Objet transféré directement dans le Sac de ton ${nomCible} !`);
                 await lancerAnalyse();
-            } catch (e) {
-                setStatus("Refus Bungie : " + e.message);
-            }
+            } catch (e) { setStatus("Refus Bungie : " + e.message); }
         }
 
         async function onDropZone(ev, cibleMode, targetBucketHash) {
@@ -1558,7 +2146,7 @@
                 return;
             }
             if (objetGlisse.lieuType === cibleMode) return;
-            await executerMouvement(cibleMode, objetGlisse.itemHash, objetGlisse.itemInstanceId, objetGlisse.lieuType);
+            await executerMouvement(cibleMode, objetGlisse.itemHash, objetGlisse.itemInstanceId, objetGlisse.lieuType, objetGlisse.charIdOwner);
             objetGlisse = null;
         }
 
@@ -1572,16 +2160,17 @@
             return await resp.json();
         }
 
-        async function executerMouvement(cibleMode, itemHash, itemInstanceId, lieuActuel) {
+        async function executerMouvement(cibleMode, itemHash, itemInstanceId, lieuActuel, sourceCharId = '') {
             fermerInspecteur(true);
             const mType = joueurInfo.membershipType;
+            const ownerChar = sourceCharId || persoActifId;
             try {
                 setStatus("Transfert en cours...");
                 if (cibleMode === 'vault') {
                     if (lieuActuel === 'equipped') throw new Error("Équipe d'abord un autre objet avant de ranger celui-ci au Coffre.");
                     const res = await appelActionBungie('TransferItem', {
                         itemReferenceHash: itemHash, stackSize: 1, transferToVault: true,
-                        itemId: itemInstanceId, characterId: persoActifId, membershipType: mType
+                        itemId: itemInstanceId, characterId: ownerChar, membershipType: mType
                     });
                     if (res.ErrorCode !== 1) throw new Error(res.Message);
                     setStatus("Objet rangé dans le Coffre !");
@@ -1595,6 +2184,14 @@
                         setStatus(`Objet transféré dans le sac de ton ${mapPersos[persoActifId].classeNom} !`);
                     }
                 } else if (cibleMode === 'equipped') {
+                    if (lieuActuel === 'inventory' && sourceCharId && sourceCharId !== persoActifId) {
+                        const stepVault = await appelActionBungie('TransferItem', {
+                            itemReferenceHash: itemHash, stackSize: 1, transferToVault: true,
+                            itemId: itemInstanceId, characterId: sourceCharId, membershipType: mType
+                        });
+                        if (stepVault.ErrorCode !== 1) throw new Error(stepVault.Message);
+                        lieuActuel = 'vault';
+                    }
                     if (lieuActuel === 'vault') {
                         const pull = await appelActionBungie('TransferItem', {
                             itemReferenceHash: itemHash, stackSize: 1, transferToVault: false,
@@ -1626,6 +2223,7 @@
             `).join('');
 
             const nbExemplaires = compteDoublons[item.itemHash] || 1;
+            const inCmp = comparateurKeys.includes(item.ukey) ? 'in-compare' : '';
 
             return `
                 <div class="equipped-detail-card"
@@ -1637,7 +2235,7 @@
                      onmouseleave="fermerInspecteur(false)"
                      onclick="afficherInspecteur(event, '${item.ukey}', true)">
                     <div class="eq-top">
-                        <div class="gear-tile tier-${item.tier}" style="width:48px; height:48px;">
+                        <div class="gear-tile tier-${item.tier} ${inCmp}" style="width:48px; height:48px;">
                             <img src="${item.icone}" loading="lazy">
                             ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
                             ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
@@ -1655,8 +2253,9 @@
 
         function rendreTuile(item) {
             const nbExemplaires = compteDoublons[item.itemHash] || 1;
+            const inCmp = comparateurKeys.includes(item.ukey) ? 'in-compare' : '';
             return `
-                <div class="gear-tile tier-${item.tier}"
+                <div class="gear-tile tier-${item.tier} ${inCmp}"
                      data-ukey="${item.ukey}"
                      draggable="${item.lieuType !== 'postmaster'}"
                      ondragstart="onDragStartItem(event, ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', ${item.bucketHash}, '${item.charIdOwner || ''}')"
@@ -1664,10 +2263,84 @@
                      onmousemove="bougerInspecteur(event)"
                      onmouseleave="fermerInspecteur(false)"
                      onclick="afficherInspecteur(event, '${item.ukey}', true)"
-                     ondblclick="${item.lieuType === 'postmaster' ? `recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})` : `executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}')`}">
+                     ondblclick="${item.lieuType === 'postmaster' ? `recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})` : `executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', '${item.charIdOwner || ''}')`}">
                     <img src="${item.icone}" loading="lazy">
                     ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
                     ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
+                </div>
+            `;
+        }
+
+        // Regroupement visuel des armes par type (Revolver, Pistolet, Fusil automatique, etc.)
+        function regrouperArmesParType(items, mode) {
+            const groupes = {};
+            items.forEach(item => {
+                const cle = item.typeNom || 'Autre';
+                if (!groupes[cle]) groupes[cle] = [];
+                groupes[cle].push(item);
+            });
+
+            const typesTries = Object.keys(groupes).sort((a, b) => a.localeCompare(b, 'fr'));
+            return typesTries.map(typeNom => {
+                const arr = groupes[typeNom];
+                if (filtreDoublonsActif) arr.sort((a, b) => a.nom.localeCompare(b.nom, 'fr') || (b.power || 0) - (a.power || 0));
+                else arr.sort((a, b) => (b.power || 0) - (a.power || 0) || a.nom.localeCompare(b.nom, 'fr'));
+
+                if (mode === 'bag') {
+                    return `
+                        <div class="bag-type-cluster">
+                            <span class="bag-type-label">${typeNom}</span>
+                            <div class="bag-type-tiles">${arr.map(rendreTuile).join('')}</div>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="vault-type-group">
+                        <div class="vault-type-label">${typeNom} <span>(${arr.length})</span></div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">${arr.map(rendreTuile).join('')}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function rendreCarteJalon(m) {
+            const phasesHtml = m.phases.length > 0 ? `
+                <div class="phases-row" title="Rencontres validées cette semaine">
+                    ${m.phases.map(p => `<span class="phase-dot ${p.complete ? 'done' : ''}"></span>`).join('')}
+                    <small style="color:#94a3b8; font-size:0.7rem;">${m.phases.filter(p => p.complete).length} / ${m.phases.length} étapes</small>
+                </div>
+            ` : '';
+
+            const objsHtml = m.objectifs.slice(0, 2).map(o => {
+                const pct = o.complete ? 100 : Math.min(100, Math.round((o.progress / Math.max(1, o.max)) * 100));
+                return `
+                    <div class="milestone-obj">
+                        <div style="display:flex; justify-content:space-between; gap:6px;">
+                            <span>${o.texte}</span>
+                            <b>${o.progress} / ${o.max}</b>
+                        </div>
+                        <div class="craft-prog-bar">
+                            <div class="craft-prog-fill ${o.complete ? 'done' : 'blue'}" style="width:${pct}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const badgeRecompenseClass = m.estPrestige ? 'badge-pinnacle' : (m.estPuissant ? 'badge-powerful' : '');
+
+            return `
+                <div class="milestone-card ${m.possede ? 'completed' : (m.estPrestige ? 'pinnacle' : '')}">
+                    <img class="milestone-icon" src="${m.icone}" loading="lazy">
+                    <div class="item-info">
+                        <h4 title="${m.nom}">${m.nom}</h4>
+                        <p>${(m.sousTitre || "").substring(0, 95)}</p>
+                        <div>
+                            <span class="badge ${m.possede ? 'badge-done' : ''}">${m.possede ? '✓ Complété' : 'À faire'}</span>
+                            <span class="badge ${badgeRecompenseClass}">${m.recompense}</span>
+                        </div>
+                        ${phasesHtml}
+                        ${objsHtml}
+                    </div>
                 </div>
             `;
         }
@@ -1685,14 +2358,17 @@
 
             const matchFiltres = (item) => {
                 if (ongletActif === 'loadout' && filtreDoublonsActif && (compteDoublons[item.itemHash] || 0) <= 1) return false;
-                if (filtreCat === 'weapon' && item.categorie !== 'weapon') return false;
-                if (filtreCat === 'armor' && item.categorie !== 'armor') return false;
-                if (filtreCat === 'Exotic' && item.tier !== 'Exotic') return false;
+                if (ongletActif !== 'milestones') {
+                    if (filtreCat === 'weapon' && item.categorie !== 'weapon') return false;
+                    if (filtreCat === 'armor' && item.categorie !== 'armor') return false;
+                    if (filtreCat === 'Exotic' && item.tier !== 'Exotic') return false;
+                }
                 if (recherche) {
                     const mNom = item.nom.toLowerCase().includes(recherche);
+                    const mType = (item.typeNom || "").toLowerCase().includes(recherche);
                     const mPerk = item.perks && item.perks.some(p => p.nom.toLowerCase().includes(recherche));
-                    const mSource = item.source && item.source.toLowerCase().includes(recherche);
-                    if (!mNom && !mPerk && !mSource) return false;
+                    const mSource = (item.source || item.sousTitre || item.recompense || "").toLowerCase().includes(recherche);
+                    if (!mNom && !mType && !mPerk && !mSource) return false;
                 }
                 return true;
             };
@@ -1712,6 +2388,10 @@
                     const eqItem = p.equipped.find(i => i.bucketHash === slot.hash && matchFiltres(i));
                     const bagItems = p.inventory.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
 
+                    const bagContentHtml = bagItems.length === 0
+                        ? '<small style="color:#334155; font-size:0.74rem;">Vide</small>'
+                        : (slot.type === 'weapon' ? regrouperArmesParType(bagItems, 'bag') : bagItems.map(rendreTuile).join(''));
+
                     return `
                         <div class="slot-row">
                             <div class="slot-label">${slot.nom}</div>
@@ -1725,7 +2405,7 @@
                                  ondragover="onDragOverZone(event)"
                                  ondragleave="onDragLeaveZone(event)"
                                  ondrop="onDropZone(event, 'inventory', ${slot.hash})">
-                                ${bagItems.map(rendreTuile).join('') || '<small style="color:#334155; font-size:0.74rem;">Vide</small>'}
+                                ${bagContentHtml}
                             </div>
                         </div>
                     `;
@@ -1738,8 +2418,17 @@
                 }).map(slot => {
                     const itemsSlot = listeCoffre.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
                     if (itemsSlot.length === 0) return '';
-                    // Quand le filtre doublons est actif, on trie par nom pour regrouper les copies côte à côte
-                    if (filtreDoublonsActif) itemsSlot.sort((a, b) => a.nom.localeCompare(b.nom));
+
+                    if (slot.type === 'weapon') {
+                        return `
+                            <div class="vault-slot-group">
+                                <h5>${slot.nom} (${itemsSlot.length})</h5>
+                                ${regrouperArmesParType(itemsSlot, 'vault')}
+                            </div>
+                        `;
+                    }
+
+                    if (filtreDoublonsActif) itemsSlot.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
                     return `
                         <div class="vault-slot-group">
                             <h5>${slot.nom} (${itemsSlot.length})</h5>
@@ -1771,6 +2460,54 @@
                             ${coffreGroupesHtml || '<p style="color:#64748b; font-size:0.85rem;">Aucun objet pour ce filtre.</p>'}
                         </div>
                     </div>
+                `;
+                return;
+            }
+
+            if (ongletActif === 'milestones') {
+                const p = mapPersos[persoActifId];
+                if (!p) {
+                    view.innerHTML = `<p style="color:#64748b;">Connecte-toi pour voir tes jalons hebdomadaires.</p>`;
+                    return;
+                }
+
+                const liste = (p.milestones || []).filter(m => {
+                    if (filtreEtat === 'missing' && m.possede) return false;
+                    if (filtreEtat === 'owned' && !m.possede) return false;
+                    return matchFiltres(m);
+                });
+
+                const nbRestants = (p.milestones || []).filter(m => !m.possede).length;
+                const nbTotal = (p.milestones || []).length;
+
+                const raidsDonjons = liste.filter(m => m.groupe === 'raid_dungeon');
+                const rituels = liste.filter(m => m.groupe === 'ritual');
+                const autres = liste.filter(m => m.groupe === 'weekly');
+
+                const blocSection = (titre, arr) => {
+                    if (arr.length === 0) return '';
+                    const todo = arr.filter(x => !x.possede).length;
+                    return `
+                        <div class="milestone-group-title">
+                            <span>${titre}</span>
+                            <small style="color:#94a3b8;">${todo} à faire / ${arr.length}</small>
+                        </div>
+                        <div class="grid">${arr.map(rendreCarteJalon).join('')}</div>
+                    `;
+                };
+
+                view.innerHTML = `
+                    <div class="reset-banner">
+                        <div>
+                            <h3 style="margin:0; font-size:1.05rem; color:var(--text);">📅 Activités de la semaine — ${p.classeNom} (✦ ${p.light})</h3>
+                            <small style="color:#94a3b8;">${nbRestants} jalons restants sur ${nbTotal} avant la réinitialisation du mardi</small>
+                        </div>
+                        <div class="reset-timer">⏳ Reset dans ${calculerCompteAReboursReset()}</div>
+                    </div>
+                    ${blocSection('☠️ Raids & Donjons', raidsDonjons)}
+                    ${blocSection('🛡️ Nuit Noire, Avant-Garde, Épreuve & Gambit', rituels)}
+                    ${blocSection('⭐ Missions Exotiques & Autres Défis Hebdomadaires', autres)}
+                    ${liste.length === 0 ? '<p style="color:#64748b;">Aucun jalon correspondant à ce filtre.</p>' : ''}
                 `;
                 return;
             }
@@ -1853,7 +2590,6 @@
                 return;
             }
 
-            // VUE CATALYSEURS EXOTIQUES
             if (ongletActif === 'catalysts') {
                 const cats = listeCatalyseurs.filter(item => {
                     if (filtreEtat === 'missing' && item.possede) return false;
