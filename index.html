@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Destiny 2 — Command Center v12.0</title>
+    <title>D2 Breaker</title>
     <style>
         :root {
             --bg-dark: #06090e;
@@ -15,6 +15,7 @@
             --purple: #a855f7;
             --blue: #3b82f6;
             --green: #22c55e;
+            --red: #ef4444;
             --red-deepsight: #ea580c;
             --text: #f1f5f9;
             --muted: #94a3b8;
@@ -69,6 +70,8 @@
         button.btn-ghost:hover { color: white; border-color: var(--muted); }
         button.btn-green { background: #15803d; color: #fff; }
         button.btn-green:hover { background: #16a34a; }
+        button.btn-danger { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+        button.btn-danger:hover { background: #991b1b; }
         button.btn-compare { background: #1e293b; border: 1px solid var(--accent); color: var(--accent); }
         button.btn-compare:hover { background: #0c4a6e; color: #fff; }
         button.btn-compare.has-items { background: #0284c7; color: #fff; border-color: #7dd3fc; }
@@ -126,7 +129,7 @@
         .char-meta span { color: var(--gold); font-weight: 700; font-size: 0.8rem; }
 
         .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-        .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 13px; }
+        .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 12px; }
         .tab-btn.active { border-color: var(--accent); color: var(--accent); background: #132036; }
 
         .guardian-stats-panel {
@@ -202,6 +205,149 @@
             color: var(--accent);
             border-radius: 4px;
             margin-bottom: 14px;
+        }
+
+        /* --- TAGS SUR LES TUILES, INSPECTEUR ET COMPARATEUR --- */
+        .tile-tag-badge {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            border: 1px solid rgba(255,255,255,0.45);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.75);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .tag-selector-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #1e293b;
+        }
+        .tag-btn {
+            background: #0c121e;
+            border: 1px solid #26334d;
+            color: #94a3b8;
+            padding: 5px 4px;
+            font-size: 0.68rem;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+        .tag-btn:hover { border-color: var(--accent); color: #fff; background: #132036; }
+        .tag-btn.active-godroll { background: #422006; border-color: var(--gold); color: #fde047; }
+        .tag-btn.active-keep { background: #0c4a6e; border-color: var(--accent); color: #bae6fd; }
+        .tag-btn.active-infuse { background: #3b0764; border-color: var(--purple); color: #e9d5ff; }
+        .tag-btn.active-junk { background: #450a0a; border-color: var(--red); color: #fecaca; }
+
+        /* --- OPTIMISEUR D'ARMURES --- */
+        .opt-controls {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+        }
+        .opt-top-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .opt-stats-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .opt-stat-box {
+            background: #090d14;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .opt-stat-box label { font-size: 0.8rem; font-weight: 700; color: #e2e8f0; }
+        .opt-stat-box select { padding: 5px 8px; font-size: 0.8rem; min-width: 78px; }
+        .opt-options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .opt-check {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            user-select: none;
+        }
+        .opt-results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .opt-set-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: grid;
+            grid-template-columns: 1.25fr 1fr auto;
+            gap: 16px;
+            align-items: center;
+        }
+        .opt-set-card.perfect { border-left-color: var(--gold); }
+        @media (max-width: 1080px) { .opt-set-card { grid-template-columns: 1fr; } }
+        .opt-set-stats {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+        @media (max-width: 650px) { .opt-set-stats { grid-template-columns: repeat(3, 1fr); } }
+        .opt-stat-pill {
+            background: #090d14;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 5px 6px;
+            text-align: center;
+        }
+        .opt-stat-pill.t10 { border-color: var(--gold); background: rgba(234,179,8,0.1); }
+        .opt-stat-pill.target-ok { border-color: var(--green); }
+        .opt-stat-pill small { display: block; font-size: 0.64rem; color: var(--muted); text-transform: uppercase; }
+        .opt-stat-pill b { font-size: 0.88rem; color: var(--text); }
+        .opt-stat-pill.t10 b { color: var(--gold); }
+        .opt-mods-note {
+            margin-top: 8px;
+            font-size: 0.76rem;
+            color: #7dd3fc;
+            background: #091322;
+            border: 1px solid #1e3a5f;
+            border-radius: 5px;
+            padding: 5px 9px;
+            display: inline-block;
         }
 
         /* --- VUE JALONS & ACTIVITÉS DE LA SEMAINE --- */
@@ -304,7 +450,6 @@
         .drop-zone.equipped-zone { border: 1px solid #283650; background: #0b111c; padding: 8px 10px; align-items: center; }
         .drop-zone.drag-over { border-color: var(--gold) !important; background: rgba(234, 179, 8, 0.12) !important; }
 
-        /* Groupes par type d'arme dans le Sac & le Coffre */
         .bag-type-cluster {
             background: #0d131f;
             border: 1px solid #1e293b;
@@ -314,37 +459,12 @@
             flex-direction: column;
             gap: 5px;
         }
-        .bag-type-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #94a3b8;
-            letter-spacing: 0.3px;
-        }
-        .bag-type-tiles {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+        .bag-type-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.3px; }
+        .bag-type-tiles { display: flex; flex-wrap: wrap; gap: 6px; }
 
-        .vault-type-group {
-            margin-bottom: 10px;
-            padding-left: 6px;
-            border-left: 2px solid #1e293b;
-        }
-        .vault-type-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #94a3b8;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .vault-type-label span {
-            color: #475569;
-            font-weight: 600;
-        }
+        .vault-type-group { margin-bottom: 10px; padding-left: 6px; border-left: 2px solid #1e293b; }
+        .vault-type-label { font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+        .vault-type-label span { color: #475569; font-weight: 600; }
 
         .equipped-detail-card { width: 100%; cursor: grab; user-select: none; }
         .eq-top { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
@@ -443,11 +563,10 @@
         .vault-slot-group { margin-bottom: 16px; }
         .vault-slot-group h5 { margin: 0 0 8px 0; font-size: 0.8rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
 
-        /* --- INSPECTEUR FLOTTANT --- */
         #itemInspector {
             position: fixed;
             z-index: 9999;
-            width: 365px;
+            width: 375px;
             background: #0b0f17;
             border: 1px solid #38bdf8;
             border-radius: 10px;
@@ -479,7 +598,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 12px;
+            margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #1e293b;
         }
@@ -497,7 +616,7 @@
             box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.9);
             display: none;
             flex-direction: column;
-            max-height: 78vh;
+            max-height: 80vh;
         }
         #compareDrawer.open { display: flex; }
         .compare-header {
@@ -519,8 +638,8 @@
             align-items: stretch;
         }
         .compare-col {
-            min-width: 255px;
-            max-width: 275px;
+            min-width: 260px;
+            max-width: 280px;
             flex-shrink: 0;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -590,6 +709,14 @@
             color: #e2e8f0;
         }
         .cmp-perk-row img { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
+        .compare-col-tags {
+            padding: 6px 10px;
+            background: #0a0f18;
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
         .compare-col-actions {
             padding: 8px 10px;
             background: #0d131f;
@@ -671,7 +798,8 @@
         <div id="charBar" class="char-bar"></div>
         <div class="tabs">
             <button class="tab-btn active" id="btn-loadout" onclick="changerOnglet('loadout')">Équipement & Coffre</button>
-            <button class="tab-btn" id="btn-milestones" onclick="changerOnglet('milestones')">📅 Jalons & Semaine (<span id="count-milestones">0</span>)</button>
+            <button class="tab-btn" id="btn-optimizer" onclick="changerOnglet('optimizer')">🛡️ Optimiseur</button>
+            <button class="tab-btn" id="btn-milestones" onclick="changerOnglet('milestones')">📅 Jalons (<span id="count-milestones">0</span>)</button>
             <button class="tab-btn" id="btn-crafting" onclick="changerOnglet('crafting')">🟥 Modèles (<span id="count-crafting">0</span>)</button>
             <button class="tab-btn" id="btn-catalysts" onclick="changerOnglet('catalysts')">✨ Catalyseurs (<span id="count-catalysts">0</span>)</button>
             <button class="tab-btn" id="btn-vendors" onclick="changerOnglet('vendors')">Marchands (<span id="count-vendors">0</span>)</button>
@@ -694,8 +822,17 @@
 
     <div id="postmasterBox" class="postmaster-box" style="display:none;"></div>
 
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+    <div id="globalFiltersBar" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center;">
         <button id="btnFiltreDoublons" class="btn-toggle" onclick="basculerFiltreDoublons()">🔁 Doublons (<span id="count-dupes">0</span>)</button>
+        <select id="filtreTag" onchange="afficherVue()">
+            <option value="all">Tag : Tous</option>
+            <option value="godroll">⭐ God Roll</option>
+            <option value="keep">🔒 À garder</option>
+            <option value="infuse">⚡ À infuser</option>
+            <option value="junk">🗑️ À démanteler</option>
+            <option value="untagged">Sans tag</option>
+        </select>
+        <button id="btnPullJunk" class="btn-danger" style="display:none;" onclick="rapatrierObjetsADemanteler()">🎒 Rapatrier les 🗑️ du Coffre</button>
         <select id="filtreMarchand" onchange="afficherVue()" style="display:none;"></select>
         <select id="filtreEtat" onchange="afficherVue()" style="display:none;">
             <option value="all">État : Tout afficher</option>
@@ -708,7 +845,7 @@
             <option value="armor">Armures</option>
             <option value="Exotic">Exotiques</option>
         </select>
-        <input type="text" id="rechercheTexte" placeholder="Rechercher..." oninput="afficherVue()" style="flex:1;">
+        <input type="text" id="rechercheTexte" placeholder="Rechercher..." oninput="afficherVue()" style="flex:1; min-width:160px;">
     </div>
 
     <div id="mainView"></div>
@@ -745,27 +882,29 @@
             { hash: 1585787867, nom: "Objet de Classe", type: "armor" }
         ];
         const BUCKETS_CONNUS = new Set(SLOTS_DESTINY.map(s => s.hash));
+        const ARMOR_SLOTS_4 = [3448274439, 3551918588, 14239492, 20886954];
+        const BUCKET_CLASS_ITEM = 1585787867;
+
+        const TAGS_CONFIG = {
+            godroll: { id: 'godroll', icon: '⭐', label: 'God Roll',    bg: '#422006', border: '#eab308' },
+            keep:    { id: 'keep',    icon: '🔒', label: 'À garder',    bg: '#0c4a6e', border: '#38bdf8' },
+            infuse:  { id: 'infuse',  icon: '⚡', label: 'Infuser',     bg: '#3b0764', border: '#a855f7' },
+            junk:    { id: 'junk',    icon: '🗑️', label: 'Démanteler',  bg: '#450a0a', border: '#ef4444' }
+        };
 
         const STATS_ARMES_ORDRE = [
-            4043523819, // Impact
-            1240592695, // Portée
-            155624089,  // Stabilité
-            943549884,  // Maniement
-            4188031367, // Rechargement
-            4284893193, // Cadence (CPM)
-            2961396640, // Temps de charge (plus bas = mieux)
-            447667954,  // Temps de tension (plus bas = mieux)
-            3871231066  // Chargeur
+            4043523819, 1240592695, 155624089, 943549884,
+            4188031367, 4284893193, 2961396640, 447667954, 3871231066
         ];
         const STATS_BAS_MEILLEUR = new Set([2961396640, 447667954]);
 
         const STATS_GARDIEN_6 = [
-            { hash: 2996146975, nom: "Mobilité" },
-            { hash: 392767087,  nom: "Résistance" },
-            { hash: 1943323491, nom: "Récupération" },
-            { hash: 1735777505, nom: "Discipline" },
-            { hash: 144602215,  nom: "Intelligence" },
-            { hash: 4244567218, nom: "Force" }
+            { hash: 2996146975, nom: "Mobilité",     court: "Mob" },
+            { hash: 392767087,  nom: "Résistance",   court: "Rés" },
+            { hash: 1943323491, nom: "Récupération", court: "Réc" },
+            { hash: 1735777505, nom: "Discipline",   court: "Dis" },
+            { hash: 144602215,  nom: "Intelligence", court: "Int" },
+            { hash: 4244567218, nom: "Force",        court: "For" }
         ];
         const STATS_ARMURES_ORDRE = STATS_GARDIEN_6.map(s => s.hash);
         const classesNom = { 0: 'Titan', 1: 'Chasseur', 2: 'Arcaniste' };
@@ -786,12 +925,26 @@
         let listeTriomphes = [];
         let registreObjets = {};
         let comparateurKeys = [];
+        let itemTags = {};
         let objetGlisse = null;
         let inspecteurVerrouille = false;
+        let inspecteurUkeyActif = null;
+
+        // État de l'Optimiseur d'armures
+        let optState = {
+            exotic: 'any',
+            targets: [0, 10, 0, 10, 0, 0], // Défaut : Résistance T10, Discipline T10
+            assumeMW: true,
+            useMods: true,
+            ignoreJunk: true,
+            results: [],
+            meta: null
+        };
 
         window.onload = async () => {
             localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
             localStorage.setItem('d2_clientId', DEFAULT_CLIENT_ID);
+            chargerTagsLocale();
 
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('bungieName')) localStorage.setItem('d2_bungieName', urlParams.get('bungieName'));
@@ -818,6 +971,92 @@
                 lancerAnalyse();
             }
         };
+
+        // =========================================================================
+        // GESTION DES TAGS / FAVORIS
+        // =========================================================================
+        function chargerTagsLocale() {
+            try { itemTags = JSON.parse(localStorage.getItem('d2_itemTags') || '{}'); }
+            catch { itemTags = {}; }
+        }
+
+        function sauvegarderTagsLocale() {
+            localStorage.setItem('d2_itemTags', JSON.stringify(itemTags));
+        }
+
+        function obtenirTag(item) {
+            if (!item || !item.itemInstanceId) return null;
+            return itemTags[item.itemInstanceId] || null;
+        }
+
+        function definirTag(itemInstanceId, tagId) {
+            if (!itemInstanceId) return;
+            if (itemTags[itemInstanceId] === tagId) {
+                delete itemTags[itemInstanceId];
+            } else {
+                itemTags[itemInstanceId] = tagId;
+            }
+            sauvegarderTagsLocale();
+            mettreAJourOptionsTags();
+            afficherVue();
+            mettreAJourComparateurUI();
+            if (inspecteurVerrouille && inspecteurUkeyActif && registreObjets[inspecteurUkeyActif]) {
+                rendreContenuInspecteur(registreObjets[inspecteurUkeyActif]);
+            }
+        }
+
+        function mettreAJourOptionsTags() {
+            const comptes = { godroll: 0, keep: 0, infuse: 0, junk: 0 };
+            Object.values(registreObjets).forEach(obj => {
+                if (obj.itemInstanceId && itemTags[obj.itemInstanceId]) {
+                    const t = itemTags[obj.itemInstanceId];
+                    if (comptes[t] !== undefined) comptes[t]++;
+                }
+            });
+            const sel = document.getElementById('filtreTag');
+            const valActuelle = sel.value;
+            sel.innerHTML = `
+                <option value="all">Tag : Tous</option>
+                <option value="godroll">⭐ God Roll (${comptes.godroll})</option>
+                <option value="keep">🔒 À garder (${comptes.keep})</option>
+                <option value="infuse">⚡ À infuser (${comptes.infuse})</option>
+                <option value="junk">🗑️ À démanteler (${comptes.junk})</option>
+                <option value="untagged">Sans tag</option>
+            `;
+            sel.value = valActuelle;
+
+            const junkDansCoffre = listeCoffre.filter(i => obtenirTag(i) === 'junk').length;
+            const btnPull = document.getElementById('btnPullJunk');
+            btnPull.style.display = (ongletActif === 'loadout' && junkDansCoffre > 0 && (valActuelle === 'junk' || valActuelle === 'all')) ? 'inline-block' : 'none';
+            btnPull.textContent = `🎒 Rapatrier ${junkDansCoffre} 🗑️ du Coffre`;
+        }
+
+        async function rapatrierObjetsADemanteler() {
+            const junkVault = listeCoffre.filter(i => obtenirTag(i) === 'junk');
+            if (junkVault.length === 0 || !persoActifId || !joueurInfo) return;
+            const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
+            let ok = 0;
+
+            try {
+                for (const item of junkVault) {
+                    setStatus(`Rapatriement des objets à démanteler vers ${nomPerso} (${ok + 1}/${junkVault.length})...`);
+                    const res = await appelActionBungie('TransferItem', {
+                        itemReferenceHash: item.itemHash,
+                        stackSize: 1,
+                        transferToVault: false,
+                        itemId: item.itemInstanceId,
+                        characterId: persoActifId,
+                        membershipType: joueurInfo.membershipType
+                    });
+                    if (res.ErrorCode === 1) ok++;
+                }
+                setStatus(`${ok} objet(s) "À démanteler" transférés dans le Sac de ton ${nomPerso} !`);
+                await lancerAnalyse();
+            } catch (e) {
+                setStatus(`Rapatriement interrompu (${ok} transférés) : ${e.message}`);
+                await lancerAnalyse();
+            }
+        }
 
         function basculerConfig() { document.getElementById('configDrawer').classList.toggle('open'); }
         function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
@@ -923,9 +1162,7 @@
             const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 17, 0, 0, 0));
             const day = now.getUTCDay();
             let joursRestants = (2 - day + 7) % 7;
-            if (joursRestants === 0 && now.getTime() >= target.getTime()) {
-                joursRestants = 7;
-            }
+            if (joursRestants === 0 && now.getTime() >= target.getTime()) joursRestants = 7;
             target.setUTCDate(target.getUTCDate() + joursRestants);
             const diffMs = Math.max(0, target.getTime() - now.getTime());
             const d = Math.floor(diffMs / 86400000);
@@ -985,6 +1222,13 @@
             return resultat;
         }
 
+        function extraireVecteur6Armure(def, instanceId, itemStatsMap) {
+            if (def.itemType !== 2) return null;
+            const liveStats = (instanceId && itemStatsMap && itemStatsMap[instanceId]?.stats) ? itemStatsMap[instanceId].stats : {};
+            const baseStats = def.stats?.stats || {};
+            return STATS_ARMURES_ORDRE.map(h => liveStats[h]?.value ?? baseStats[h]?.value ?? 0);
+        }
+
         function formaterEquipement(item, lieuType, charIdOwner, instances, itemPerks, itemStatsMap, forcePostmaster = false) {
             const def = dictGlobal.items[item.itemHash];
             if (!def || !def.displayProperties?.name) return null;
@@ -992,10 +1236,13 @@
             if (!forcePostmaster && !BUCKETS_CONNUS.has(bucketHash)) return null;
 
             const instanceId = item.itemInstanceId;
-            const power = instanceId && instances[instanceId]?.primaryStat?.value ? instances[instanceId].primaryStat.value : null;
+            const inst = instanceId ? instances[instanceId] : null;
+            const power = inst?.primaryStat?.value ? inst.primaryStat.value : null;
+            const isMasterwork = ((item.state || 0) & 4) !== 0;
             const tierKey = def.inventory?.tierType === 6 ? 'Exotic' : (def.inventory?.tierType === 5 ? 'Superior' : 'Rare');
             const perks = extrairePerksDetails(instanceId, itemPerks);
             const stats = extraireStatsObjet(def, instanceId, itemStatsMap);
+            const armorStats6 = extraireVecteur6Armure(def, instanceId, itemStatsMap);
             const ukey = instanceId || ('hash_' + item.itemHash + '_' + Math.random().toString(36).substring(2, 7));
 
             const obj = {
@@ -1007,12 +1254,15 @@
                 itemInstanceId: instanceId,
                 stackSize: item.quantity || 1,
                 bucketHash: bucketHash,
+                classType: def.classType, // 0 Titan, 1 Chasseur, 2 Arcaniste, 3 Tous
+                isMasterwork: isMasterwork,
                 lieuType: lieuType,
                 charIdOwner: charIdOwner,
                 icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '',
                 power: power,
                 perks: perks,
                 stats: stats,
+                armorStats6: armorStats6,
                 categorie: def.itemType === 3 ? 'weapon' : 'armor',
                 tier: tierKey
             };
@@ -1087,15 +1337,9 @@
                 if (mLive.activities) {
                     mLive.activities.forEach(act => {
                         const actDef = dictGlobal.activities?.[act.activityHash];
-                        if (actDef?.displayProperties?.name && !nomActiviteAssociee) {
-                            nomActiviteAssociee = actDef.displayProperties.name;
-                        }
-                        if (!icone && actDef?.displayProperties?.icon) {
-                            icone = 'https://www.bungie.net' + actDef.displayProperties.icon;
-                        }
-                        if (act.phases && act.phases.length > phases.length) {
-                            phases = act.phases.map(ph => ({ complete: !!ph.complete }));
-                        }
+                        if (actDef?.displayProperties?.name && !nomActiviteAssociee) nomActiviteAssociee = actDef.displayProperties.name;
+                        if (!icone && actDef?.displayProperties?.icon) icone = 'https://www.bungie.net' + actDef.displayProperties.icon;
+                        if (act.phases && act.phases.length > phases.length) phases = act.phases.map(ph => ({ complete: !!ph.complete }));
                         (act.challenges || []).forEach(ch => {
                             const o = ch.objective;
                             if (!o || objVus.has(o.objectiveHash)) return;
@@ -1112,12 +1356,7 @@
                 }
 
                 let rewardEntriesLive = [];
-                if (mLive.rewards) {
-                    mLive.rewards.forEach(r => {
-                        (r.entries || []).forEach(e => rewardEntriesLive.push(e));
-                    });
-                }
-
+                if (mLive.rewards) mLive.rewards.forEach(r => (r.entries || []).forEach(e => rewardEntriesLive.push(e)));
                 if (objectifs.length === 0 && phases.length === 0 && rewardEntriesLive.length === 0) continue;
 
                 let complete = false;
@@ -1127,11 +1366,8 @@
 
                 const texteRecherche = `${nomJalon} ${descJalon} ${nomActiviteAssociee}`.toLowerCase();
                 let groupe = 'weekly';
-                if (phases.length > 0 || motsRaidDonjon.some(m => texteRecherche.includes(m))) {
-                    groupe = 'raid_dungeon';
-                } else if (motsRituels.some(m => texteRecherche.includes(m))) {
-                    groupe = 'ritual';
-                }
+                if (phases.length > 0 || motsRaidDonjon.some(m => texteRecherche.includes(m))) groupe = 'raid_dungeon';
+                else if (motsRituels.some(m => texteRecherche.includes(m))) groupe = 'ritual';
 
                 const estPrestige = `${recompenseLabel} ${descJalon}`.toLowerCase().includes('prestige') || `${recompenseLabel} ${descJalon}`.toLowerCase().includes('pinnacle');
                 const estPuissant = `${recompenseLabel} ${descJalon}`.toLowerCase().includes('puissant') || `${recompenseLabel} ${descJalon}`.toLowerCase().includes('powerful');
@@ -1194,7 +1430,7 @@
                     dictGlobal = { items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities };
                 }
 
-                setStatus("3/3 — Lecture en direct : Personnages, Coffre, Jalons et Collections...");
+                setStatus("3/3 — Lecture en direct : Personnages, Armures, Coffre, Jalons et Collections...");
                 const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,202,205,300,302,304,800,900`;
                 const headers = { 'X-API-Key': DEFAULT_API_KEY };
                 if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
@@ -1220,6 +1456,7 @@
                     const jalonsPerso = extraireJalonsPerso(charProgressions[cId]?.milestones);
                     mapPersos[cId] = {
                         id: cId,
+                        classType: c.classType,
                         classeNom: classesNom[c.classType] || 'Gardien',
                         light: c.light,
                         statsGlobales: c.stats || {},
@@ -1285,7 +1522,6 @@
                     }
                 }
 
-                // Collections (800)
                 const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles || {}) };
                 for (const cId in (resp.characterCollectibles?.data || {})) {
                     Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles);
@@ -1316,7 +1552,6 @@
                     listeExotiques.push(obj);
                 }
 
-                // Triomphes, Modèles (Crafting) & Catalyseurs Exotiques (900)
                 const recordsJoueur = { ...(resp.profileRecords?.data?.records || {}) };
                 for (const cId in (resp.characterRecords?.data || {})) {
                     Object.assign(recordsJoueur, resp.characterRecords.data[cId].records);
@@ -1427,11 +1662,11 @@
                     return (b.progActuel / b.progMax) - (a.progActuel / a.progMax);
                 });
 
-                // Nettoyer les clés du comparateur qui n'existeraient plus et mettre à jour le tiroir s'il est ouvert
                 comparateurKeys = comparateurKeys.filter(k => registreObjets[k]);
                 mettreAJourComparateurUI();
-
+                mettreAJourOptionsTags();
                 mettreAJourCompteurJalons();
+
                 document.getElementById('count-crafting').textContent = listeCrafting.length;
                 document.getElementById('count-catalysts').textContent = listeCatalyseurs.length;
                 document.getElementById('count-quests').textContent = listeQuetes.length;
@@ -1448,12 +1683,456 @@
                 if (ongletActif === 'vendors') {
                     chargerMarchandsPerso(persoActifId);
                 } else {
+                    if (ongletActif === 'optimizer') calculerOptimisationArmures(false);
                     afficherVue();
                 }
 
             } catch (err) {
                 setStatus("Info : " + err.message);
             }
+        }
+
+        // =========================================================================
+        // OPTIMISEUR D'ARMURES (DOUBLE / TRIPLE 100)
+        // =========================================================================
+        function collecterArmuresClasseActive() {
+            const p = mapPersos[persoActifId];
+            if (!p) return [];
+            const tous = [];
+            Object.values(mapPersos).forEach(ch => {
+                tous.push(...ch.equipped, ...ch.inventory);
+            });
+            tous.push(...listeCoffre);
+            return tous.filter(i =>
+                i.categorie === 'armor' &&
+                i.itemInstanceId &&
+                i.classType === p.classType &&
+                (i.tier === 'Exotic' || i.tier === 'Superior')
+            );
+        }
+
+        function appliquerPresetOptimiseur(preset) {
+            if (preset === 'triple_pve') optState.targets = [0, 10, 10, 10, 0, 0];
+            else if (preset === 'res_dis') optState.targets = [0, 10, 0, 10, 0, 0];
+            else if (preset === 'pvp_mob') optState.targets = [10, 7, 10, 0, 0, 0];
+            else optState.targets = [0, 0, 0, 0, 0, 0];
+            calculerOptimisationArmures(true);
+        }
+
+        function majParamOptimiseur() {
+            const selExo = document.getElementById('optExotic');
+            if (selExo) optState.exotic = selExo.value;
+            for (let i = 0; i < 6; i++) {
+                const el = document.getElementById('optStat_' + i);
+                if (el) optState.targets[i] = parseInt(el.value, 10) || 0;
+            }
+            const cbMW = document.getElementById('optAssumeMW');
+            const cbMods = document.getElementById('optUseMods');
+            const cbJunk = document.getElementById('optIgnoreJunk');
+            if (cbMW) optState.assumeMW = cbMW.checked;
+            if (cbMods) optState.useMods = cbMods.checked;
+            if (cbJunk) optState.ignoreJunk = cbJunk.checked;
+            calculerOptimisationArmures(true);
+        }
+
+        function calculerOptimisationArmures(rerender = true) {
+            const t0 = performance.now();
+            const armures = collecterArmuresClasseActive().filter(a => {
+                if (optState.ignoreJunk && obtenirTag(a) === 'junk') return false;
+                return true;
+            });
+
+            // Meilleur objet de classe disponible (MW prioritaire)
+            const classItems = armures.filter(a => a.bucketHash === BUCKET_CLASS_ITEM);
+            classItems.sort((a, b) => (b.isMasterwork ? 1 : 0) - (a.isMasterwork ? 1 : 0) || (b.power || 0) - (a.power || 0));
+            const bestClassItem = classItems[0] || null;
+            const bonusClassItem = (bestClassItem && (bestClassItem.isMasterwork || optState.assumeMW)) ? 2 : 0;
+
+            const exoChoisi = optState.exotic; // 'any', 'none', ou itemHash en string
+            let exoBucketVerrouille = null;
+            if (exoChoisi !== 'any' && exoChoisi !== 'none') {
+                const sampleExo = armures.find(a => String(a.itemHash) === exoChoisi);
+                if (sampleExo) exoBucketVerrouille = sampleExo.bucketHash;
+            }
+
+            const targetsPts = optState.targets.map(t => t * 10);
+            const maxMods = optState.useMods ? 5 : 0;
+
+            // Préparation et filtrage intelligent (Top 16 par emplacement pour une vitesse instantanée)
+            const pools = ARMOR_SLOTS_4.map(bHash => {
+                let candidates = armures.filter(a => a.bucketHash === bHash && a.armorStats6);
+
+                if (exoChoisi === 'none') {
+                    candidates = candidates.filter(a => a.tier !== 'Exotic');
+                } else if (exoBucketVerrouille !== null) {
+                    if (bHash === exoBucketVerrouille) {
+                        candidates = candidates.filter(a => String(a.itemHash) === exoChoisi);
+                    } else {
+                        candidates = candidates.filter(a => a.tier !== 'Exotic');
+                    }
+                }
+
+                // Pré-calcul du vecteur de stats effectif (avec bonus MW si coché)
+                const enriched = candidates.map(a => {
+                    const addMW = (optState.assumeMW && !a.isMasterwork) ? 2 : 0;
+                    const vec = a.armorStats6.map(v => v + addMW);
+                    let scoreHeuristique = 0;
+                    for (let i = 0; i < 6; i++) {
+                        scoreHeuristique += vec[i] * (optState.targets[i] > 0 ? (2 + optState.targets[i] * 0.25) : 0.7);
+                    }
+                    return { item: a, vec, isExo: a.tier === 'Exotic', scoreHeuristique };
+                });
+
+                enriched.sort((a, b) => b.scoreHeuristique - a.scoreHeuristique);
+                // Garder les 16 meilleurs + tous les exotiques si en mode 'any' (plafonné à 20)
+                if (enriched.length > 16) {
+                    const top = enriched.slice(0, 14);
+                    const exos = enriched.slice(14).filter(e => e.isExo).slice(0, 4);
+                    return [...top, ...exos];
+                }
+                return enriched;
+            });
+
+            if (pools.some(p => p.length === 0)) {
+                optState.results = [];
+                optState.meta = { totalTested: 0, validCount: 0, ms: Math.round(performance.now() - t0), missingSlot: true };
+                if (rerender) afficherVue();
+                return;
+            }
+
+            // Ordre de priorité des stats pour placer les mods restants
+            const ordrePriorite = [0, 1, 2, 3, 4, 5].sort((a, b) => optState.targets[b] - optState.targets[a]);
+
+            let tested = 0;
+            let exactMatches = [];
+            let fallbackMatches = [];
+
+            const [p0, p1, p2, p3] = pools;
+            for (let i0 = 0; i0 < p0.length; i0++) {
+                const a0 = p0[i0];
+                for (let i1 = 0; i1 < p1.length; i1++) {
+                    const a1 = p1[i1];
+                    const exo01 = (a0.isExo ? 1 : 0) + (a1.isExo ? 1 : 0);
+                    if (exo01 > 1) continue;
+
+                    for (let i2 = 0; i2 < p2.length; i2++) {
+                        const a2 = p2[i2];
+                        const exo012 = exo01 + (a2.isExo ? 1 : 0);
+                        if (exo012 > 1) continue;
+
+                        for (let i3 = 0; i3 < p3.length; i3++) {
+                            const a3 = p3[i3];
+                            if (exo012 + (a3.isExo ? 1 : 0) > 1) continue;
+                            tested++;
+
+                            const base = [
+                                a0.vec[0] + a1.vec[0] + a2.vec[0] + a3.vec[0] + bonusClassItem,
+                                a0.vec[1] + a1.vec[1] + a2.vec[1] + a3.vec[1] + bonusClassItem,
+                                a0.vec[2] + a1.vec[2] + a2.vec[2] + a3.vec[2] + bonusClassItem,
+                                a0.vec[3] + a1.vec[3] + a2.vec[3] + a3.vec[3] + bonusClassItem,
+                                a0.vec[4] + a1.vec[4] + a2.vec[4] + a3.vec[4] + bonusClassItem,
+                                a0.vec[5] + a1.vec[5] + a2.vec[5] + a3.vec[5] + bonusClassItem
+                            ];
+
+                            // Calcul des mods nécessaires pour atteindre les cibles
+                            let modsUsed = 0;
+                            let deficitRestant = 0;
+                            const modsParStat = [0, 0, 0, 0, 0, 0]; // en points ajoutés (+5 ou +10 par slot)
+                            const modsDetail = [];
+
+                            for (let s = 0; s < 6; s++) {
+                                const def = targetsPts[s] - base[s];
+                                if (def > 0) {
+                                    const slotsReq = Math.ceil(def / 10);
+                                    modsUsed += slotsReq;
+                                    const ptsAjoutes = (def % 10 > 0 && def % 10 <= 5) ? ((slotsReq - 1) * 10 + 5) : (slotsReq * 10);
+                                    modsParStat[s] = ptsAjoutes;
+                                }
+                            }
+
+                            const respecteCibles = modsUsed <= maxMods;
+
+                            // Copie des stats finales
+                            const finalStats = base.slice();
+                            if (respecteCibles) {
+                                for (let s = 0; s < 6; s++) {
+                                    if (modsParStat[s] > 0) {
+                                        finalStats[s] += modsParStat[s];
+                                        const maj = Math.floor(modsParStat[s] / 10);
+                                        const min = (modsParStat[s] % 10) === 5 ? 1 : 0;
+                                        if (maj > 0) modsDetail.push(`${maj}× +10 ${STATS_GARDIEN_6[s].nom}`);
+                                        if (min > 0) modsDetail.push(`1× +5 ${STATS_GARDIEN_6[s].nom}`);
+                                    }
+                                }
+                                // Utiliser les emplacements de mods restants pour pousser les paliers utiles
+                                let restants = maxMods - modsUsed;
+                                while (restants > 0) {
+                                    // Chercher la stat la plus rentable à booster (+10 sous 100)
+                                    let bestS = -1;
+                                    for (const s of ordrePriorite) {
+                                        if (finalStats[s] < 100) { bestS = s; break; }
+                                    }
+                                    if (bestS === -1) break;
+                                    const needTo100 = 100 - finalStats[bestS];
+                                    const gain = needTo100 <= 5 ? 5 : 10;
+                                    finalStats[bestS] += gain;
+                                    modsDetail.push(`1× +${gain} ${STATS_GARDIEN_6[bestS].nom}`);
+                                    restants--;
+                                }
+                            } else {
+                                // Calculer à quel point on est proche si aucun ensemble parfait
+                                for (let s = 0; s < 6; s++) {
+                                    const def = targetsPts[s] - base[s];
+                                    if (def > 0) deficitRestant += def;
+                                }
+                            }
+
+                            let totalTiers = 0;
+                            let wasted = 0;
+                            for (let s = 0; s < 6; s++) {
+                                const v = finalStats[s];
+                                const t = Math.min(10, Math.floor(v / 10));
+                                totalTiers += t;
+                                wasted += v >= 100 ? (v - 100) : (v % 10);
+                            }
+
+                            const entry = {
+                                pieces: [a0.item, a1.item, a2.item, a3.item, bestClassItem].filter(Boolean),
+                                finalStats,
+                                totalTiers,
+                                wasted,
+                                modsUsed,
+                                modsDetail,
+                                exact: respecteCibles,
+                                score: respecteCibles
+                                    ? (totalTiers * 10000 - modsUsed * 200 - wasted * 5)
+                                    : (-deficitRestant * 1000 + totalTiers * 100 - wasted)
+                            };
+
+                            if (respecteCibles) {
+                                if (exactMatches.length < 15) {
+                                    exactMatches.push(entry);
+                                    exactMatches.sort((a, b) => b.score - a.score);
+                                } else if (entry.score > exactMatches[exactMatches.length - 1].score) {
+                                    exactMatches[exactMatches.length - 1] = entry;
+                                    exactMatches.sort((a, b) => b.score - a.score);
+                                }
+                            } else if (exactMatches.length === 0) {
+                                if (fallbackMatches.length < 10) {
+                                    fallbackMatches.push(entry);
+                                    fallbackMatches.sort((a, b) => b.score - a.score);
+                                } else if (entry.score > fallbackMatches[fallbackMatches.length - 1].score) {
+                                    fallbackMatches[fallbackMatches.length - 1] = entry;
+                                    fallbackMatches.sort((a, b) => b.score - a.score);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            optState.results = exactMatches.length > 0 ? exactMatches : fallbackMatches;
+            optState.meta = {
+                totalTested: tested,
+                exactFound: exactMatches.length > 0,
+                ms: Math.round(performance.now() - t0),
+                missingSlot: false
+            };
+
+            if (rerender) afficherVue();
+        }
+
+        async function equiperEnsembleOptimise(idx) {
+            const set = optState.results[idx];
+            if (!set || !joueurInfo || !persoActifId) return;
+
+            const mType = joueurInfo.membershipType;
+            const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
+            const legendairesAEquiper = [];
+            let exotiqueAEquiper = null;
+
+            try {
+                setStatus(`Préparation de l'ensemble T${set.totalTiers} pour ton ${nomPerso}...`);
+
+                for (const piece of set.pieces) {
+                    const dejaEquipe = mapPersos[persoActifId].equipped.find(x => x.itemInstanceId === piece.itemInstanceId);
+                    if (dejaEquipe) continue;
+
+                    // Si sur un autre perso (rare pour armures), passer par le coffre
+                    if (piece.lieuType === 'inventory' && piece.charIdOwner && piece.charIdOwner !== persoActifId) {
+                        await appelActionBungie('TransferItem', {
+                            itemReferenceHash: piece.itemHash, stackSize: 1, transferToVault: true,
+                            itemId: piece.itemInstanceId, characterId: piece.charIdOwner, membershipType: mType
+                        });
+                    }
+                    if (piece.lieuType === 'vault' || (piece.lieuType === 'inventory' && piece.charIdOwner !== persoActifId)) {
+                        setStatus(`Rapatriement de "${piece.nom}"...`);
+                        const pull = await appelActionBungie('TransferItem', {
+                            itemReferenceHash: piece.itemHash, stackSize: 1, transferToVault: false,
+                            itemId: piece.itemInstanceId, characterId: persoActifId, membershipType: mType
+                        });
+                        if (pull.ErrorCode !== 1) throw new Error(pull.Message);
+                    }
+
+                    if (piece.tier === 'Exotic') exotiqueAEquiper = piece.itemInstanceId;
+                    else legendairesAEquiper.push(piece.itemInstanceId);
+                }
+
+                // Équiper d'abord les Légendaires (libère l'ancien slot exotique si besoin), puis l'Exotique
+                if (legendairesAEquiper.length > 0) {
+                    const eqL = await appelActionBungie('EquipItems', {
+                        itemIds: legendairesAEquiper, characterId: persoActifId, membershipType: mType
+                    });
+                    if (eqL.ErrorCode !== 1) throw new Error(eqL.Message);
+                }
+                if (exotiqueAEquiper) {
+                    const eqE = await appelActionBungie('EquipItem', {
+                        itemId: exotiqueAEquiper, characterId: persoActifId, membershipType: mType
+                    });
+                    if (eqE.ErrorCode !== 1) throw new Error(eqE.Message);
+                }
+
+                setStatus(`Ensemble T${set.totalTiers} équipé en direct sur ton ${nomPerso} !`);
+                await lancerAnalyse();
+            } catch (e) {
+                setStatus(`Refus Bungie : ${e.message} (En Orbite ou à la Tour requis).`);
+            }
+        }
+
+        function sauvegarderSetOptimiseEnBuild(idx) {
+            const set = optState.results[idx];
+            const p = mapPersos[persoActifId];
+            if (!set || !p) return;
+
+            const exo = set.pieces.find(x => x.tier === 'Exotic');
+            const nom = `Opti T${set.totalTiers}${exo ? ' — ' + exo.nom : ''}`;
+            const armesActuelles = p.equipped.filter(i => i.categorie === 'weapon');
+            const itemsBuild = [...armesActuelles, ...set.pieces].map(item => ({
+                itemHash: item.itemHash,
+                itemInstanceId: item.itemInstanceId,
+                bucketHash: item.bucketHash,
+                nom: item.nom
+            }));
+
+            const builds = chargerBuildsLocale();
+            builds.push({ id: Date.now(), nom, items: itemsBuild });
+            localStorage.setItem(getCleBuilds(), JSON.stringify(builds));
+            setStatus(`Ensemble sauvegardé dans tes Builds sous le nom "${nom}" !`);
+        }
+
+        function rendreVueOptimiseur() {
+            const p = mapPersos[persoActifId];
+            if (!p) return `<p style="color:#64748b;">Connecte-toi avec Bungie.net pour optimiser les armures de ton Gardien.</p>`;
+
+            const armuresClasse = collecterArmuresClasseActive();
+            // Exotiques uniques pour le menu déroulant
+            const mapExos = {};
+            armuresClasse.filter(a => a.tier === 'Exotic' && a.bucketHash !== BUCKET_CLASS_ITEM).forEach(a => {
+                if (!mapExos[a.itemHash]) mapExos[a.itemHash] = { nom: a.nom, type: a.typeNom, count: 0 };
+                mapExos[a.itemHash].count++;
+            });
+            const exosTries = Object.entries(mapExos).sort((a, b) => a[1].nom.localeCompare(b[1].nom, 'fr'));
+
+            const optionsExosHtml = `
+                <option value="any" ${optState.exotic === 'any' ? 'selected' : ''}>Exotique : Automatique (0 ou 1 max)</option>
+                <option value="none" ${optState.exotic === 'none' ? 'selected' : ''}>Légendaires uniquement (Aucun exotique)</option>
+                ${exosTries.map(([h, info]) => `
+                    <option value="${h}" ${optState.exotic === h ? 'selected' : ''}>★ ${info.nom} (${info.type} ×${info.count})</option>
+                `).join('')}
+            `;
+
+            const statSelectorsHtml = STATS_GARDIEN_6.map((st, idx) => `
+                <div class="opt-stat-box">
+                    <label for="optStat_${idx}">${st.nom}</label>
+                    <select id="optStat_${idx}" onchange="majParamOptimiseur()">
+                        ${[0,1,2,3,4,5,6,7,8,9,10].map(t => `
+                            <option value="${t}" ${optState.targets[idx] === t ? 'selected' : ''}>${t === 0 ? 'Libre' : `Min T${t} (${t*10})`}</option>
+                        `).join('')}
+                    </select>
+                </div>
+            `).join('');
+
+            let resultsHtml = '';
+            if (!optState.meta) {
+                resultsHtml = `<p style="color:#94a3b8;">Clique sur <b>⚡ Calculer les combinaisons</b> pour analyser tes ${armuresClasse.length} pièces d'armure de ${p.classeNom}.</p>`;
+            } else if (optState.meta.missingSlot) {
+                resultsHtml = `<p style="color:#f87171;">Aucune armure disponible pour l'un des 4 emplacements (vérifie l'exotique sélectionné ou les filtres).</p>`;
+            } else {
+                const banniereInfo = optState.meta.exactFound
+                    ? `<div style="margin-bottom:12px; font-size:0.84rem; color:#86efac;">✓ ${optState.meta.totalTested.toLocaleString('fr-FR')} combinaisons analysées en ${optState.meta.ms} ms — Meilleurs ensembles atteignant tes paliers :</div>`
+                    : `<div style="margin-bottom:12px; font-size:0.84rem; color:#fdba74;">⚠️ Aucun ensemble n'atteint exactement tous ces paliers sur ton ${p.classeNom} (${optState.meta.totalTested.toLocaleString('fr-FR')} combinaisons testées en ${optState.meta.ms} ms). Voici les combinaisons les plus proches :</div>`;
+
+                resultsHtml = banniereInfo + `<div class="opt-results-list">` + optState.results.map((res, idx) => {
+                    const statsPills = STATS_GARDIEN_6.map((st, sIdx) => {
+                        const val = res.finalStats[sIdx];
+                        const tier = Math.min(10, Math.floor(val / 10));
+                        const hitTarget = optState.targets[sIdx] > 0 && tier >= optState.targets[sIdx];
+                        return `
+                            <div class="opt-stat-pill ${tier === 10 ? 't10' : (hitTarget ? 'target-ok' : '')}">
+                                <small>${st.court}</small>
+                                <b>T${tier}</b>
+                                <small style="color:#64748b;">${val}</small>
+                            </div>
+                        `;
+                    }).join('');
+
+                    const modsTexte = res.modsDetail.length > 0
+                        ? `Mods conseillés : ${res.modsDetail.join(' • ')}`
+                        : (optState.useMods ? 'Aucun mod de stat requis' : 'Sans mods de stats');
+
+                    return `
+                        <div class="opt-set-card ${res.exact ? 'perfect' : ''}">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    <b style="font-size:1rem; color:var(--gold);">#${idx + 1} — Total T${res.totalTiers}</b>
+                                    <span class="badge">${res.wasted} pts perdus</span>
+                                    ${res.exact ? `<span class="badge badge-done">✓ Objectifs atteints</span>` : ''}
+                                </div>
+                                <div class="opt-set-stats">${statsPills}</div>
+                                <div class="opt-mods-note">${modsTexte}</div>
+                            </div>
+
+                            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                                ${res.pieces.map(rendreTuile).join('')}
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:6px; min-width:155px;">
+                                <button class="btn-green" onclick="equiperEnsembleOptimise(${idx})">⚡ Équiper cet ensemble</button>
+                                <button class="btn-compare" onclick="sauvegarderSetOptimiseEnBuild(${idx})">💾 Sauver en Build</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('') + `</div>`;
+            }
+
+            return `
+                <div class="opt-controls">
+                    <div class="opt-top-row">
+                        <div>
+                            <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">🛡️ Optimiseur d'Armures — ${p.classeNom} (${armuresClasse.length} pièces disponibles)</h3>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                            <select id="optExotic" onchange="majParamOptimiseur()" style="min-width:260px;">${optionsExosHtml}</select>
+                            <button class="btn-ghost" onclick="appliquerPresetOptimiseur('triple_pve')">Triple 100 PvE</button>
+                            <button class="btn-ghost" onclick="appliquerPresetOptimiseur('res_dis')">Rés/Disc T10</button>
+                            <button class="btn-ghost" onclick="appliquerPresetOptimiseur('pvp_mob')">PvP Mob/Réc</button>
+                            <button class="btn-ghost" onclick="appliquerPresetOptimiseur('reset')">↺ Zéro</button>
+                        </div>
+                    </div>
+
+                    <div class="opt-stats-inputs">${statSelectorsHtml}</div>
+
+                    <div class="opt-options-row">
+                        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                            <label class="opt-check"><input type="checkbox" id="optAssumeMW" ${optState.assumeMW ? 'checked' : ''} onchange="majParamOptimiseur()"> Supposer Pièce Maîtresse (+12/pièce)</label>
+                            <label class="opt-check"><input type="checkbox" id="optUseMods" ${optState.useMods ? 'checked' : ''} onchange="majParamOptimiseur()"> Inclure Mods de stats (+50 pts max)</label>
+                            <label class="opt-check"><input type="checkbox" id="optIgnoreJunk" ${optState.ignoreJunk ? 'checked' : ''} onchange="majParamOptimiseur()"> Ignorer les armures 🗑️ À démanteler</label>
+                        </div>
+                        <button class="btn-green" onclick="majParamOptimiseur()">⚡ Calculer les combinaisons</button>
+                    </div>
+                </div>
+                ${resultsHtml}
+            `;
         }
 
         // =========================================================================
@@ -1465,9 +2144,7 @@
             mettreAJourComparateurUI();
         }
 
-        function fermerComparateur() {
-            document.getElementById('compareDrawer').classList.remove('open');
-        }
+        function fermerComparateur() { document.getElementById('compareDrawer').classList.remove('open'); }
 
         function viderComparateur() {
             comparateurKeys = [];
@@ -1479,11 +2156,8 @@
             fermerInspecteur(true);
             if (!registreObjets[ukey]) return;
             const idx = comparateurKeys.indexOf(ukey);
-            if (idx === -1) {
-                comparateurKeys.push(ukey);
-            } else if (!ouvrir) {
-                comparateurKeys.splice(idx, 1);
-            }
+            if (idx === -1) comparateurKeys.push(ukey);
+            else if (!ouvrir) comparateurKeys.splice(idx, 1);
             if (ouvrir) document.getElementById('compareDrawer').classList.add('open');
             mettreAJourComparateurUI();
             afficherVue();
@@ -1527,6 +2201,18 @@
             return item.lieuType === 'equipped' ? `⚡ Équipé (${cls})` : `🎒 Sac (${cls})`;
         }
 
+        function rendreBoutonsTags(item, compact = false) {
+            if (!item.itemInstanceId) return '';
+            const cur = obtenirTag(item);
+            return Object.values(TAGS_CONFIG).map(t => `
+                <button class="tag-btn ${cur === t.id ? 'active-' + t.id : ''}"
+                        onclick="definirTag('${item.itemInstanceId}', '${t.id}')"
+                        title="${t.label}">
+                    ${t.icon}${compact ? '' : ' ' + t.label}
+                </button>
+            `).join('');
+        }
+
         function mettreAJourComparateurUI() {
             const items = comparateurKeys.map(k => registreObjets[k]).filter(Boolean);
             document.getElementById('count-compare').textContent = items.length;
@@ -1535,17 +2221,14 @@
 
             const conteneur = document.getElementById('compareContent');
             if (items.length === 0) {
-                conteneur.innerHTML = `<p style="color:#64748b; font-size:0.86rem; margin:10px 0;">Clique sur n'importe quelle arme ou armure puis sur <b>⚖️ + Comparer</b> (ou <b>⚖️ Comparer les copies</b>) pour comparer leurs statistiques et perks côte-à-côte.</p>`;
+                conteneur.innerHTML = `<p style="color:#64748b; font-size:0.86rem; margin:10px 0;">Clique sur une arme ou armure puis sur <b>⚖️ + Comparer</b> pour comparer leurs statistiques, leurs perks et les taguer côte-à-côte.</p>`;
                 return;
             }
 
-            // Construire l'union ordonnée des statistiques présentes sur les objets comparés
             const statsMetaMap = new Map();
             items.forEach(it => {
                 (it.stats || []).forEach(s => {
-                    if (!statsMetaMap.has(s.hash)) {
-                        statsMetaMap.set(s.hash, { hash: s.hash, nom: s.nom, isBar: s.isBar, isTotal: s.isTotal });
-                    }
+                    if (!statsMetaMap.has(s.hash)) statsMetaMap.set(s.hash, { hash: s.hash, nom: s.nom, isBar: s.isBar, isTotal: s.isTotal });
                 });
             });
 
@@ -1556,12 +2239,9 @@
                 return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
             });
 
-            // Calculer min et max par stat si >= 2 objets
             const bornesStats = {};
             toutesStats.forEach(st => {
-                const valeurs = items
-                    .map(it => (it.stats || []).find(x => x.hash === st.hash)?.val)
-                    .filter(v => v !== undefined);
+                const valeurs = items.map(it => (it.stats || []).find(x => x.hash === st.hash)?.val).filter(v => v !== undefined);
                 if (valeurs.length >= 2) {
                     const min = Math.min(...valeurs);
                     const max = Math.max(...valeurs);
@@ -1606,6 +2286,7 @@
                 let actionsHtml = '';
                 if (item.itemInstanceId && item.lieuType !== 'postmaster') {
                     actionsHtml = `
+                        <div class="compare-col-tags">${rendreBoutonsTags(item, true)}</div>
                         <div class="compare-col-actions">
                             ${item.lieuType !== 'equipped' ? `<button class="btn-green" onclick="executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', '${item.charIdOwner || ''}')">⚡ Équiper</button>` : ''}
                             ${item.lieuType === 'vault' ? `<button onclick="executerMouvement('inventory', ${item.itemHash}, '${item.itemInstanceId}', 'vault', '')">🎒 Sac ${nomPersoActif}</button>` : ''}
@@ -1654,9 +2335,7 @@
                 const perdu = val >= 100 ? (val - 100) : (val % 10);
 
                 let segmentsHtml = '';
-                for (let i = 1; i <= 10; i++) {
-                    segmentsHtml += `<div class="g-seg ${i <= tier ? 'filled' : ''}"></div>`;
-                }
+                for (let i = 1; i <= 10; i++) segmentsHtml += `<div class="g-seg ${i <= tier ? 'filled' : ''}"></div>`;
 
                 return `
                     <div class="g-stat-card ${tier === 10 ? 'tier-10' : ''}">
@@ -1683,17 +2362,11 @@
         function sauvegarderBuildActuel() {
             const p = mapPersos[persoActifId];
             if (!p || p.equipped.length === 0) return;
-
             const champNom = document.getElementById('nomNouveauBuild');
             const nom = champNom.value.trim() || `Build ${p.classeNom} (${p.light})`;
-
             const itemsBuild = p.equipped.map(item => ({
-                itemHash: item.itemHash,
-                itemInstanceId: item.itemInstanceId,
-                bucketHash: item.bucketHash,
-                nom: item.nom
+                itemHash: item.itemHash, itemInstanceId: item.itemInstanceId, bucketHash: item.bucketHash, nom: item.nom
             }));
-
             const builds = chargerBuildsLocale();
             builds.push({ id: Date.now(), nom, items: itemsBuild });
             localStorage.setItem(getCleBuilds(), JSON.stringify(builds));
@@ -1711,49 +2384,45 @@
         async function equiperBuildComplet(id) {
             const build = chargerBuildsLocale().find(b => b.id === id);
             if (!build || !joueurInfo) return;
-
             const mType = joueurInfo.membershipType;
-            const idsAEquiper = [];
+            const legIds = [];
+            const exoIds = [];
 
             try {
                 setStatus(`Préparation du Build "${build.nom}"...`);
                 for (const bItem of build.items) {
                     const dejaEquipe = mapPersos[persoActifId].equipped.find(x => x.itemInstanceId === bItem.itemInstanceId);
                     if (dejaEquipe) continue;
-
-                    const dansCoffre = listeCoffre.find(x => x.itemInstanceId === bItem.itemInstanceId);
-                    if (dansCoffre) {
+                    const liveObj = registreObjets[bItem.itemInstanceId];
+                    if (liveObj && liveObj.lieuType === 'vault') {
                         setStatus(`Rapatriement de "${bItem.nom}" depuis le Coffre...`);
                         await appelActionBungie('TransferItem', {
                             itemReferenceHash: bItem.itemHash, stackSize: 1, transferToVault: false,
                             itemId: bItem.itemInstanceId, characterId: persoActifId, membershipType: mType
                         });
                     }
-                    idsAEquiper.push(bItem.itemInstanceId);
+                    if (liveObj?.tier === 'Exotic') exoIds.push(bItem.itemInstanceId);
+                    else legIds.push(bItem.itemInstanceId);
                 }
 
-                if (idsAEquiper.length > 0) {
-                    setStatus(`Équipement simultané des ${idsAEquiper.length} pièces...`);
-                    const eq = await appelActionBungie('EquipItems', {
-                        itemIds: idsAEquiper, characterId: persoActifId, membershipType: mType
-                    });
-                    if (eq.ErrorCode !== 1) throw new Error(eq.Message);
+                if (legIds.length > 0) {
+                    const eqL = await appelActionBungie('EquipItems', { itemIds: legIds, characterId: persoActifId, membershipType: mType });
+                    if (eqL.ErrorCode !== 1) throw new Error(eqL.Message);
+                }
+                if (exoIds.length > 0) {
+                    const eqE = await appelActionBungie('EquipItems', { itemIds: exoIds, characterId: persoActifId, membershipType: mType });
+                    if (eqE.ErrorCode !== 1) throw new Error(eqE.Message);
                 }
 
                 setStatus(`Build "${build.nom}" équipé !`);
                 await lancerAnalyse();
-            } catch (e) {
-                setStatus(`Erreur Build : ${e.message} (En Orbite ou à la Tour requis).`);
-            }
+            } catch (e) { setStatus(`Erreur Build : ${e.message} (En Orbite ou à la Tour requis).`); }
         }
 
         function afficherBarreBuilds() {
             const bar = document.getElementById('buildsBar');
             const zone = document.getElementById('listeBuildsChips');
-            if (!persoActifId || ongletActif !== 'loadout') {
-                bar.style.display = 'none';
-                return;
-            }
+            if (!persoActifId || ongletActif !== 'loadout') { bar.style.display = 'none'; return; }
             bar.style.display = 'flex';
             const builds = chargerBuildsLocale();
             if (builds.length === 0) {
@@ -1786,33 +2455,24 @@
         async function toutRecupererDuPostmaster() {
             const p = mapPersos[persoActifId];
             if (!p || p.postmaster.length === 0) return;
-
             try {
                 setStatus(`Récupération de ${p.postmaster.length} objets du Commis des postes...`);
                 for (const item of p.postmaster) {
                     await appelActionBungie('PullFromPostmaster', {
-                        itemReferenceHash: item.itemHash,
-                        stackSize: item.stackSize || 1,
-                        itemId: item.itemInstanceId || "0",
-                        characterId: persoActifId,
+                        itemReferenceHash: item.itemHash, stackSize: item.stackSize || 1,
+                        itemId: item.itemInstanceId || "0", characterId: persoActifId,
                         membershipType: joueurInfo.membershipType
                     });
                 }
                 setStatus("Commis des postes vidé vers le Sac !");
                 await lancerAnalyse();
-            } catch (e) {
-                setStatus("Erreur lors de la récupération : " + e.message);
-                await lancerAnalyse();
-            }
+            } catch (e) { setStatus("Erreur récupération : " + e.message); await lancerAnalyse(); }
         }
 
         function afficherPostmaster() {
             const box = document.getElementById('postmasterBox');
             const p = mapPersos[persoActifId];
-            if (!p || ongletActif !== 'loadout' || p.postmaster.length === 0) {
-                box.style.display = 'none';
-                return;
-            }
+            if (!p || ongletActif !== 'loadout' || p.postmaster.length === 0) { box.style.display = 'none'; return; }
             box.style.display = 'block';
             box.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
@@ -1825,19 +2485,9 @@
             `;
         }
 
-        function afficherInspecteur(ev, ukey, verrouiller = false) {
-            if (inspecteurVerrouille && !verrouiller) return;
-            const item = registreObjets[ukey];
-            if (!item) return;
-
-            if (verrouiller) {
-                ev.stopPropagation();
-                inspecteurVerrouille = true;
-            }
-
+        // --- INSPECTEUR FLOTTANT ---
+        function rendreContenuInspecteur(item) {
             const insp = document.getElementById('itemInspector');
-            insp.classList.toggle('pinned', inspecteurVerrouille);
-
             const statsHtml = (item.stats || []).map(s => `
                 <div class="insp-stat-row">
                     <span style="color:${s.isTotal ? 'var(--gold)' : '#cbd5e1'}; font-weight:${s.isTotal ? '700' : '400'};">${s.nom}</span>
@@ -1856,8 +2506,13 @@
                 </div>
             `).join('');
 
+            let tagsRowHtml = '';
             let actionsHtml = '';
             if (inspecteurVerrouille) {
+                if (item.itemInstanceId) {
+                    tagsRowHtml = `<div class="tag-selector-row">${rendreBoutonsTags(item, false)}</div>`;
+                }
+
                 const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
                 const estDansComp = comparateurKeys.includes(item.ukey);
                 const nbCopies = compteDoublons[item.itemHash] || 0;
@@ -1904,12 +2559,16 @@
                 }
             }
 
+            const tagActuel = obtenirTag(item);
+            const tagPillHeader = tagActuel ? `<span class="badge" style="background:${TAGS_CONFIG[tagActuel].bg}; border:1px solid ${TAGS_CONFIG[tagActuel].border}; color:#fff; margin-top:3px;">${TAGS_CONFIG[tagActuel].icon} ${TAGS_CONFIG[tagActuel].label}</span>` : '';
+
             insp.innerHTML = `
                 <div class="insp-banner tier-${item.tier}">
                     <img class="insp-icon" src="${item.icone}">
                     <div class="insp-title">
                         <h3>${item.nom}</h3>
-                        <small>${item.typeNom}</small>
+                        <small>${item.typeNom}${item.isMasterwork ? ' • ★ Pièce Maîtresse' : ''}</small>
+                        ${tagPillHeader}
                     </div>
                     ${item.power ? `<div class="insp-power">✦ ${item.power}</div>` : ''}
                 </div>
@@ -1917,10 +2576,26 @@
                     ${item.flavor ? `<p class="insp-flavor">"${item.flavor}"</p>` : ''}
                     ${statsHtml || '<small style="color:#64748b;">Aucune statistique chiffrée.</small>'}
                     ${perksHtml}
+                    ${tagsRowHtml}
                     ${actionsHtml}
                 </div>
             `;
+        }
 
+        function afficherInspecteur(ev, ukey, verrouiller = false) {
+            if (inspecteurVerrouille && !verrouiller) return;
+            const item = registreObjets[ukey];
+            if (!item) return;
+
+            if (verrouiller) {
+                ev.stopPropagation();
+                inspecteurVerrouille = true;
+            }
+            inspecteurUkeyActif = ukey;
+
+            const insp = document.getElementById('itemInspector');
+            insp.classList.toggle('pinned', inspecteurVerrouille);
+            rendreContenuInspecteur(item);
             insp.style.display = 'block';
             positionnerInspecteur(ev);
         }
@@ -1943,6 +2618,7 @@
         function fermerInspecteur(force = false) {
             if (inspecteurVerrouille && !force) return;
             inspecteurVerrouille = false;
+            inspecteurUkeyActif = null;
             const insp = document.getElementById('itemInspector');
             insp.style.display = 'none';
             insp.classList.remove('pinned');
@@ -1950,9 +2626,11 @@
 
         function selectionnerPerso(charId) {
             persoActifId = charId;
+            optState.exotic = 'any';
             afficherBarrePersos();
             mettreAJourCompteurJalons();
             if (ongletActif === 'vendors') chargerMarchandsPerso(charId);
+            else if (ongletActif === 'optimizer') calculerOptimisationArmures(true);
             else afficherVue();
         }
 
@@ -1975,16 +2653,25 @@
 
         function changerOnglet(onglet) {
             ongletActif = onglet;
-            ['loadout', 'milestones', 'crafting', 'catalysts', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
+            ['loadout', 'optimizer', 'milestones', 'crafting', 'catalysts', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
                 document.getElementById('btn-' + t).classList.toggle('active', t === onglet);
             });
+
+            const globalFilters = document.getElementById('globalFiltersBar');
+            globalFilters.style.display = onglet === 'optimizer' ? 'none' : 'flex';
+
             document.getElementById('btnFiltreDoublons').style.display = onglet === 'loadout' ? 'inline-block' : 'none';
+            document.getElementById('filtreTag').style.display = onglet === 'loadout' ? 'inline-block' : 'none';
             document.getElementById('filtreMarchand').style.display = onglet === 'vendors' ? 'inline-block' : 'none';
             document.getElementById('filtreEtat').style.display = ['milestones', 'crafting', 'catalysts', 'exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
             document.getElementById('filtreCategorie').style.display = onglet === 'milestones' ? 'none' : 'inline-block';
 
+            mettreAJourOptionsTags();
+
             if (onglet === 'vendors' && Object.keys(groupesMarchands).length === 0 && persoActifId) {
                 chargerMarchandsPerso(persoActifId);
+            } else if (onglet === 'optimizer') {
+                calculerOptimisationArmures(true);
             } else {
                 afficherVue();
             }
@@ -1996,7 +2683,6 @@
                 setStatus("Clique sur 'Se connecter avec Bungie.net' pour inspecter les Marchands.");
                 return;
             }
-
             try {
                 setStatus(`Chargement des Marchands pour ${mapPersos[charId].classeNom}...`);
                 const url = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/Character/${charId}/Vendors/?components=400,402,300,302,304`;
@@ -2054,9 +2740,7 @@
                         totalObjets++;
                     }
 
-                    // Trier les armes des marchands par type d'arme (Revolver, Pistolet, etc.)
                     armes.sort((a, b) => a.typeNom.localeCompare(b.typeNom, 'fr') || a.nom.localeCompare(b.nom, 'fr'));
-
                     if (armes.length + armures.length + autres.length > 0) {
                         groupesMarchands[nomMarchand] = { nom: nomMarchand, icone: iconeMarchand, desc: descMarchand, armes, armures, autres };
                     }
@@ -2070,18 +2754,14 @@
                 document.getElementById('count-vendors').textContent = noms.length;
                 setStatus(`${noms.length} Marchands chargés (${totalObjets} offres).`);
                 afficherVue();
-
             } catch (e) { setStatus("Erreur Marchands : " + e.message); }
         }
 
         function onDragStartItem(ev, itemHash, itemInstanceId, lieuType, bucketHash, charIdOwner) {
             fermerInspecteur(true);
             objetGlisse = {
-                itemHash: Number(itemHash),
-                itemInstanceId: String(itemInstanceId),
-                lieuType,
-                bucketHash: Number(bucketHash),
-                charIdOwner: charIdOwner || ''
+                itemHash: Number(itemHash), itemInstanceId: String(itemInstanceId),
+                lieuType, bucketHash: Number(bucketHash), charIdOwner: charIdOwner || ''
             };
             ev.dataTransfer.setData('text/plain', itemInstanceId);
         }
@@ -2093,13 +2773,7 @@
             ev.preventDefault();
             ev.currentTarget.classList.remove('drag-over');
             if (!objetGlisse) return;
-            await transfererVersAutrePerso(
-                objetGlisse.itemHash,
-                objetGlisse.itemInstanceId,
-                objetGlisse.lieuType,
-                objetGlisse.charIdOwner,
-                targetCharId
-            );
+            await transfererVersAutrePerso(objetGlisse.itemHash, objetGlisse.itemInstanceId, objetGlisse.lieuType, objetGlisse.charIdOwner, targetCharId);
             objetGlisse = null;
         }
 
@@ -2112,10 +2786,7 @@
             const nomCible = mapPersos[targetCharId]?.classeNom || 'Personnage';
 
             try {
-                if (lieuActuel === 'equipped') {
-                    throw new Error("Déséquipe d'abord cet objet avant de l'envoyer sur un autre personnage.");
-                }
-
+                if (lieuActuel === 'equipped') throw new Error("Déséquipe d'abord cet objet avant de l'envoyer sur un autre personnage.");
                 if (lieuActuel === 'inventory' && sourceCharId) {
                     setStatus(`Transfert vers ${nomCible} (1/2 — Passage par le Coffre)...`);
                     const toVault = await appelActionBungie('TransferItem', {
@@ -2124,14 +2795,12 @@
                     });
                     if (toVault.ErrorCode !== 1) throw new Error(toVault.Message);
                 }
-
                 setStatus(`Transfert vers ${nomCible} (2/2 — Livraison dans le Sac)...`);
                 const toTarget = await appelActionBungie('TransferItem', {
                     itemReferenceHash: itemHash, stackSize: 1, transferToVault: false,
                     itemId: itemInstanceId, characterId: targetCharId, membershipType: mType
                 });
                 if (toTarget.ErrorCode !== 1) throw new Error(toTarget.Message);
-
                 setStatus(`Objet transféré directement dans le Sac de ton ${nomCible} !`);
                 await lancerAnalyse();
             } catch (e) { setStatus("Refus Bungie : " + e.message); }
@@ -2209,6 +2878,13 @@
             } catch (e) { setStatus("Refus Bungie : " + e.message); }
         }
 
+        function badgeTagTuile(item) {
+            const t = obtenirTag(item);
+            if (!t || !TAGS_CONFIG[t]) return '';
+            const cfg = TAGS_CONFIG[t];
+            return `<span class="tile-tag-badge" style="background:${cfg.bg}; border-color:${cfg.border};">${cfg.icon}</span>`;
+        }
+
         function rendreCarteEquipee(item) {
             const statsPrincipales = (item.stats || []).slice(0, 6).map(s => `
                 <div class="mini-stat">
@@ -2237,6 +2913,7 @@
                     <div class="eq-top">
                         <div class="gear-tile tier-${item.tier} ${inCmp}" style="width:48px; height:48px;">
                             <img src="${item.icone}" loading="lazy">
+                            ${badgeTagTuile(item)}
                             ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
                             ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
                         </div>
@@ -2265,13 +2942,13 @@
                      onclick="afficherInspecteur(event, '${item.ukey}', true)"
                      ondblclick="${item.lieuType === 'postmaster' ? `recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})` : `executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', '${item.charIdOwner || ''}')`}">
                     <img src="${item.icone}" loading="lazy">
+                    ${badgeTagTuile(item)}
                     ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
                     ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
                 </div>
             `;
         }
 
-        // Regroupement visuel des armes par type (Revolver, Pistolet, Fusil automatique, etc.)
         function regrouperArmesParType(items, mode) {
             const groupes = {};
             items.forEach(item => {
@@ -2327,7 +3004,6 @@
             }).join('');
 
             const badgeRecompenseClass = m.estPrestige ? 'badge-pinnacle' : (m.estPuissant ? 'badge-powerful' : '');
-
             return `
                 <div class="milestone-card ${m.possede ? 'completed' : (m.estPrestige ? 'pinnacle' : '')}">
                     <img class="milestone-icon" src="${m.icone}" loading="lazy">
@@ -2349,15 +3025,30 @@
             afficherStatsGlobalesGardien();
             afficherBarreBuilds();
             afficherPostmaster();
+            mettreAJourOptionsTags();
 
             const view = document.getElementById('mainView');
+
+            if (ongletActif === 'optimizer') {
+                view.innerHTML = rendreVueOptimiseur();
+                return;
+            }
+
             const filtreCat = document.getElementById('filtreCategorie').value;
             const filtreEtat = document.getElementById('filtreEtat').value;
             const filtreMarchand = document.getElementById('filtreMarchand').value;
+            const filtreTag = document.getElementById('filtreTag').value;
             const recherche = document.getElementById('rechercheTexte').value.toLowerCase();
 
             const matchFiltres = (item) => {
-                if (ongletActif === 'loadout' && filtreDoublonsActif && (compteDoublons[item.itemHash] || 0) <= 1) return false;
+                if (ongletActif === 'loadout') {
+                    if (filtreDoublonsActif && (compteDoublons[item.itemHash] || 0) <= 1) return false;
+                    if (filtreTag !== 'all') {
+                        const t = obtenirTag(item);
+                        if (filtreTag === 'untagged' && t !== null) return false;
+                        if (filtreTag !== 'untagged' && t !== filtreTag) return false;
+                    }
+                }
                 if (ongletActif !== 'milestones') {
                     if (filtreCat === 'weapon' && item.categorie !== 'weapon') return false;
                     if (filtreCat === 'armor' && item.categorie !== 'armor') return false;
