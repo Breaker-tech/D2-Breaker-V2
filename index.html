@@ -15,7 +15,6 @@
             --purple: #a855f7;
             --blue: #3b82f6;
             --green: #22c55e;
-            --red: #ef4444;
             --text: #f1f5f9;
             --muted: #94a3b8;
         }
@@ -81,7 +80,7 @@
 
         .config-drawer {
             background: var(--bg-panel);
-            border: 1px solid var(--border);
+            border: 1px solid var(--accent);
             border-radius: 8px;
             padding: 14px 18px;
             margin-bottom: 14px;
@@ -118,7 +117,6 @@
         .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 15px; }
         .tab-btn.active { border-color: var(--accent); color: var(--accent); background: #132036; }
 
-        /* --- BARRE DES 6 STATISTIQUES GLOBALES DU GARDIEN (T1 à T10) --- */
         .guardian-stats-panel {
             background: var(--bg-panel);
             border: 1px solid var(--border);
@@ -139,48 +137,17 @@
             border-color: var(--gold);
             background: linear-gradient(180deg, rgba(234,179,8,0.08), #090d14);
         }
-        .g-stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
-        }
+        .g-stat-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 5px; }
         .g-stat-name { font-weight: 700; color: #e2e8f0; }
-        .g-stat-tier {
-            font-weight: 800;
-            padding: 1px 6px;
-            border-radius: 4px;
-            font-size: 0.72rem;
-            background: #1e293b;
-            color: var(--accent);
-        }
-        .g-stat-card.tier-10 .g-stat-tier {
-            background: var(--gold);
-            color: #090c10;
-        }
-        .g-stat-segments {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
-            height: 6px;
-            margin-bottom: 4px;
-        }
-        .g-seg {
-            background: #1e293b;
-            border-radius: 1px;
-        }
+        .g-stat-tier { font-weight: 800; padding: 1px 6px; border-radius: 4px; font-size: 0.72rem; background: #1e293b; color: var(--accent); }
+        .g-stat-card.tier-10 .g-stat-tier { background: var(--gold); color: #090c10; }
+        .g-stat-segments { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; height: 6px; margin-bottom: 4px; }
+        .g-seg { background: #1e293b; border-radius: 1px; }
         .g-seg.filled { background: var(--accent); }
         .g-stat-card.tier-10 .g-seg.filled { background: var(--gold); }
-        .g-stat-sub {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.68rem;
-            color: var(--muted);
-        }
+        .g-stat-sub { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); }
         .waste-warn { color: #f97316; }
 
-        /* --- BARRE DE GESTION DES BUILDS (LOADOUTS) --- */
         .builds-bar {
             background: var(--bg-panel);
             border: 1px solid var(--border);
@@ -193,12 +160,7 @@
             align-items: center;
             justify-content: space-between;
         }
-        .build-chips {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        .build-chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .build-chip {
             background: #132036;
             border: 1px solid #283a5e;
@@ -210,12 +172,8 @@
             font-size: 0.8rem;
         }
         .build-chip b { color: var(--text); }
-        .build-chip button {
-            padding: 3px 8px;
-            font-size: 0.72rem;
-        }
+        .build-chip button { padding: 3px 8px; font-size: 0.72rem; }
 
-        /* --- ALERTE COMMIS DES POSTES (POSTMASTER) --- */
         .postmaster-box {
             background: linear-gradient(90deg, #1e1b4b, #0f141d);
             border: 1px solid var(--purple);
@@ -245,15 +203,8 @@
             gap: 18px;
             align-items: start;
         }
-        @media (max-width: 1150px) {
-            .loadout-workspace { grid-template-columns: 1fr; }
-        }
-        .slots-column {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-        }
+        @media (max-width: 1150px) { .loadout-workspace { grid-template-columns: 1fr; } }
+        .slots-column { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
         .slot-row {
             display: grid;
             grid-template-columns: 115px 310px 1fr;
@@ -262,19 +213,9 @@
             padding: 10px;
             border-bottom: 1px solid var(--border);
         }
-        @media (max-width: 780px) {
-            .slot-row { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 780px) { .slot-row { grid-template-columns: 1fr; } }
         .slot-row:last-child { border-bottom: none; }
-        .slot-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        .slot-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; display: flex; flex-direction: column; justify-content: center; }
         .slot-label small { font-size: 0.68rem; color: #475569; font-weight: 500; margin-top: 2px; }
         .drop-zone {
             min-height: 76px;
@@ -288,15 +229,8 @@
             align-items: center;
             transition: all 0.15s;
         }
-        .drop-zone.equipped-zone {
-            border: 1px solid #283650;
-            background: #0b111c;
-            padding: 8px 10px;
-        }
-        .drop-zone.drag-over {
-            border-color: var(--gold) !important;
-            background: rgba(234, 179, 8, 0.12) !important;
-        }
+        .drop-zone.equipped-zone { border: 1px solid #283650; background: #0b111c; padding: 8px 10px; }
+        .drop-zone.drag-over { border-color: var(--gold) !important; background: rgba(234, 179, 8, 0.12) !important; }
 
         .equipped-detail-card { width: 100%; cursor: grab; user-select: none; }
         .eq-top { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
@@ -343,11 +277,7 @@
             transition: transform 0.12s, box-shadow 0.12s;
             flex-shrink: 0;
         }
-        .gear-tile:hover {
-            transform: translateY(-2px) scale(1.04);
-            z-index: 5;
-            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
-        }
+        .gear-tile:hover { transform: translateY(-2px) scale(1.04); z-index: 5; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35); }
         .gear-tile.tier-Exotic { border-color: var(--gold); }
         .gear-tile.tier-Superior { border-color: var(--purple); }
         .gear-tile.tier-Rare { border-color: var(--blue); }
@@ -380,16 +310,8 @@
             overflow-y: auto;
         }
         .vault-slot-group { margin-bottom: 14px; }
-        .vault-slot-group h5 {
-            margin: 0 0 6px 0;
-            font-size: 0.78rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 4px;
-        }
+        .vault-slot-group h5 { margin: 0 0 6px 0; font-size: 0.78rem; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
 
-        /* Fenêtre d'inspection */
         #itemInspector {
             position: fixed;
             z-index: 9999;
@@ -459,20 +381,20 @@
     <div id="configDrawer" class="config-drawer">
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
             <div style="font-size:0.82rem; color:#94a3b8;">
-                <b>Paramètres API :</b> Colle ta clé API et ton Client ID aux lignes 388-389 pour que tout soit automatique sur GitHub Pages.
+                <b>Configuration rapide :</b> Entre ta Clé API et ton Client ID ici (ou partage un lien pré-configuré avec le bouton Lien Ami).
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <input type="password" id="apiKey" placeholder="Clé API (X-API-Key)" style="width:155px;">
                 <input type="text" id="clientId" placeholder="OAuth Client ID" style="width:115px;">
-                <input type="text" id="bungieName" placeholder="Pseudo#1234 (optionnel)" style="width:175px;">
-                <input type="text" id="oauthCode" placeholder="Code OAuth manuel" style="width:150px;">
-                <button onclick="echangerCodeOAuth()">Valider Code</button>
+                <input type="text" id="bungieName" placeholder="Pseudo#1234 (optionnel)" style="width:165px;">
+                <button class="btn-green" onclick="enregistrerConfig()">💾 Enregistrer</button>
+                <button class="btn-ghost" onclick="copierLienPartage()" title="Copie un lien avec ta clé API et ton Client ID intégrés pour tes amis">🔗 Copier Lien Ami</button>
             </div>
         </div>
     </div>
 
     <div id="status" class="status-bar">
-        <span id="statusText">Prêt. Connecte-toi avec Bungie.net pour charger tes paliers T10, tes Builds et ton Coffre.</span>
+        <span id="statusText">Prêt. Clique sur ⚙️ Config pour vérifier ta clé API ou sur "Se connecter avec Bungie.net".</span>
         <small style="color:#64748b;">Survol = Stats • Clic = Verrouiller & Actions • Glisser-Déposer = Équiper / Coffre</small>
     </div>
 
@@ -487,10 +409,8 @@
         </div>
     </div>
 
-    <!-- Bandeau des 6 Statistiques Globales du Gardien (Paliers T1 à T10) -->
     <div id="guardianStatsPanel" class="guardian-stats-panel" style="display:none;"></div>
 
-    <!-- Barre de Sauvegarde et d'Équipement de Builds en 1 Clic -->
     <div id="buildsBar" class="builds-bar" style="display:none;">
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             <b style="color:var(--accent); font-size:0.86rem;">⚡ Mes Builds (Loadouts) :</b>
@@ -500,10 +420,8 @@
         <div id="listeBuildsChips" class="build-chips"></div>
     </div>
 
-    <!-- Alerte Commis des postes (Postmaster) si des objets y sont bloqués -->
     <div id="postmasterBox" class="postmaster-box" style="display:none;"></div>
 
-    <!-- Filtres -->
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
         <select id="filtreMarchand" onchange="afficherVue()" style="display:none;"></select>
         <select id="filtreEtat" onchange="afficherVue()" style="display:none;">
@@ -524,11 +442,8 @@
     <div id="itemInspector"></div>
 
     <script>
-        // =========================================================================
-        // COLLE TA CLÉ API ET TON CLIENT ID ICI SUR GITHUB PAGES :
         const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
         const DEFAULT_CLIENT_ID = "56923";
-        // =========================================================================
 
         const BUCKET_POSTMASTER = 215593132;
         const SLOTS_DESTINY = [
@@ -556,14 +471,12 @@
             { hash: 4244567218, nom: "Force" }
         ];
         const STATS_ARMURES_ORDRE = STATS_GARDIEN_6.map(s => s.hash);
-
         const classesNom = { 0: 'Titan', 1: 'Chasseur', 2: 'Arcaniste' };
 
         let ongletActif = 'loadout';
         let joueurInfo = null;
         let persoActifId = null;
         let dictGlobal = {};
-
         let mapPersos = {};
         let listeCoffre = [];
         let groupesMarchands = {};
@@ -575,6 +488,11 @@
         let inspecteurVerrouille = false;
 
         window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Si un ami ouvre un lien partagé contenant ?k=...&c=..., on enregistre automatiquement les clés !
+            if (urlParams.get('k')) localStorage.setItem('d2_apiKey', urlParams.get('k'));
+            if (urlParams.get('c')) localStorage.setItem('d2_clientId', urlParams.get('c'));
+
             if (DEFAULT_API_KEY) localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
             if (DEFAULT_CLIENT_ID) localStorage.setItem('d2_clientId', DEFAULT_CLIENT_ID);
 
@@ -591,13 +509,15 @@
                 }
             });
 
-            // Capture automatique du ?code= au retour de Bungie sur GitHub Pages
-            const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('code')) {
-                document.getElementById('oauthCode').value = urlParams.get('code');
+                const code = urlParams.get('code');
                 window.history.replaceState({}, document.title, window.location.pathname);
-                await echangerCodeOAuth();
+                await echangerCodeOAuth(code);
                 return;
+            }
+
+            if (urlParams.get('k') || urlParams.get('c')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
             if (localStorage.getItem('d2_apiKey') && (localStorage.getItem('d2_accessToken') || localStorage.getItem('d2_bungieName'))) {
@@ -610,16 +530,96 @@
         function basculerConfig() { document.getElementById('configDrawer').classList.toggle('open'); }
         function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
 
+        function enregistrerConfig() {
+            const k = document.getElementById('apiKey').value.trim();
+            const c = document.getElementById('clientId').value.trim();
+            const b = document.getElementById('bungieName').value.trim();
+            if (k) localStorage.setItem('d2_apiKey', k);
+            if (c) localStorage.setItem('d2_clientId', c);
+            if (b) localStorage.setItem('d2_bungieName', b);
+            document.getElementById('configDrawer').classList.remove('open');
+            setStatus("Configuration enregistrée ! Tu peux maintenant cliquer sur 'Se connecter avec Bungie.net' ou 'Actualiser'.");
+            if (k && (b || localStorage.getItem('d2_accessToken'))) lancerAnalyse();
+        }
+
+        function copierLienPartage() {
+            const k = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey');
+            const c = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId');
+            if (!k || !c) return alert("Entre d'abord ta Clé API et ton Client ID avant de générer le lien pour tes amis.");
+            const url = `${window.location.origin}${window.location.pathname}?k=${encodeURIComponent(k)}&c=${encodeURIComponent(c)}`;
+            navigator.clipboard.writeText(url);
+            setStatus("🔗 Lien Ami copié dans le presse-papier ! Envoie-le à tes amis : ils n'auront rien à configurer.");
+        }
+
         function connexionRapideBungie() {
-            const clientId = document.getElementById('clientId').value.trim() || DEFAULT_CLIENT_ID;
-            if (!clientId) {
+            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
+            if (!clientId || !apiKey) {
                 document.getElementById('configDrawer').classList.add('open');
-                alert("Renseigne ton OAuth Client ID dans ⚙️ Config.");
+                alert("Entre ta Clé API et ton OAuth Client ID dans l'encadré ⚙️ Config puis clique sur Enregistrer.");
                 return;
             }
             localStorage.setItem('d2_clientId', clientId);
-            // Sur GitHub Pages (https), on redirige dans le même onglet pour une connexion fluide en 1 clic
-            const authUrl = `https://www.bungie.net/fr/OAuth/Authorize?client_id=${clientId}&response_type=code`; if (window.location.protocol.startsWith('http')) { window.location.href = authUrl; } else { window.open(authUrl, '_blank'); document.getElementById('configDrawer').classList.add('open'); } }  async function echangerCodeOAuth() { const clientId = document.getElementById('clientId').value.trim() \vert{}\vert{} DEFAULT_CLIENT_ID; let code = document.getElementById('oauthCode').value.trim(); if (code.includes('code=')) code = new URLSearchParams(code.split('?')[1]).get('code'); if (!clientId \vert{}\vert{} !code) return;  try { setStatus("Connexion OAuth à Bungie.net en cours..."); const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code, client_id: clientId }) }); const data = await resp.json(); if (data.access_token) { sauvegarderTokens(data); document.getElementById('oauthCode').value = ""; document.getElementById('configDrawer').classList.remove('open'); lancerAnalyse(); } else { setStatus("Erreur OAuth : " + (data.error_description \vert{}\vert{} "Code expiré.")); } } catch (e) { setStatus("Erreur OAuth : " + e.message); } }  function sauvegarderTokens(data) { localStorage.setItem('d2_accessToken', data.access_token); if (data.refresh_token) localStorage.setItem('d2_refreshToken', data.refresh_token); localStorage.setItem('d2_tokenExpiry', Date.now() + (data.expires_in * 1000) - 60000); }  async function obtenirTokenValide() { const clientId = document.getElementById('clientId').value.trim() \vert{}\vert{} DEFAULT_CLIENT_ID; const token = localStorage.getItem('d2_accessToken'); const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') \vert{}\vert{} '0'); const refresh = localStorage.getItem('d2_refreshToken');  if (token && Date.now() < expiry) return token; if (refresh && clientId) { try { const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: clientId }) }); const data = await resp.json(); if (data.access_token) { sauvegarderTokens(data); return data.access_token; } } catch (e) { console.warn(e); } } return token; }  async function identifierJoueur(apiKey, accessToken) { if (accessToken) { const resp = await fetch('https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/', { headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` }
+            localStorage.setItem('d2_apiKey', apiKey);
+            window.location.href = `https://www.bungie.net/fr/OAuth/Authorize?client_id=${clientId}&response_type=code`;
+        }
+
+        async function echangerCodeOAuth(codeRecu) {
+            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
+            if (!clientId || !codeRecu) return;
+
+            try {
+                setStatus("Connexion OAuth à Bungie.net en cours...");
+                const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ grant_type: 'authorization_code', code: codeRecu, client_id: clientId })
+                });
+                const data = await resp.json();
+                if (data.access_token) {
+                    sauvegarderTokens(data);
+                    document.getElementById('configDrawer').classList.remove('open');
+                    lancerAnalyse();
+                } else {
+                    setStatus("Erreur OAuth : " + (data.error_description || "Code expiré, reclique sur Se connecter."));
+                }
+            } catch (e) { setStatus("Erreur OAuth : " + e.message); }
+        }
+
+        function sauvegarderTokens(data) {
+            localStorage.setItem('d2_accessToken', data.access_token);
+            if (data.refresh_token) localStorage.setItem('d2_refreshToken', data.refresh_token);
+            localStorage.setItem('d2_tokenExpiry', Date.now() + (data.expires_in * 1000) - 60000);
+        }
+
+        async function obtenirTokenValide() {
+            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
+            const token = localStorage.getItem('d2_accessToken');
+            const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0');
+            const refresh = localStorage.getItem('d2_refreshToken');
+
+            if (token && Date.now() < expiry) return token;
+            if (refresh && clientId) {
+                try {
+                    const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: clientId })
+                    });
+                    const data = await resp.json();
+                    if (data.access_token) {
+                        sauvegarderTokens(data);
+                        return data.access_token;
+                    }
+                } catch (e) { console.warn(e); }
+            }
+            return token;
+        }
+
+        async function identifierJoueur(apiKey, accessToken) {
+            if (accessToken) {
+                const resp = await fetch('https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/', {
+                    headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` }
                 });
                 const data = await resp.json();
                 if (data.Response?.destinyMemberships?.length > 0) {
@@ -726,13 +726,13 @@
         }
 
         async function lancerAnalyse() {
-            const apiKey = document.getElementById('apiKey').value.trim() || DEFAULT_API_KEY;
-            const clientId = document.getElementById('clientId').value.trim() || DEFAULT_CLIENT_ID;
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
+            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
             const fullBungieName = document.getElementById('bungieName').value.trim();
 
             if (!apiKey) {
                 document.getElementById('configDrawer').classList.add('open');
-                setStatus("Renseigne ta clé API dans ⚙️ Config pour démarrer.");
+                setStatus("Renseigne ta Clé API dans ⚙️ Config puis clique sur Enregistrer.");
                 return;
             }
 
@@ -773,7 +773,126 @@
                 setStatus("3/3 — Lecture en direct : Personnages, Paliers T10, Coffre et Commis des postes...");
                 const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,205,300,302,304,800,900`;
                 const headers = { 'X-API-Key': apiKey };
-                if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;  const profileResp = await fetch(profileUrl, { headers }); const profileData = await profileResp.json(); const resp = profileData.Response;  const instances = resp.itemComponents?.instances?.data \vert{}\vert{} {}; const itemPerks = resp.itemComponents?.perks?.data \vert{}\vert{} {}; const itemStatsMap = resp.itemComponents?.stats?.data \vert{}\vert{} {}; registreObjets = {};  mapPersos = {}; for (const [cId, c] of Object.entries(resp.characters?.data \vert{}\vert{} {})) { mapPersos[cId] = { id: cId, classeNom: classesNom[c.classType] \vert{}\vert{} 'Gardien', light: c.light, statsGlobales: c.stats \vert{}\vert{} {}, // Les 6 stats globales calculées par Bungie ! emblem: c.emblemPath ? 'https://www.bungie.net' + c.emblemPath : '', equipped: [], inventory: [], postmaster: [] }; } if (!persoActifId \vert{}\vert{} !mapPersos[persoActifId]) { persoActifId = Object.keys(mapPersos)[0]; } afficherBarrePersos();  for (const [cId, data] of Object.entries(resp.characterEquipment?.data \vert{}\vert{} {})) { data.items.forEach(i => { const fmt = formaterEquipement(i, 'equipped', cId, instances, itemPerks, itemStatsMap); if (fmt) mapPersos[cId].equipped.push(fmt); }); }  listeQuetes = []; for (const [cId, data] of Object.entries(resp.characterInventories?.data \vert{}\vert{} {})) { data.items.forEach(i => { const def = dictGlobal.items[i.itemHash]; if (!def) return; // Détection des objets bloqués au Commis des postes (Bucket 215593132) if (i.bucketHash === BUCKET_POSTMASTER) { const fmtPost = formaterEquipement(i, 'postmaster', cId, instances, itemPerks, itemStatsMap, true); if (fmtPost) mapPersos[cId].postmaster.push(fmtPost); } else if (def.itemType === 12 \vert{}\vert{} (def.itemCategoryHashes && def.itemCategoryHashes.includes(53))) { listeQuetes.push({ nom: def.displayProperties.name, source: def.displayProperties.description \vert{}\vert{} "Quête / Contrat", icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '', possede: false, categorie: 'quest', tier: 'Superior', badgeTexte: mapPersos[cId]?.classeNom \vert{}\vert{} 'Quête' }); } else { const fmt = formaterEquipement(i, 'inventory', cId, instances, itemPerks, itemStatsMap); if (fmt) mapPersos[cId].inventory.push(fmt); } }); }  listeCoffre = []; (resp.profileInventory?.data?.items \vert{}\vert{} []).forEach(i => { const fmt = formaterEquipement(i, 'vault', null, instances, itemPerks, itemStatsMap); if (fmt) listeCoffre.push(fmt); }); listeCoffre.sort((a, b) => (b.power \vert{}\vert{} 0) - (a.power \vert{}\vert{} 0));  const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles \vert{}\vert{} {}) }; for (const cId in (resp.characterCollectibles?.data \vert{}\vert{} {})) { Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles); } listeExotiques = []; for (const [hash, def] of Object.entries(dictGlobal.collectibles)) { if (!def.displayProperties?.name \vert{}\vert{} !def.displayProperties?.icon) continue; const itemDef = dictGlobal.items[def.itemHash]; const isExo = itemDef?.inventory?.tierType === 6; const cat = itemDef?.itemType === 3 ? 'weapon' : (itemDef?.itemType === 2 ? 'armor' : 'other'); const possede = ((collectiblesJoueur[hash]?.state ?? 1) & 1) === 0; const ukey = 'col_' + hash; const obj = { ukey, nom: def.displayProperties.name, typeNom: itemDef?.itemTypeDisplayName \vert{}\vert{} "Collection", flavor: itemDef?.flavorText \vert{}\vert{} "", source: def.sourceString \vert{}\vert{} "Collection Destiny 2", icone: 'https://www.bungie.net' + def.displayProperties.icon, possede, categorie: cat, tier: isExo ? 'Exotic' : 'Superior', badgeTexte: possede ? 'Débloqué' : 'Manquant', stats: itemDef ? extraireStatsObjet(itemDef, null, null) : [], perks: [] }; registreObjets[ukey] = obj; listeExotiques.push(obj); }  const recordsJoueur = resp.profileRecords?.data?.records \vert{}\vert{} {}; listeTriomphes = []; for (const [hash, rec] of Object.entries(recordsJoueur)) { const def = dictGlobal.records[hash]; if (!def \vert{}\vert{} !def.displayProperties?.name) continue; const complete = (rec.state & 4) === 0; listeTriomphes.push({ nom: def.displayProperties.name, source: def.displayProperties.description \vert{}\vert{} "Triomphe", icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png', possede: complete, categorie: 'triumph', tier: complete ? 'Exotic' : 'Rare', badgeTexte: complete ? 'Complété' : 'À faire' }); }  document.getElementById('count-quests').textContent = listeQuetes.length; document.getElementById('count-exotics').textContent = listeExotiques.length; document.getElementById('count-triumphs').textContent = listeTriomphes.length;  setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — Paliers T10, Builds et Coffre opérationnels.`);
+                if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+                const profileResp = await fetch(profileUrl, { headers });
+                const profileData = await profileResp.json();
+                const resp = profileData.Response;
+
+                const instances = resp.itemComponents?.instances?.data || {};
+                const itemPerks = resp.itemComponents?.perks?.data || {};
+                const itemStatsMap = resp.itemComponents?.stats?.data || {};
+                registreObjets = {};
+
+                mapPersos = {};
+                for (const [cId, c] of Object.entries(resp.characters?.data || {})) {
+                    mapPersos[cId] = {
+                        id: cId,
+                        classeNom: classesNom[c.classType] || 'Gardien',
+                        light: c.light,
+                        statsGlobales: c.stats || {},
+                        emblem: c.emblemPath ? 'https://www.bungie.net' + c.emblemPath : '',
+                        equipped: [],
+                        inventory: [],
+                        postmaster: []
+                    };
+                }
+                if (!persoActifId || !mapPersos[persoActifId]) {
+                    persoActifId = Object.keys(mapPersos)[0];
+                }
+                afficherBarrePersos();
+
+                for (const [cId, data] of Object.entries(resp.characterEquipment?.data || {})) {
+                    data.items.forEach(i => {
+                        const fmt = formaterEquipement(i, 'equipped', cId, instances, itemPerks, itemStatsMap);
+                        if (fmt) mapPersos[cId].equipped.push(fmt);
+                    });
+                }
+
+                listeQuetes = [];
+                for (const [cId, data] of Object.entries(resp.characterInventories?.data || {})) {
+                    data.items.forEach(i => {
+                        const def = dictGlobal.items[i.itemHash];
+                        if (!def) return;
+                        if (i.bucketHash === BUCKET_POSTMASTER) {
+                            const fmtPost = formaterEquipement(i, 'postmaster', cId, instances, itemPerks, itemStatsMap, true);
+                            if (fmtPost) mapPersos[cId].postmaster.push(fmtPost);
+                        } else if (def.itemType === 12 || (def.itemCategoryHashes && def.itemCategoryHashes.includes(53))) {
+                            listeQuetes.push({
+                                nom: def.displayProperties.name,
+                                source: def.displayProperties.description || "Quête / Contrat",
+                                icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '',
+                                possede: false,
+                                categorie: 'quest',
+                                tier: 'Superior',
+                                badgeTexte: mapPersos[cId]?.classeNom || 'Quête'
+                            });
+                        } else {
+                            const fmt = formaterEquipement(i, 'inventory', cId, instances, itemPerks, itemStatsMap);
+                            if (fmt) mapPersos[cId].inventory.push(fmt);
+                        }
+                    });
+                }
+
+                listeCoffre = [];
+                (resp.profileInventory?.data?.items || []).forEach(i => {
+                    const fmt = formaterEquipement(i, 'vault', null, instances, itemPerks, itemStatsMap);
+                    if (fmt) listeCoffre.push(fmt);
+                });
+                listeCoffre.sort((a, b) => (b.power || 0) - (a.power || 0));
+
+                const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles || {}) };
+                for (const cId in (resp.characterCollectibles?.data || {})) {
+                    Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles);
+                }
+                listeExotiques = [];
+                for (const [hash, def] of Object.entries(dictGlobal.collectibles)) {
+                    if (!def.displayProperties?.name || !def.displayProperties?.icon) continue;
+                    const itemDef = dictGlobal.items[def.itemHash];
+                    const isExo = itemDef?.inventory?.tierType === 6;
+                    const cat = itemDef?.itemType === 3 ? 'weapon' : (itemDef?.itemType === 2 ? 'armor' : 'other');
+                    const possede = ((collectiblesJoueur[hash]?.state ?? 1) & 1) === 0;
+                    const ukey = 'col_' + hash;
+                    const obj = {
+                        ukey,
+                        nom: def.displayProperties.name,
+                        typeNom: itemDef?.itemTypeDisplayName || "Collection",
+                        flavor: itemDef?.flavorText || "",
+                        source: def.sourceString || "Collection Destiny 2",
+                        icone: 'https://www.bungie.net' + def.displayProperties.icon,
+                        possede,
+                        categorie: cat,
+                        tier: isExo ? 'Exotic' : 'Superior',
+                        badgeTexte: possede ? 'Débloqué' : 'Manquant',
+                        stats: itemDef ? extraireStatsObjet(itemDef, null, null) : [],
+                        perks: []
+                    };
+                    registreObjets[ukey] = obj;
+                    listeExotiques.push(obj);
+                }
+
+                const recordsJoueur = resp.profileRecords?.data?.records || {};
+                listeTriomphes = [];
+                for (const [hash, rec] of Object.entries(recordsJoueur)) {
+                    const def = dictGlobal.records[hash];
+                    if (!def || !def.displayProperties?.name) continue;
+                    const complete = (rec.state & 4) === 0;
+                    listeTriomphes.push({
+                        nom: def.displayProperties.name,
+                        source: def.displayProperties.description || "Triomphe",
+                        icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png',
+                        possede: complete,
+                        categorie: 'triumph',
+                        tier: complete ? 'Exotic' : 'Rare',
+                        badgeTexte: complete ? 'Complété' : 'À faire'
+                    });
+                }
+
+                document.getElementById('count-quests').textContent = listeQuetes.length;
+                document.getElementById('count-exotics').textContent = listeExotiques.length;
+                document.getElementById('count-triumphs').textContent = listeTriomphes.length;
+
+                setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — Paliers T10, Builds et Coffre opérationnels.`);
                 if (ongletActif === 'vendors') {
                     chargerMarchandsPerso(persoActifId);
                 } else {
@@ -785,7 +904,6 @@
             }
         }
 
-        // --- AFFICHAGE DES 6 PALIERS DE STATISTIQUES GLOBALES (T1 à T10) ---
         function afficherStatsGlobalesGardien() {
             const panel = document.getElementById('guardianStatsPanel');
             const p = mapPersos[persoActifId];
@@ -795,19 +913,672 @@
             }
             panel.style.display = 'grid';
 
-            let totalPointsPerdus = 0;
             panel.innerHTML = STATS_GARDIEN_6.map(st => {
                 const val = p.statsGlobales[st.hash] || 0;
                 const tier = Math.min(10, Math.floor(val / 10));
                 const perdu = val >= 100 ? (val - 100) : (val % 10);
-                totalPointsPerdus += perdu;
 
                 let segmentsHtml = '';
                 for (let i = 1; i <= 10; i++) {
-                    segmentsHtml += `<div class="g-seg \${i <= tier ? 'filled' : ''}"></div>`;
+                    segmentsHtml += `<div class="g-seg ${i <= tier ? 'filled' : ''}"></div>`;
                 }
 
                 return `
-                    <div class="g-stat-card \${tier === 10 ? 'tier-10' : ''}">
+                    <div class="g-stat-card ${tier === 10 ? 'tier-10' : ''}">
                         <div class="g-stat-header">
-                            <span class="g
+                            <span class="g-stat-name">${st.nom} (${val})</span>
+                            <span class="g-stat-tier">Palier T${tier}</span>
+                        </div>
+                        <div class="g-stat-segments">${segmentsHtml}</div>
+                        <div class="g-stat-sub">
+                            <span>Bonus actif : ${tier * 10}</span>
+                            ${perdu > 0 ? `<span class="waste-warn">+${perdu} pts perdus</span>` : `<span style="color:var(--green);">✓ Palier pile</span>`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCleBuilds() { return `d2_builds_${persoActifId || 'default'}`; }
+        function chargerBuildsLocale() {
+            try { return JSON.parse(localStorage.getItem(getCleBuilds()) || '[]'); }
+            catch { return []; }
+        }
+
+        function sauvegarderBuildActuel() {
+            const p = mapPersos[persoActifId];
+            if (!p || p.equipped.length === 0) return;
+
+            const champNom = document.getElementById('nomNouveauBuild');
+            const nom = champNom.value.trim() || `Build ${p.classeNom} (${p.light})`;
+
+            const itemsBuild = p.equipped.map(item => ({
+                itemHash: item.itemHash,
+                itemInstanceId: item.itemInstanceId,
+                bucketHash: item.bucketHash,
+                nom: item.nom
+            }));
+
+            const builds = chargerBuildsLocale();
+            builds.push({ id: Date.now(), nom, items: itemsBuild });
+            localStorage.setItem(getCleBuilds(), JSON.stringify(builds));
+            champNom.value = "";
+            afficherBarreBuilds();
+            setStatus(`Build "${nom}" sauvegardé !`);
+        }
+
+        function supprimerBuild(id) {
+            const builds = chargerBuildsLocale().filter(b => b.id !== id);
+            localStorage.setItem(getCleBuilds(), JSON.stringify(builds));
+            afficherBarreBuilds();
+        }
+
+        async function equiperBuildComplet(id) {
+            const build = chargerBuildsLocale().find(b => b.id === id);
+            if (!build || !joueurInfo) return;
+
+            const mType = joueurInfo.membershipType;
+            const idsAEquiper = [];
+
+            try {
+                setStatus(`Préparation du Build "${build.nom}"...`);
+                for (const bItem of build.items) {
+                    const dejaEquipe = mapPersos[persoActifId].equipped.find(x => x.itemInstanceId === bItem.itemInstanceId);
+                    if (dejaEquipe) continue;
+
+                    const dansCoffre = listeCoffre.find(x => x.itemInstanceId === bItem.itemInstanceId);
+                    if (dansCoffre) {
+                        setStatus(`Rapatriement de "${bItem.nom}" depuis le Coffre...`);
+                        await appelActionBungie('TransferItem', {
+                            itemReferenceHash: bItem.itemHash, stackSize: 1, transferToVault: false,
+                            itemId: bItem.itemInstanceId, characterId: persoActifId, membershipType: mType
+                        });
+                    }
+                    idsAEquiper.push(bItem.itemInstanceId);
+                }
+
+                if (idsAEquiper.length > 0) {
+                    setStatus(`Équipement simultané des ${idsAEquiper.length} pièces...`);
+                    const eq = await appelActionBungie('EquipItems', {
+                        itemIds: idsAEquiper, characterId: persoActifId, membershipType: mType
+                    });
+                    if (eq.ErrorCode !== 1) throw new Error(eq.Message);
+                }
+
+                setStatus(`Build "${build.nom}" équipé avec succès !`);
+                await lancerAnalyse();
+            } catch (e) {
+                setStatus(`Erreur Build : ${e.message} (Assure-toi d'être en Orbite ou à la Tour).`);
+            }
+        }
+
+        function afficherBarreBuilds() {
+            const bar = document.getElementById('buildsBar');
+            const zone = document.getElementById('listeBuildsChips');
+            if (!persoActifId || ongletActif !== 'loadout') {
+                bar.style.display = 'none';
+                return;
+            }
+            bar.style.display = 'flex';
+            const builds = chargerBuildsLocale();
+            if (builds.length === 0) {
+                zone.innerHTML = `<small style="color:#64748b;">Aucun build enregistré sur ce personnage.</small>`;
+                return;
+            }
+            zone.innerHTML = builds.map(b => `
+                <div class="build-chip">
+                    <b title="${b.items.map(i => i.nom).join(' • ')}">${b.nom}</b>
+                    <button onclick="equiperBuildComplet(${b.id})">⚡ Équiper</button>
+                    <button class="btn-ghost" onclick="supprimerBuild(${b.id})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        async function recupererDuPostmaster(itemHash, itemInstanceId, stackSize) {
+            try {
+                setStatus("Récupération chez le Commis des postes...");
+                const res = await appelActionBungie('PullFromPostmaster', {
+                    itemReferenceHash: itemHash, stackSize: stackSize || 1,
+                    itemId: itemInstanceId || "0", characterId: persoActifId,
+                    membershipType: joueurInfo.membershipType
+                });
+                if (res.ErrorCode !== 1) throw new Error(res.Message);
+                setStatus("Objet récupéré dans le Sac !");
+                await lancerAnalyse();
+            } catch (e) { setStatus("Erreur Commis des postes : " + e.message); }
+        }
+
+        function afficherPostmaster() {
+            const box = document.getElementById('postmasterBox');
+            const p = mapPersos[persoActifId];
+            if (!p || ongletActif !== 'loadout' || p.postmaster.length === 0) {
+                box.style.display = 'none';
+                return;
+            }
+            box.style.display = 'block';
+            box.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <b style="color:#d8b4fe; font-size:0.9rem;">📬 Commis des postes — Kadi 55-30 (${p.postmaster.length} / 21 objets)</b>
+                    <small style="color:#cbd5e1;">Clique sur un objet puis sur "📥 Récupérer dans le Sac"</small>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    ${p.postmaster.map(rendreTuile).join('')}
+                </div>
+            `;
+        }
+
+        function afficherInspecteur(ev, ukey, verrouiller = false) {
+            if (inspecteurVerrouille && !verrouiller) return;
+            const item = registreObjets[ukey];
+            if (!item) return;
+
+            if (verrouiller) {
+                ev.stopPropagation();
+                inspecteurVerrouille = true;
+            }
+
+            const insp = document.getElementById('itemInspector');
+            insp.classList.toggle('pinned', inspecteurVerrouille);
+
+            const statsHtml = (item.stats || []).map(s => `
+                <div class="insp-stat-row">
+                    <span style="color:${s.isTotal ? 'var(--gold)' : '#cbd5e1'}; font-weight:${s.isTotal ? '700' : '400'};">${s.nom}</span>
+                    ${s.isBar ? `<div class="insp-stat-bar"><div class="insp-stat-fill" style="width:${Math.min(100, s.val)}%;"></div></div>` : `<span></span>`}
+                    <span style="text-align:right; font-weight:700; color:${s.isTotal ? 'var(--gold)' : '#fff'};">${s.val}</span>
+                </div>
+            `).join('');
+
+            const perksHtml = (item.perks || []).map(p => `
+                <div class="insp-perk-item">
+                    ${p.icone ? `<img src="${p.icone}">` : ''}
+                    <div>
+                        <b>${p.nom}</b>
+                        <span>${p.desc.substring(0, 110)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            let actionsHtml = '';
+            if (inspecteurVerrouille) {
+                const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
+                if (item.lieuType === 'postmaster') {
+                    actionsHtml = `
+                        <div class="insp-actions">
+                            <button class="btn-green" onclick="recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})">📥 Récupérer dans le Sac</button>
+                            <button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button>
+                        </div>
+                    `;
+                } else if (item.itemInstanceId) {
+                    actionsHtml = `
+                        <div class="insp-actions">
+                            ${item.lieuType !== 'equipped' ? `<button onclick="executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}')">⚡ Équiper (${nomPerso})</button>` : ''}
+                            ${item.lieuType === 'vault' ? `<button onclick="executerMouvement('inventory', ${item.itemHash}, '${item.itemInstanceId}', 'vault')">🎒 Vers Sac</button>` : ''}
+                            ${item.lieuType === 'inventory' ? `<button onclick="executerMouvement('vault', ${item.itemHash}, '${item.itemInstanceId}', 'inventory')">🏦 Vers Coffre</button>` : ''}
+                            <button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button>
+                        </div>
+                    `;
+                } else {
+                    actionsHtml = `<div class="insp-actions"><button class="btn-ghost" onclick="fermerInspecteur(true)">✕ Fermer</button></div>`;
+                }
+            }
+
+            insp.innerHTML = `
+                <div class="insp-banner tier-${item.tier}">
+                    <img class="insp-icon" src="${item.icone}">
+                    <div class="insp-title">
+                        <h3>${item.nom}</h3>
+                        <small>${item.typeNom}</small>
+                    </div>
+                    ${item.power ? `<div class="insp-power">✦ ${item.power}</div>` : ''}
+                </div>
+                <div class="insp-body">
+                    ${item.flavor ? `<p class="insp-flavor">"${item.flavor}"</p>` : ''}
+                    ${statsHtml || '<small style="color:#64748b;">Aucune statistique chiffrée.</small>'}
+                    ${perksHtml}
+                    ${actionsHtml}
+                    ${!inspecteurVerrouille ? `<div style="margin-top:8px; font-size:0.68rem; color:#64748b; text-align:center;">Clique pour verrouiller cette fiche</div>` : ''}
+                </div>
+            `;
+
+            insp.style.display = 'block';
+            positionnerInspecteur(ev);
+        }
+
+        function positionnerInspecteur(ev) {
+            const insp = document.getElementById('itemInspector');
+            if (insp.style.display === 'none') return;
+            const pad = 16;
+            let x = ev.clientX + pad;
+            let y = ev.clientY + pad;
+            const rect = insp.getBoundingClientRect();
+            if (x + rect.width > window.innerWidth - 12) x = ev.clientX - rect.width - pad;
+            if (y + rect.height > window.innerHeight - 12) y = Math.max(12, window.innerHeight - rect.height - 12);
+            insp.style.left = x + 'px';
+            insp.style.top = y + 'px';
+        }
+
+        function bougerInspecteur(ev) { if (!inspecteurVerrouille) positionnerInspecteur(ev); }
+
+        function fermerInspecteur(force = false) {
+            if (inspecteurVerrouille && !force) return;
+            inspecteurVerrouille = false;
+            const insp = document.getElementById('itemInspector');
+            insp.style.display = 'none';
+            insp.classList.remove('pinned');
+        }
+
+        function selectionnerPerso(charId) {
+            persoActifId = charId;
+            afficherBarrePersos();
+            if (ongletActif === 'vendors') chargerMarchandsPerso(charId);
+            else afficherVue();
+        }
+
+        function afficherBarrePersos() {
+            const bar = document.getElementById('charBar');
+            bar.innerHTML = Object.entries(mapPersos).map(([cId, p]) => `
+                <div class="char-card ${cId === persoActifId ? 'active' : ''}" onclick="selectionnerPerso('${cId}')">
+                    <img class="char-emblem" src="${p.emblem}">
+                    <div class="char-meta">
+                        <h4>${p.classeNom}</h4>
+                        <span>✦ ${p.light}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changerOnglet(onglet) {
+            ongletActif = onglet;
+            ['loadout', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
+                document.getElementById('btn-' + t).classList.toggle('active', t === onglet);
+            });
+            document.getElementById('filtreMarchand').style.display = onglet === 'vendors' ? 'inline-block' : 'none';
+            document.getElementById('filtreEtat').style.display = ['exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
+
+            if (onglet === 'vendors' && Object.keys(groupesMarchands).length === 0 && persoActifId) {
+                chargerMarchandsPerso(persoActifId);
+            } else {
+                afficherVue();
+            }
+        }
+
+        async function chargerMarchandsPerso(charId) {
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
+            const accessToken = await obtenirTokenValide();
+            if (!accessToken || !joueurInfo) {
+                setStatus("Clique sur 'Se connecter avec Bungie.net' pour inspecter les Marchands.");
+                return;
+            }
+
+            try {
+                setStatus(`Chargement des Marchands pour ton ${mapPersos[charId].classeNom}...`);
+                const url = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/Character/${charId}/Vendors/?components=400,402,300,302,304`;
+                const resp = await fetch(url, { headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` } });
+                const data = await resp.json();
+
+                const vendorsData = data.Response?.vendors?.data || {};
+                const salesData = data.Response?.sales?.data || {};
+                const vendorStats = data.Response?.itemComponents || {};
+                groupesMarchands = {};
+                let totalObjets = 0;
+
+                for (const vHash in salesData) {
+                    if (!vendorsData[vHash]) continue;
+                    const vDef = dictGlobal.vendors[vHash];
+                    if (!vDef || !vDef.displayProperties?.name) continue;
+
+                    const nomMarchand = vDef.displayProperties.name;
+                    const iconeMarchand = vDef.displayProperties.icon ? 'https://www.bungie.net' + vDef.displayProperties.icon : '';
+                    const descMarchand = vDef.displayProperties.subtitle || vDef.displayProperties.description || "Marchand de la Tour";
+                    const statsMarchand = vendorStats[vHash]?.stats?.data || {};
+                    const perksMarchand = vendorStats[vHash]?.perks?.data || {};
+
+                    const armes = [], armures = [], autres = [];
+                    const dejaVu = new Set();
+
+                    for (const [sKey, sItem] of Object.entries(salesData[vHash].saleItems || {})) {
+                        const itemDef = dictGlobal.items[sItem.itemHash];
+                        if (!itemDef || !itemDef.displayProperties?.name) continue;
+                        if (dejaVu.has(itemDef.displayProperties.name)) continue;
+                        if (![2, 3, 12, 19].includes(itemDef.itemType) && itemDef.inventory?.tierType < 5) continue;
+
+                        dejaVu.add(itemDef.displayProperties.name);
+                        const tierKey = itemDef.inventory?.tierType === 6 ? 'Exotic' : (itemDef.inventory?.tierType === 5 ? 'Superior' : 'Rare');
+                        const ukey = `vendor_${vHash}_${sKey}`;
+
+                        const obj = {
+                            ukey,
+                            nom: itemDef.displayProperties.name,
+                            typeNom: itemDef.itemTypeDisplayName || "Offre Marchand",
+                            flavor: itemDef.flavorText || "",
+                            source: itemDef.itemTypeDisplayName || "Objet",
+                            icone: itemDef.displayProperties.icon ? 'https://www.bungie.net' + itemDef.displayProperties.icon : '',
+                            categorie: itemDef.itemType === 3 ? 'weapon' : (itemDef.itemType === 2 ? 'armor' : 'other'),
+                            tier: tierKey,
+                            badgeTexte: nomMarchand,
+                            stats: extraireStatsObjet(itemDef, sKey, statsMarchand),
+                            perks: extrairePerksDetails(sKey, perksMarchand)
+                        };
+                        registreObjets[ukey] = obj;
+
+                        if (itemDef.itemType === 3) armes.push(obj);
+                        else if (itemDef.itemType === 2) armures.push(obj);
+                        else autres.push(obj);
+                        totalObjets++;
+                    }
+
+                    if (armes.length + armures.length + autres.length > 0) {
+                        groupesMarchands[nomMarchand] = { nom: nomMarchand, icone: iconeMarchand, desc: descMarchand, armes, armures, autres };
+                    }
+                }
+
+                const noms = Object.keys(groupesMarchands).sort();
+                document.getElementById('filtreMarchand').innerHTML =
+                    `<option value="all">Tous les Marchands (${noms.length})</option>` +
+                    noms.map(n => `<option value="${n}">${n}</option>`).join('');
+
+                document.getElementById('count-vendors').textContent = noms.length;
+                setStatus(`${noms.length} Marchands chargés (${totalObjets} offres).`);
+                afficherVue();
+
+            } catch (e) { setStatus("Erreur Marchands : " + e.message); }
+        }
+
+        function onDragStartItem(ev, itemHash, itemInstanceId, lieuType, bucketHash) {
+            fermerInspecteur(true);
+            objetGlisse = { itemHash: Number(itemHash), itemInstanceId: String(itemInstanceId), lieuType, bucketHash: Number(bucketHash) };
+            ev.dataTransfer.setData('text/plain', itemInstanceId);
+        }
+
+        function onDragOverZone(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        function onDragLeaveZone(ev) { ev.currentTarget.classList.remove('drag-over'); }
+
+        async function onDropZone(ev, cibleMode, targetBucketHash) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            if (!objetGlisse) return;
+            if (targetBucketHash && objetGlisse.bucketHash !== targetBucketHash) {
+                setStatus("Action annulée : cet objet n'appartient pas à cet emplacement.");
+                return;
+            }
+            if (objetGlisse.lieuType === cibleMode) return;
+            await executerMouvement(cibleMode, objetGlisse.itemHash, objetGlisse.itemInstanceId, objetGlisse.lieuType);
+            objetGlisse = null;
+        }
+
+        async function appelActionBungie(endpoint, payload) {
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
+            const accessToken = await obtenirTokenValide();
+            const resp = await fetch(`https://www.bungie.net/Platform/Destiny2/Actions/Items/${endpoint}/`, {
+                method: 'POST',
+                headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            return await resp.json();
+        }
+
+        async function executerMouvement(cibleMode, itemHash, itemInstanceId, lieuActuel) {
+            fermerInspecteur(true);
+            const mType = joueurInfo.membershipType;
+            try {
+                setStatus("Transfert en cours auprès des serveurs Bungie...");
+                if (cibleMode === 'vault') {
+                    if (lieuActuel === 'equipped') throw new Error("Équipe d'abord un autre objet avant de ranger celui-ci au Coffre.");
+                    const res = await appelActionBungie('TransferItem', {
+                        itemReferenceHash: itemHash, stackSize: 1, transferToVault: true,
+                        itemId: itemInstanceId, characterId: persoActifId, membershipType: mType
+                    });
+                    if (res.ErrorCode !== 1) throw new Error(res.Message);
+                    setStatus("Objet rangé dans le Coffre !");
+                } else if (cibleMode === 'inventory') {
+                    if (lieuActuel === 'vault') {
+                        const res = await appelActionBungie('TransferItem', {
+                            itemReferenceHash: itemHash, stackSize: 1, transferToVault: false,
+                            itemId: itemInstanceId, characterId: persoActifId, membershipType: mType
+                        });
+                        if (res.ErrorCode !== 1) throw new Error(res.Message);
+                        setStatus(`Objet transféré dans le sac de ton ${mapPersos[persoActifId].classeNom} !`);
+                    }
+                } else if (cibleMode === 'equipped') {
+                    if (lieuActuel === 'vault') {
+                        const pull = await appelActionBungie('TransferItem', {
+                            itemReferenceHash: itemHash, stackSize: 1, transferToVault: false,
+                            itemId: itemInstanceId, characterId: persoActifId, membershipType: mType
+                        });
+                        if (pull.ErrorCode !== 1) throw new Error(pull.Message);
+                    }
+                    const eq = await appelActionBungie('EquipItem', {
+                        itemId: itemInstanceId, characterId: persoActifId, membershipType: mType
+                    });
+                    if (eq.ErrorCode !== 1) throw new Error(eq.Message);
+                    setStatus(`Objet équipé en direct sur ton ${mapPersos[persoActifId].classeNom} !`);
+                }
+                await lancerAnalyse();
+            } catch (e) { setStatus("Refus Bungie : " + e.message); }
+        }
+
+        function rendreCarteEquipee(item) {
+            const statsPrincipales = (item.stats || []).slice(0, 6).map(s => `
+                <div class="mini-stat">
+                    <span class="mini-stat-name" style="color:${s.isTotal ? 'var(--gold)' : '#94a3b8'};">${s.nom}</span>
+                    ${s.isBar ? `<div class="mini-stat-bar-wrap"><div class="mini-stat-bar" style="width:${Math.min(100, s.val)}%;"></div></div>` : ''}
+                    <span class="mini-stat-val" style="color:${s.isTotal ? 'var(--gold)' : '#f1f5f9'};">${s.val}</span>
+                </div>
+            `).join('');
+
+            const perksChips = (item.perks || []).slice(0, 3).map(p => `
+                <span class="eq-perk-chip">${p.icone ? `<img src="${p.icone}">` : ''}${p.nom}</span>
+            `).join('');
+
+            return `
+                <div class="equipped-detail-card"
+                     data-ukey="${item.ukey}"
+                     draggable="true"
+                     ondragstart="onDragStartItem(event, ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', ${item.bucketHash})"
+                     onmouseenter="afficherInspecteur(event, '${item.ukey}', false)"
+                     onmousemove="bougerInspecteur(event)"
+                     onmouseleave="fermerInspecteur(false)"
+                     onclick="afficherInspecteur(event, '${item.ukey}', true)">
+                    <div class="eq-top">
+                        <div class="gear-tile tier-${item.tier}" style="width:48px; height:48px;">
+                            <img src="${item.icone}" loading="lazy">
+                            ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
+                        </div>
+                        <div class="eq-title">
+                            <h4>${item.nom}</h4>
+                            <span>${item.typeNom}</span>
+                        </div>
+                    </div>
+                    ${statsPrincipales ? `<div class="eq-stats-grid">${statsPrincipales}</div>` : ''}
+                    ${perksChips ? `<div class="eq-perks">${perksChips}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function rendreTuile(item) {
+            return `
+                <div class="gear-tile tier-${item.tier}"
+                     data-ukey="${item.ukey}"
+                     draggable="${item.lieuType !== 'postmaster'}"
+                     ondragstart="onDragStartItem(event, ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}', ${item.bucketHash})"
+                     onmouseenter="afficherInspecteur(event, '${item.ukey}', false)"
+                     onmousemove="bougerInspecteur(event)"
+                     onmouseleave="fermerInspecteur(false)"
+                     onclick="afficherInspecteur(event, '${item.ukey}', true)"
+                     ondblclick="${item.lieuType === 'postmaster' ? `recupererDuPostmaster(${item.itemHash}, '${item.itemInstanceId}', ${item.stackSize})` : `executerMouvement('equipped', ${item.itemHash}, '${item.itemInstanceId}', '${item.lieuType}')`}">
+                    <img src="${item.icone}" loading="lazy">
+                    ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
+                </div>
+            `;
+        }
+
+        function afficherVue() {
+            afficherStatsGlobalesGardien();
+            afficherBarreBuilds();
+            afficherPostmaster();
+
+            const view = document.getElementById('mainView');
+            const filtreCat = document.getElementById('filtreCategorie').value;
+            const filtreEtat = document.getElementById('filtreEtat').value;
+            const filtreMarchand = document.getElementById('filtreMarchand').value;
+            const recherche = document.getElementById('rechercheTexte').value.toLowerCase();
+
+            const matchFiltres = (item) => {
+                if (filtreCat === 'weapon' && item.categorie !== 'weapon') return false;
+                if (filtreCat === 'armor' && item.categorie !== 'armor') return false;
+                if (filtreCat === 'Exotic' && item.tier !== 'Exotic') return false;
+                if (recherche) {
+                    const mNom = item.nom.toLowerCase().includes(recherche);
+                    const mPerk = item.perks && item.perks.some(p => p.nom.toLowerCase().includes(recherche));
+                    const mSource = item.source && item.source.toLowerCase().includes(recherche);
+                    if (!mNom && !mPerk && !mSource) return false;
+                }
+                return true;
+            };
+
+            if (ongletActif === 'loadout') {
+                const p = mapPersos[persoActifId];
+                if (!p) {
+                    view.innerHTML = `<p style="color:#64748b;">Clique sur "Se connecter avec Bungie.net" en haut à droite pour charger ton Gardien.</p>`;
+                    return;
+                }
+
+                const lignesSlotsHtml = SLOTS_DESTINY.filter(s => {
+                    if (filtreCat === 'weapon' && s.type !== 'weapon') return false;
+                    if (filtreCat === 'armor' && s.type !== 'armor') return false;
+                    return true;
+                }).map(slot => {
+                    const eqItem = p.equipped.find(i => i.bucketHash === slot.hash && matchFiltres(i));
+                    const bagItems = p.inventory.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
+
+                    return `
+                        <div class="slot-row">
+                            <div class="slot-label">${slot.nom}<small>${slot.sousTitre}</small></div>
+                            <div class="drop-zone equipped-zone"
+                                 ondragover="onDragOverZone(event)"
+                                 ondragleave="onDragLeaveZone(event)"
+                                 ondrop="onDropZone(event, 'equipped', ${slot.hash})">
+                                ${eqItem ? rendreCarteEquipee(eqItem) : '<small style="color:#475569; font-size:0.75rem;">Aucun objet équipé</small>'}
+                            </div>
+                            <div class="drop-zone"
+                                 ondragover="onDragOverZone(event)"
+                                 ondragleave="onDragLeaveZone(event)"
+                                 ondrop="onDropZone(event, 'inventory', ${slot.hash})">
+                                ${bagItems.map(rendreTuile).join('') || '<small style="color:#334155; font-size:0.75rem;">Sac vide — Glisser ici (9 places)</small>'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const coffreGroupesHtml = SLOTS_DESTINY.filter(s => {
+                    if (filtreCat === 'weapon' && s.type !== 'weapon') return false;
+                    if (filtreCat === 'armor' && s.type !== 'armor') return false;
+                    return true;
+                }).map(slot => {
+                    const itemsSlot = listeCoffre.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
+                    if (itemsSlot.length === 0) return '';
+                    return `
+                        <div class="vault-slot-group">
+                            <h5>${slot.nom} (${itemsSlot.length})</h5>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                ${itemsSlot.map(rendreTuile).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                view.innerHTML = `
+                    <div class="loadout-workspace">
+                        <div class="slots-column">
+                            <div style="display:grid; grid-template-columns:115px 310px 1fr; gap:12px; padding:0 10px 8px 10px; color:#38bdf8; font-size:0.76rem; font-weight:700; text-transform:uppercase;">
+                                <span>Emplacement</span>
+                                <span>Équipé (Stats en direct)</span>
+                                <span>Sac du ${p.classeNom} (Survol / Clic = Stats)</span>
+                            </div>
+                            ${lignesSlotsHtml}
+                        </div>
+
+                        <div class="vault-column"
+                             ondragover="onDragOverZone(event)"
+                             ondragleave="onDragLeaveZone(event)"
+                             ondrop="onDropZone(event, 'vault', null)">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h3 style="margin:0; font-size:1rem; color:#38bdf8;">🏦 Mon Coffre (${listeCoffre.length} / 700)</h3>
+                                <small style="color:#94a3b8;">Survole ou clique pour inspecter</small>
+                            </div>
+                            ${coffreGroupesHtml || '<p style="color:#64748b; font-size:0.85rem;">Aucun objet dans le Coffre pour ce filtre.</p>'}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (ongletActif === 'vendors') {
+                const vendeurs = Object.values(groupesMarchands).filter(v => filtreMarchand === 'all' || v.nom === filtreMarchand);
+                if (vendeurs.length === 0) {
+                    view.innerHTML = `<p style="color:#64748b;">Aucun marchand chargé.</p>`;
+                    return;
+                }
+
+                const rendreCarteMarchand = (item) => `
+                    <div class="item-card tier-${item.tier}"
+                         data-ukey="${item.ukey}"
+                         onmouseenter="afficherInspecteur(event, '${item.ukey}', false)"
+                         onmousemove="bougerInspecteur(event)"
+                         onmouseleave="fermerInspecteur(false)"
+                         onclick="afficherInspecteur(event, '${item.ukey}', true)">
+                        <img class="item-icon" src="${item.icone}" loading="lazy">
+                        <div class="item-info">
+                            <h4>${item.nom}</h4>
+                            <p>${item.source}</p>
+                            <span class="badge">${item.badgeTexte}</span>
+                        </div>
+                    </div>
+                `;
+
+                view.innerHTML = vendeurs.map(v => {
+                    const armes = v.armes.filter(matchFiltres);
+                    const armures = v.armures.filter(matchFiltres);
+                    const autres = v.autres.filter(matchFiltres);
+                    if (armes.length + armures.length + autres.length === 0) return '';
+
+                    return `
+                        <div class="vendor-section">
+                            <div class="vendor-header">
+                                ${v.icone ? `<img class="vendor-icon" src="${v.icone}">` : ''}
+                                <div>
+                                    <h3 style="margin:0;">${v.nom}</h3>
+                                    <small style="color:#94a3b8;">${v.desc}</small>
+                                </div>
+                            </div>
+                            ${armes.length ? `<div class="vendor-cat-title">🔫 Armes proposées (${armes.length})</div><div class="grid">${armes.map(rendreCarteMarchand).join('')}</div>` : ''}
+                            ${armures.length ? `<div class="vendor-cat-title">🛡️ Armures proposées (${armures.length})</div><div class="grid">${armures.map(rendreCarteMarchand).join('')}</div>` : ''}
+                            ${autres.length && filtreCat === 'all' ? `<div class="vendor-cat-title">📜 Contrats & Offres spéciales (${autres.length})</div><div class="grid">${autres.slice(0, 12).map(rendreCarteMarchand).join('')}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                return;
+            }
+
+            const source = { quests: listeQuetes, exotics: listeExotiques, triumphs: listeTriomphes }[ongletActif] || [];
+            const resultats = source.filter(item => {
+                if (filtreEtat === 'missing' && item.possede) return false;
+                if (filtreEtat === 'owned' && !item.possede) return false;
+                return matchFiltres(item);
+            }).slice(0, 160);
+
+            view.innerHTML = `<div class="grid">` + resultats.map(item => `
+                <div class="item-card ${item.possede === false && ongletActif !== 'quests' ? 'missing' : 'tier-' + item.tier}"
+                     ${item.ukey ? `data-ukey="${item.ukey}" onmouseenter="afficherInspecteur(event, '${item.ukey}', false)" onmousemove="bougerInspecteur(event)" onmouseleave="fermerInspecteur(false)" onclick="afficherInspecteur(event, '${item.ukey}', true)"` : ''}>
+                    <img class="item-icon" src="${item.icone}" loading="lazy">
+                    <div class="item-info">
+                        <h4>${item.nom}</h4>
+                        <p>${item.source.substring(0, 85)}</p>
+                        <span class="badge">${item.badgeTexte}</span>
+                    </div>
+                </div>
+            `).join('') + `</div>`;
+        }
+    </script>
+</body>
+</html>
