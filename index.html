@@ -109,4 +109,705 @@
             cursor: pointer;
             transition: all 0.15s;
         }
-        .char-card.active { border-color: var(--accent); background:
+        .char-card.active { border-color: var(--accent); background: #132036; }
+        .char-emblem { width: 38px; height: 38px; border-radius: 5px; }
+        .char-meta h4 { margin: 0; font-size: 0.92rem; }
+        .char-meta span { color: var(--gold); font-weight: 700; font-size: 0.8rem; }
+
+        .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .tab-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 15px; }
+        .tab-btn.active { border-color: var(--accent); color: var(--accent); background: #132036; }
+
+        /* --- BARRE DES 6 STATISTIQUES GLOBALES DU GARDIEN (T1 à T10) --- */
+        .guardian-stats-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+            gap: 12px;
+        }
+        .g-stat-card {
+            background: #090d14;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        .g-stat-card.tier-10 {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, rgba(234,179,8,0.08), #090d14);
+        }
+        .g-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        .g-stat-name { font-weight: 700; color: #e2e8f0; }
+        .g-stat-tier {
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            background: #1e293b;
+            color: var(--accent);
+        }
+        .g-stat-card.tier-10 .g-stat-tier {
+            background: var(--gold);
+            color: #090c10;
+        }
+        .g-stat-segments {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            height: 6px;
+            margin-bottom: 4px;
+        }
+        .g-seg {
+            background: #1e293b;
+            border-radius: 1px;
+        }
+        .g-seg.filled { background: var(--accent); }
+        .g-stat-card.tier-10 .g-seg.filled { background: var(--gold); }
+        .g-stat-sub {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.68rem;
+            color: var(--muted);
+        }
+        .waste-warn { color: #f97316; }
+
+        /* --- BARRE DE GESTION DES BUILDS (LOADOUTS) --- */
+        .builds-bar {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .build-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .build-chip {
+            background: #132036;
+            border: 1px solid #283a5e;
+            border-radius: 6px;
+            padding: 5px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        .build-chip b { color: var(--text); }
+        .build-chip button {
+            padding: 3px 8px;
+            font-size: 0.72rem;
+        }
+
+        /* --- ALERTE COMMIS DES POSTES (POSTMASTER) --- */
+        .postmaster-box {
+            background: linear-gradient(90deg, #1e1b4b, #0f141d);
+            border: 1px solid var(--purple);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+        }
+
+        .status-bar {
+            background: #0c1322;
+            border-left: 3px solid var(--accent);
+            padding: 7px 12px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            border-radius: 4px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .loadout-workspace {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+        @media (max-width: 1150px) {
+            .loadout-workspace { grid-template-columns: 1fr; }
+        }
+        .slots-column {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .slot-row {
+            display: grid;
+            grid-template-columns: 115px 310px 1fr;
+            gap: 12px;
+            align-items: stretch;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        @media (max-width: 780px) {
+            .slot-row { grid-template-columns: 1fr; }
+        }
+        .slot-row:last-child { border-bottom: none; }
+        .slot-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .slot-label small { font-size: 0.68rem; color: #475569; font-weight: 500; margin-top: 2px; }
+        .drop-zone {
+            min-height: 76px;
+            background: var(--bg-slot);
+            border: 1px dashed #26334d;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            transition: all 0.15s;
+        }
+        .drop-zone.equipped-zone {
+            border: 1px solid #283650;
+            background: #0b111c;
+            padding: 8px 10px;
+        }
+        .drop-zone.drag-over {
+            border-color: var(--gold) !important;
+            background: rgba(234, 179, 8, 0.12) !important;
+        }
+
+        .equipped-detail-card { width: 100%; cursor: grab; user-select: none; }
+        .eq-top { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+        .eq-title { flex: 1; min-width: 0; }
+        .eq-title h4 { margin: 0; font-size: 0.9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .eq-title span { font-size: 0.72rem; color: var(--muted); }
+        .eq-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 10px;
+            background: #06090f;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #192336;
+        }
+        .mini-stat { display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; gap: 6px; }
+        .mini-stat-name { color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-stat-bar-wrap { flex: 1; height: 4px; background: #1e293b; border-radius: 2px; overflow: hidden; min-width: 28px; }
+        .mini-stat-bar { height: 100%; background: var(--accent); }
+        .mini-stat-val { font-weight: 700; color: var(--text); min-width: 20px; text-align: right; }
+        .eq-perks { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+        .eq-perk-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #111927;
+            border: 1px solid #26334d;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.66rem;
+            color: #cbd5e1;
+        }
+        .eq-perk-chip img { width: 13px; height: 13px; border-radius: 50%; }
+
+        .gear-tile {
+            width: 58px;
+            height: 58px;
+            position: relative;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            border: 2px solid #475569;
+            background: #000;
+            transition: transform 0.12s, box-shadow 0.12s;
+            flex-shrink: 0;
+        }
+        .gear-tile:hover {
+            transform: translateY(-2px) scale(1.04);
+            z-index: 5;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+        }
+        .gear-tile.tier-Exotic { border-color: var(--gold); }
+        .gear-tile.tier-Superior { border-color: var(--purple); }
+        .gear-tile.tier-Rare { border-color: var(--blue); }
+        .gear-tile img { width: 100%; height: 100%; border-radius: 4px; display: block; pointer-events: none; }
+        .tile-power {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: rgba(7, 10, 14, 0.9);
+            color: var(--text);
+            font-size: 0.66rem;
+            font-weight: 800;
+            text-align: center;
+            padding: 1px 0;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            pointer-events: none;
+        }
+        .gear-tile.tier-Exotic .tile-power { color: var(--gold); }
+
+        .vault-column {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            position: sticky;
+            top: 16px;
+            max-height: 86vh;
+            overflow-y: auto;
+        }
+        .vault-slot-group { margin-bottom: 14px; }
+        .vault-slot-group h5 {
+            margin: 0 0 6px 0;
+            font-size: 0.78rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+
+        /* Fenêtre d'inspection */
+        #itemInspector {
+            position: fixed;
+            z-index: 9999;
+            width: 350px;
+            background: #0b0f17;
+            border: 1px solid #38bdf8;
+            border-radius: 10px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+            display: none;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        #itemInspector.pinned { pointer-events: auto; border: 2px solid var(--gold); }
+        .insp-banner { padding: 12px 14px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .insp-banner.tier-Exotic { background: linear-gradient(135deg, #713f12, #1f1608); }
+        .insp-banner.tier-Superior { background: linear-gradient(135deg, #4c1d95, #180c2e); }
+        .insp-banner.tier-Rare { background: linear-gradient(135deg, #1e3a8a, #0c1938); }
+        .insp-icon { width: 52px; height: 52px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.4); }
+        .insp-title { flex: 1; min-width: 0; }
+        .insp-title h3 { margin: 0; font-size: 1rem; color: #fff; }
+        .insp-title small { color: #cbd5e1; font-size: 0.78rem; display: block; margin-top: 2px; }
+        .insp-power { font-size: 1.15rem; font-weight: 800; color: var(--gold); }
+        .insp-body { padding: 12px 14px; }
+        .insp-flavor { font-style: italic; font-size: 0.76rem; color: #94a3b8; margin: 0 0 10px 0; }
+        .insp-stat-row { display: grid; grid-template-columns: 110px 1fr 32px; gap: 8px; align-items: center; font-size: 0.76rem; margin-bottom: 5px; }
+        .insp-stat-bar { height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+        .insp-stat-fill { height: 100%; background: #f8fafc; }
+        .insp-perk-item { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1e293b; }
+        .insp-perk-item img { width: 24px; height: 24px; border-radius: 50%; background: #1e293b; flex-shrink: 0; }
+        .insp-perk-item b { font-size: 0.8rem; color: var(--accent); display: block; }
+        .insp-perk-item span { font-size: 0.72rem; color: #94a3b8; line-height: 1.25; display: block; }
+        .insp-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #1e293b; }
+        .insp-actions button { flex: 1; padding: 7px 8px; font-size: 0.76rem; }
+
+        .vendor-section { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .vendor-header { display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px; }
+        .vendor-icon { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--accent); }
+        .vendor-cat-title { font-size: 0.78rem; text-transform: uppercase; color: var(--gold); margin: 10px 0 8px 0; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); gap: 10px; }
+        .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+        .item-card:hover { border-color: var(--accent); }
+        .item-card.tier-Exotic { border-left: 4px solid var(--gold); }
+        .item-card.tier-Superior { border-left: 4px solid var(--purple); }
+        .item-card.tier-Rare { border-left: 4px solid var(--blue); }
+        .item-card.missing { opacity: 0.5; border-left: 4px solid #ef4444; }
+        .item-icon { width: 48px; height: 48px; border-radius: 6px; flex-shrink: 0; }
+        .item-info { flex: 1; min-width: 0; }
+        .item-info h4 { margin: 0 0 3px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-info p { margin: 0; font-size: 0.74rem; color: var(--muted); }
+        .badge { display: inline-block; font-size: 0.66rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-top: 4px; background: #0c4a6e; color: #7dd3fc; }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="brand">
+            <h2>▲ DESTINY 2 COMMAND CENTER</h2>
+            <span id="userBadge" class="user-pill" style="display:none;">Non connecté</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn-login" id="btnMainLogin" onclick="connexionRapideBungie()">Se connecter avec Bungie.net</button>
+            <button onclick="lancerAnalyse()">↻ Actualiser</button>
+            <button class="btn-ghost" onclick="basculerConfig()">⚙️ Config</button>
+        </div>
+    </div>
+
+    <div id="configDrawer" class="config-drawer">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+            <div style="font-size:0.82rem; color:#94a3b8;">
+                <b>Paramètres API :</b> Colle ta clé API et ton Client ID aux lignes 388-389 pour que tout soit automatique sur GitHub Pages.
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <input type="password" id="apiKey" placeholder="Clé API (X-API-Key)" style="width:155px;">
+                <input type="text" id="clientId" placeholder="OAuth Client ID" style="width:115px;">
+                <input type="text" id="bungieName" placeholder="Pseudo#1234 (optionnel)" style="width:175px;">
+                <input type="text" id="oauthCode" placeholder="Code OAuth manuel" style="width:150px;">
+                <button onclick="echangerCodeOAuth()">Valider Code</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="status" class="status-bar">
+        <span id="statusText">Prêt. Connecte-toi avec Bungie.net pour charger tes paliers T10, tes Builds et ton Coffre.</span>
+        <small style="color:#64748b;">Survol = Stats • Clic = Verrouiller & Actions • Glisser-Déposer = Équiper / Coffre</small>
+    </div>
+
+    <div class="nav-row">
+        <div id="charBar" class="char-bar"></div>
+        <div class="tabs">
+            <button class="tab-btn active" id="btn-loadout" onclick="changerOnglet('loadout')">Équipement, Builds & Coffre</button>
+            <button class="tab-btn" id="btn-vendors" onclick="changerOnglet('vendors')">Marchands (<span id="count-vendors">0</span>)</button>
+            <button class="tab-btn" id="btn-quests" onclick="changerOnglet('quests')">Quêtes (<span id="count-quests">0</span>)</button>
+            <button class="tab-btn" id="btn-exotics" onclick="changerOnglet('exotics')">Collections (<span id="count-exotics">0</span>)</button>
+            <button class="tab-btn" id="btn-triumphs" onclick="changerOnglet('triumphs')">Triomphes (<span id="count-triumphs">0</span>)</button>
+        </div>
+    </div>
+
+    <!-- Bandeau des 6 Statistiques Globales du Gardien (Paliers T1 à T10) -->
+    <div id="guardianStatsPanel" class="guardian-stats-panel" style="display:none;"></div>
+
+    <!-- Barre de Sauvegarde et d'Équipement de Builds en 1 Clic -->
+    <div id="buildsBar" class="builds-bar" style="display:none;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <b style="color:var(--accent); font-size:0.86rem;">⚡ Mes Builds (Loadouts) :</b>
+            <input type="text" id="nomNouveauBuild" placeholder="Nom du build (ex: Raid Solaire, PvP...)" style="width:230px;">
+            <button class="btn-green" onclick="sauvegarderBuildActuel()">+ Sauvegarder l'équipement actuel</button>
+        </div>
+        <div id="listeBuildsChips" class="build-chips"></div>
+    </div>
+
+    <!-- Alerte Commis des postes (Postmaster) si des objets y sont bloqués -->
+    <div id="postmasterBox" class="postmaster-box" style="display:none;"></div>
+
+    <!-- Filtres -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+        <select id="filtreMarchand" onchange="afficherVue()" style="display:none;"></select>
+        <select id="filtreEtat" onchange="afficherVue()" style="display:none;">
+            <option value="all">État : Tout afficher</option>
+            <option value="missing">À faire / Manquants uniquement</option>
+            <option value="owned">Obtenus / Complétés uniquement</option>
+        </select>
+        <select id="filtreCategorie" onchange="afficherVue()">
+            <option value="all">Catégorie : Toutes (Armes & Armures)</option>
+            <option value="weapon">Armes uniquement</option>
+            <option value="armor">Armures uniquement</option>
+            <option value="Exotic">Rareté : Exotiques uniquement</option>
+        </select>
+        <input type="text" id="rechercheTexte" placeholder="Rechercher une arme, un perk, un marchand, une quête..." oninput="afficherVue()" style="flex:1;">
+    </div>
+
+    <div id="mainView"></div>
+    <div id="itemInspector"></div>
+
+    <script>
+        // =========================================================================
+        // COLLE TA CLÉ API ET TON CLIENT ID ICI SUR GITHUB PAGES :
+        const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
+        const DEFAULT_CLIENT_ID = "56923";
+        // =========================================================================
+
+        const BUCKET_POSTMASTER = 215593132;
+        const SLOTS_DESTINY = [
+            { hash: 1498876634, nom: "Arme Cinétique", sousTitre: "Cinétique / Stase / Filobscur", type: "weapon" },
+            { hash: 2465295065, nom: "Arme Énergétique", sousTitre: "Abyssal / Solaire / Cryo", type: "weapon" },
+            { hash: 953998645,  nom: "Arme Puissante", sousTitre: "Lourde", type: "weapon" },
+            { hash: 3448274439, nom: "Casque", sousTitre: "Armure de tête", type: "armor" },
+            { hash: 3551918588, nom: "Gantelets", sousTitre: "Armure de bras", type: "armor" },
+            { hash: 14239492,   nom: "Armure de Torse", sousTitre: "Armure de poitrine", type: "armor" },
+            { hash: 20886954,   nom: "Armure de Jambes", sousTitre: "Bottes / Jambières", type: "armor" },
+            { hash: 1585787867, nom: "Objet de Classe", sousTitre: "Cape / Fanion / Brassard", type: "armor" }
+        ];
+        const BUCKETS_CONNUS = new Set(SLOTS_DESTINY.map(s => s.hash));
+
+        const STATS_ARMES_ORDRE = [
+            4043523819, 1240592695, 155624089, 943549884,
+            4188031367, 4284893193, 2961396640, 447667954, 3871231066
+        ];
+        const STATS_GARDIEN_6 = [
+            { hash: 2996146975, nom: "Mobilité" },
+            { hash: 392767087,  nom: "Résistance" },
+            { hash: 1943323491, nom: "Récupération" },
+            { hash: 1735777505, nom: "Discipline" },
+            { hash: 144602215,  nom: "Intelligence" },
+            { hash: 4244567218, nom: "Force" }
+        ];
+        const STATS_ARMURES_ORDRE = STATS_GARDIEN_6.map(s => s.hash);
+
+        const classesNom = { 0: 'Titan', 1: 'Chasseur', 2: 'Arcaniste' };
+
+        let ongletActif = 'loadout';
+        let joueurInfo = null;
+        let persoActifId = null;
+        let dictGlobal = {};
+
+        let mapPersos = {};
+        let listeCoffre = [];
+        let groupesMarchands = {};
+        let listeQuetes = [];
+        let listeExotiques = [];
+        let listeTriomphes = [];
+        let registreObjets = {};
+        let objetGlisse = null;
+        let inspecteurVerrouille = false;
+
+        window.onload = async () => {
+            if (DEFAULT_API_KEY) localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
+            if (DEFAULT_CLIENT_ID) localStorage.setItem('d2_clientId', DEFAULT_CLIENT_ID);
+
+            ['apiKey', 'clientId', 'bungieName'].forEach(id => {
+                if (localStorage.getItem('d2_' + id)) {
+                    document.getElementById(id).value = localStorage.getItem('d2_' + id);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                const insp = document.getElementById('itemInspector');
+                if (inspecteurVerrouille && !insp.contains(e.target) && !e.target.closest('[data-ukey]')) {
+                    fermerInspecteur(true);
+                }
+            });
+
+            // Capture automatique du ?code= au retour de Bungie sur GitHub Pages
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('code')) {
+                document.getElementById('oauthCode').value = urlParams.get('code');
+                window.history.replaceState({}, document.title, window.location.pathname);
+                await echangerCodeOAuth();
+                return;
+            }
+
+            if (localStorage.getItem('d2_apiKey') && (localStorage.getItem('d2_accessToken') || localStorage.getItem('d2_bungieName'))) {
+                lancerAnalyse();
+            } else {
+                document.getElementById('configDrawer').classList.add('open');
+            }
+        };
+
+        function basculerConfig() { document.getElementById('configDrawer').classList.toggle('open'); }
+        function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+
+        function connexionRapideBungie() {
+            const clientId = document.getElementById('clientId').value.trim() || DEFAULT_CLIENT_ID;
+            if (!clientId) {
+                document.getElementById('configDrawer').classList.add('open');
+                alert("Renseigne ton OAuth Client ID dans ⚙️ Config.");
+                return;
+            }
+            localStorage.setItem('d2_clientId', clientId);
+            // Sur GitHub Pages (https), on redirige dans le même onglet pour une connexion fluide en 1 clic
+            const authUrl = `https://www.bungie.net/fr/OAuth/Authorize?client_id=${clientId}&response_type=code`; if (window.location.protocol.startsWith('http')) { window.location.href = authUrl; } else { window.open(authUrl, '_blank'); document.getElementById('configDrawer').classList.add('open'); } }  async function echangerCodeOAuth() { const clientId = document.getElementById('clientId').value.trim() \vert{}\vert{} DEFAULT_CLIENT_ID; let code = document.getElementById('oauthCode').value.trim(); if (code.includes('code=')) code = new URLSearchParams(code.split('?')[1]).get('code'); if (!clientId \vert{}\vert{} !code) return;  try { setStatus("Connexion OAuth à Bungie.net en cours..."); const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code, client_id: clientId }) }); const data = await resp.json(); if (data.access_token) { sauvegarderTokens(data); document.getElementById('oauthCode').value = ""; document.getElementById('configDrawer').classList.remove('open'); lancerAnalyse(); } else { setStatus("Erreur OAuth : " + (data.error_description \vert{}\vert{} "Code expiré.")); } } catch (e) { setStatus("Erreur OAuth : " + e.message); } }  function sauvegarderTokens(data) { localStorage.setItem('d2_accessToken', data.access_token); if (data.refresh_token) localStorage.setItem('d2_refreshToken', data.refresh_token); localStorage.setItem('d2_tokenExpiry', Date.now() + (data.expires_in * 1000) - 60000); }  async function obtenirTokenValide() { const clientId = document.getElementById('clientId').value.trim() \vert{}\vert{} DEFAULT_CLIENT_ID; const token = localStorage.getItem('d2_accessToken'); const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') \vert{}\vert{} '0'); const refresh = localStorage.getItem('d2_refreshToken');  if (token && Date.now() < expiry) return token; if (refresh && clientId) { try { const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: clientId }) }); const data = await resp.json(); if (data.access_token) { sauvegarderTokens(data); return data.access_token; } } catch (e) { console.warn(e); } } return token; }  async function identifierJoueur(apiKey, accessToken) { if (accessToken) { const resp = await fetch('https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/', { headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` }
+                });
+                const data = await resp.json();
+                if (data.Response?.destinyMemberships?.length > 0) {
+                    const primaryId = data.Response.primaryMembershipId;
+                    return data.Response.destinyMemberships.find(x => x.membershipId === primaryId) || data.Response.destinyMemberships[0];
+                }
+            }
+            const fullBungieName = document.getElementById('bungieName').value.trim();
+            if (!fullBungieName.includes('#')) throw new Error("Clique sur 'Se connecter avec Bungie.net' en haut à droite.");
+            const [displayName, displayNameCode] = fullBungieName.split('#');
+            const searchResp = await fetch('https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/', {
+                method: 'POST',
+                headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ displayName, displayNameCode: parseInt(displayNameCode) })
+            });
+            const searchData = await searchResp.json();
+            return searchData.Response[0];
+        }
+
+        function extrairePerksDetails(instanceId, itemPerks) {
+            const liste = [];
+            if (instanceId && itemPerks[instanceId]?.perks && dictGlobal.perks) {
+                const dejaVu = new Set();
+                itemPerks[instanceId].perks.forEach(p => {
+                    const pDef = dictGlobal.perks[p.perkHash];
+                    if (p.visible && pDef?.displayProperties?.name && !dejaVu.has(pDef.displayProperties.name) && liste.length < 5) {
+                        dejaVu.add(pDef.displayProperties.name);
+                        liste.push({
+                            nom: pDef.displayProperties.name,
+                            desc: pDef.displayProperties.description || "",
+                            icone: pDef.displayProperties.icon ? 'https://www.bungie.net' + pDef.displayProperties.icon : ''
+                        });
+                    }
+                });
+            }
+            return liste;
+        }
+
+        function extraireStatsObjet(def, instanceId, itemStatsMap) {
+            const estArme = def.itemType === 3;
+            const ordreCible = estArme ? STATS_ARMES_ORDRE : STATS_ARMURES_ORDRE;
+            const liveStats = (instanceId && itemStatsMap && itemStatsMap[instanceId]?.stats) ? itemStatsMap[instanceId].stats : {};
+            const baseStats = def.stats?.stats || {};
+
+            const resultat = [];
+            let totalArmure = 0;
+
+            ordreCible.forEach(statHash => {
+                const val = liveStats[statHash]?.value ?? baseStats[statHash]?.value;
+                const sDef = dictGlobal.stats?.[statHash];
+                if (val !== undefined && val > 0 && sDef?.displayProperties?.name) {
+                    const nomCourt = sDef.displayProperties.name
+                        .replace('Vitesse de rechargement', 'Rechargement')
+                        .replace('Coups par minute', 'Cadence (CPM)');
+                    resultat.push({
+                        hash: statHash,
+                        nom: nomCourt,
+                        val: val,
+                        isBar: ![4284893193, 3871231066, 2961396640, 447667954].includes(statHash)
+                    });
+                    if (!estArme) totalArmure += val;
+                }
+            });
+
+            if (!estArme && totalArmure > 0) {
+                resultat.push({ hash: 0, nom: "Total des stats", val: totalArmure, isBar: false, isTotal: true });
+            }
+            return resultat;
+        }
+
+        function formaterEquipement(item, lieuType, charIdOwner, instances, itemPerks, itemStatsMap, forcePostmaster = false) {
+            const def = dictGlobal.items[item.itemHash];
+            if (!def || !def.displayProperties?.name) return null;
+            const bucketHash = def.inventory?.bucketTypeHash;
+            if (!forcePostmaster && !BUCKETS_CONNUS.has(bucketHash)) return null;
+
+            const instanceId = item.itemInstanceId;
+            const power = instanceId && instances[instanceId]?.primaryStat?.value ? instances[instanceId].primaryStat.value : null;
+            const tierKey = def.inventory?.tierType === 6 ? 'Exotic' : (def.inventory?.tierType === 5 ? 'Superior' : 'Rare');
+            const perks = extrairePerksDetails(instanceId, itemPerks);
+            const stats = extraireStatsObjet(def, instanceId, itemStatsMap);
+            const ukey = instanceId || ('hash_' + item.itemHash + '_' + Math.random().toString(36).substring(2, 7));
+
+            const obj = {
+                ukey,
+                nom: def.displayProperties.name,
+                typeNom: def.itemTypeDisplayName || 'Équipement',
+                flavor: def.flavorText || "",
+                itemHash: item.itemHash,
+                itemInstanceId: instanceId,
+                stackSize: item.quantity || 1,
+                bucketHash: bucketHash,
+                lieuType: lieuType,
+                charIdOwner: charIdOwner,
+                icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '',
+                power: power,
+                perks: perks,
+                stats: stats,
+                categorie: def.itemType === 3 ? 'weapon' : 'armor',
+                tier: tierKey
+            };
+            registreObjets[ukey] = obj;
+            return obj;
+        }
+
+        async function lancerAnalyse() {
+            const apiKey = document.getElementById('apiKey').value.trim() || DEFAULT_API_KEY;
+            const clientId = document.getElementById('clientId').value.trim() || DEFAULT_CLIENT_ID;
+            const fullBungieName = document.getElementById('bungieName').value.trim();
+
+            if (!apiKey) {
+                document.getElementById('configDrawer').classList.add('open');
+                setStatus("Renseigne ta clé API dans ⚙️ Config pour démarrer.");
+                return;
+            }
+
+            localStorage.setItem('d2_apiKey', apiKey);
+            if (clientId) localStorage.setItem('d2_clientId', clientId);
+            if (fullBungieName) localStorage.setItem('d2_bungieName', fullBungieName);
+
+            try {
+                const accessToken = await obtenirTokenValide();
+                setStatus("1/3 — Identification du Gardien...");
+                joueurInfo = await identifierJoueur(apiKey, accessToken);
+
+                const nomAffiche = joueurInfo.bungieGlobalDisplayName
+                    ? `${joueurInfo.bungieGlobalDisplayName}#${joueurInfo.bungieGlobalDisplayNameCode}`
+                    : (joueurInfo.displayName || "Gardien Connecté");
+                const badge = document.getElementById('userBadge');
+                badge.textContent = "✦ " + nomAffiche;
+                badge.style.display = "inline-block";
+                if (accessToken) document.getElementById('btnMainLogin').textContent = "✓ Compte Bungie Lié";
+
+                if (!dictGlobal.items) {
+                    setStatus("2/3 — Chargement du Manifest FR...");
+                    const manifestResp = await fetch('https://www.bungie.net/Platform/Destiny2/Manifest/', { headers: { 'X-API-Key': apiKey } });
+                    const manifestData = await manifestResp.json();
+                    const cheminsFR = manifestData.Response.jsonWorldComponentContentPaths.fr;
+
+                    const [items, collectibles, records, perks, vendors, stats] = await Promise.all([
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyInventoryItemDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyCollectibleDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyRecordDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinySandboxPerkDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyVendorDefinition).then(r => r.json()),
+                        fetch('https://www.bungie.net' + cheminsFR.DestinyStatDefinition).then(r => r.json())
+                    ]);
+                    dictGlobal = { items, collectibles, records, perks, vendors, stats };
+                }
+
+                setStatus("3/3 — Lecture en direct : Personnages, Paliers T10, Coffre et Commis des postes...");
+                const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,205,300,302,304,800,900`;
+                const headers = { 'X-API-Key': apiKey };
+                if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;  const profileResp = await fetch(profileUrl, { headers }); const profileData = await profileResp.json(); const resp = profileData.Response;  const instances = resp.itemComponents?.instances?.data \vert{}\vert{} {}; const itemPerks = resp.itemComponents?.perks?.data \vert{}\vert{} {}; const itemStatsMap = resp.itemComponents?.stats?.data \vert{}\vert{} {}; registreObjets = {};  mapPersos = {}; for (const [cId, c] of Object.entries(resp.characters?.data \vert{}\vert{} {})) { mapPersos[cId] = { id: cId, classeNom: classesNom[c.classType] \vert{}\vert{} 'Gardien', light: c.light, statsGlobales: c.stats \vert{}\vert{} {}, // Les 6 stats globales calculées par Bungie ! emblem: c.emblemPath ? 'https://www.bungie.net' + c.emblemPath : '', equipped: [], inventory: [], postmaster: [] }; } if (!persoActifId \vert{}\vert{} !mapPersos[persoActifId]) { persoActifId = Object.keys(mapPersos)[0]; } afficherBarrePersos();  for (const [cId, data] of Object.entries(resp.characterEquipment?.data \vert{}\vert{} {})) { data.items.forEach(i => { const fmt = formaterEquipement(i, 'equipped', cId, instances, itemPerks, itemStatsMap); if (fmt) mapPersos[cId].equipped.push(fmt); }); }  listeQuetes = []; for (const [cId, data] of Object.entries(resp.characterInventories?.data \vert{}\vert{} {})) { data.items.forEach(i => { const def = dictGlobal.items[i.itemHash]; if (!def) return; // Détection des objets bloqués au Commis des postes (Bucket 215593132) if (i.bucketHash === BUCKET_POSTMASTER) { const fmtPost = formaterEquipement(i, 'postmaster', cId, instances, itemPerks, itemStatsMap, true); if (fmtPost) mapPersos[cId].postmaster.push(fmtPost); } else if (def.itemType === 12 \vert{}\vert{} (def.itemCategoryHashes && def.itemCategoryHashes.includes(53))) { listeQuetes.push({ nom: def.displayProperties.name, source: def.displayProperties.description \vert{}\vert{} "Quête / Contrat", icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '', possede: false, categorie: 'quest', tier: 'Superior', badgeTexte: mapPersos[cId]?.classeNom \vert{}\vert{} 'Quête' }); } else { const fmt = formaterEquipement(i, 'inventory', cId, instances, itemPerks, itemStatsMap); if (fmt) mapPersos[cId].inventory.push(fmt); } }); }  listeCoffre = []; (resp.profileInventory?.data?.items \vert{}\vert{} []).forEach(i => { const fmt = formaterEquipement(i, 'vault', null, instances, itemPerks, itemStatsMap); if (fmt) listeCoffre.push(fmt); }); listeCoffre.sort((a, b) => (b.power \vert{}\vert{} 0) - (a.power \vert{}\vert{} 0));  const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles \vert{}\vert{} {}) }; for (const cId in (resp.characterCollectibles?.data \vert{}\vert{} {})) { Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles); } listeExotiques = []; for (const [hash, def] of Object.entries(dictGlobal.collectibles)) { if (!def.displayProperties?.name \vert{}\vert{} !def.displayProperties?.icon) continue; const itemDef = dictGlobal.items[def.itemHash]; const isExo = itemDef?.inventory?.tierType === 6; const cat = itemDef?.itemType === 3 ? 'weapon' : (itemDef?.itemType === 2 ? 'armor' : 'other'); const possede = ((collectiblesJoueur[hash]?.state ?? 1) & 1) === 0; const ukey = 'col_' + hash; const obj = { ukey, nom: def.displayProperties.name, typeNom: itemDef?.itemTypeDisplayName \vert{}\vert{} "Collection", flavor: itemDef?.flavorText \vert{}\vert{} "", source: def.sourceString \vert{}\vert{} "Collection Destiny 2", icone: 'https://www.bungie.net' + def.displayProperties.icon, possede, categorie: cat, tier: isExo ? 'Exotic' : 'Superior', badgeTexte: possede ? 'Débloqué' : 'Manquant', stats: itemDef ? extraireStatsObjet(itemDef, null, null) : [], perks: [] }; registreObjets[ukey] = obj; listeExotiques.push(obj); }  const recordsJoueur = resp.profileRecords?.data?.records \vert{}\vert{} {}; listeTriomphes = []; for (const [hash, rec] of Object.entries(recordsJoueur)) { const def = dictGlobal.records[hash]; if (!def \vert{}\vert{} !def.displayProperties?.name) continue; const complete = (rec.state & 4) === 0; listeTriomphes.push({ nom: def.displayProperties.name, source: def.displayProperties.description \vert{}\vert{} "Triomphe", icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png', possede: complete, categorie: 'triumph', tier: complete ? 'Exotic' : 'Rare', badgeTexte: complete ? 'Complété' : 'À faire' }); }  document.getElementById('count-quests').textContent = listeQuetes.length; document.getElementById('count-exotics').textContent = listeExotiques.length; document.getElementById('count-triumphs').textContent = listeTriomphes.length;  setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — Paliers T10, Builds et Coffre opérationnels.`);
+                if (ongletActif === 'vendors') {
+                    chargerMarchandsPerso(persoActifId);
+                } else {
+                    afficherVue();
+                }
+
+            } catch (err) {
+                setStatus("Erreur : " + err.message);
+            }
+        }
+
+        // --- AFFICHAGE DES 6 PALIERS DE STATISTIQUES GLOBALES (T1 à T10) ---
+        function afficherStatsGlobalesGardien() {
+            const panel = document.getElementById('guardianStatsPanel');
+            const p = mapPersos[persoActifId];
+            if (!p || ongletActif !== 'loadout') {
+                panel.style.display = 'none';
+                return;
+            }
+            panel.style.display = 'grid';
+
+            let totalPointsPerdus = 0;
+            panel.innerHTML = STATS_GARDIEN_6.map(st => {
+                const val = p.statsGlobales[st.hash] || 0;
+                const tier = Math.min(10, Math.floor(val / 10));
+                const perdu = val >= 100 ? (val - 100) : (val % 10);
+                totalPointsPerdus += perdu;
+
+                let segmentsHtml = '';
+                for (let i = 1; i <= 10; i++) {
+                    segmentsHtml += `<div class="g-seg \${i <= tier ? 'filled' : ''}"></div>`;
+                }
+
+                return `
+                    <div class="g-stat-card \${tier === 10 ? 'tier-10' : ''}">
+                        <div class="g-stat-header">
+                            <span class="g
