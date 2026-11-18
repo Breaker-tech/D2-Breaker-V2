@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Destiny 2 — Command Center v8.1</title>
+    <title>Destiny 2 — Command Center v9.0</title>
     <style>
         :root {
             --bg-dark: #06090e;
@@ -15,6 +15,7 @@
             --purple: #a855f7;
             --blue: #3b82f6;
             --green: #22c55e;
+            --red-deepsight: #ea580c;
             --text: #f1f5f9;
             --muted: #94a3b8;
         }
@@ -39,7 +40,7 @@
             justify-content: space-between;
             margin-bottom: 14px;
         }
-        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
         .brand h2 { margin: 0; font-size: 1.25rem; color: var(--accent); letter-spacing: 0.5px; }
         .user-pill {
             background: #132036;
@@ -48,6 +49,15 @@
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .key-pill {
+            background: #052e16;
+            border: 1px solid var(--green);
+            color: #86efac;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
         button {
@@ -350,18 +360,38 @@
         .vendor-header { display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px; }
         .vendor-icon { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--accent); }
         .vendor-cat-title { font-size: 0.78rem; text-transform: uppercase; color: var(--gold); margin: 10px 0 8px 0; font-weight: 700; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); gap: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
         .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
         .item-card:hover { border-color: var(--accent); }
         .item-card.tier-Exotic { border-left: 4px solid var(--gold); }
         .item-card.tier-Superior { border-left: 4px solid var(--purple); }
         .item-card.tier-Rare { border-left: 4px solid var(--blue); }
-        .item-card.missing { opacity: 0.5; border-left: 4px solid #ef4444; }
+        .item-card.deepsight-active { border-left: 4px solid var(--red-deepsight); box-shadow: inset 0 0 12px rgba(234, 88, 12, 0.12); }
+        .item-card.missing { opacity: 0.55; border-left: 4px solid #ef4444; }
         .item-icon { width: 48px; height: 48px; border-radius: 6px; flex-shrink: 0; }
+        .item-icon.red-border { border: 2px solid var(--red-deepsight); }
         .item-info { flex: 1; min-width: 0; }
         .item-info h4 { margin: 0 0 3px 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-info p { margin: 0; font-size: 0.74rem; color: var(--muted); }
         .badge { display: inline-block; font-size: 0.66rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-top: 4px; background: #0c4a6e; color: #7dd3fc; }
+        .badge.craft-ok { background: #14532d; color: #86efac; }
+        .badge.craft-pending { background: #431407; color: #fdba74; border: 1px solid var(--red-deepsight); }
+
+        .craft-prog-bar {
+            height: 6px;
+            background: #090d14;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 6px;
+            border: 1px solid #26334d;
+        }
+        .craft-prog-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ea580c, #f97316);
+        }
+        .craft-prog-fill.done {
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+        }
     </style>
 </head>
 <body>
@@ -370,6 +400,7 @@
         <div class="brand">
             <h2>▲ DESTINY 2 COMMAND CENTER</h2>
             <span id="userBadge" class="user-pill" style="display:none;">Non connecté</span>
+            <span class="key-pill" title="Clé API b5ca5b...e981 et Client ID 56923 intégrés en dur dans le code">✓ API & Client ID 56923 intégrés</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
             <button class="btn-login" id="btnMainLogin" onclick="connexionRapideBungie()">Se connecter avec Bungie.net</button>
@@ -381,20 +412,18 @@
     <div id="configDrawer" class="config-drawer">
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
             <div style="font-size:0.82rem; color:#94a3b8;">
-                <b>Configuration rapide :</b> Entre ta Clé API et ton Client ID ici.
+                <b>Identifiants intégrés dans le code :</b> Clé API <code>b5ca5b2b28314f6785135d45d6a5e981</code> • Client ID <code>56923</code>.<br>
+                Tu peux aussi chercher un joueur public sans OAuth en tapant son Pseudo#1234 ci-contre :
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <input type="password" id="apiKey" placeholder="Clé API (X-API-Key)" style="width:155px;">
-                <input type="text" id="clientId" placeholder="OAuth Client ID" style="width:115px;">
-                <input type="text" id="bungieName" placeholder="Pseudo#1234 (optionnel)" style="width:165px;">
-                <button class="btn-green" onclick="enregistrerConfig()">💾 Enregistrer</button>
-                <button class="btn-ghost" onclick="copierLienPartage()" title="Copie un lien avec ta clé API et ton Client ID intégrés pour tes amis">🔗 Copier Lien Ami</button>
+                <input type="text" id="bungieName" placeholder="Pseudo#1234 (optionnel)" style="width:190px;">
+                <button class="btn-green" onclick="enregistrerConfig()">💾 Chercher ce Pseudo</button>
             </div>
         </div>
     </div>
 
     <div id="status" class="status-bar">
-        <span id="statusText">Prêt. Clique sur ⚙️ Config pour vérifier ta clé API ou sur "Se connecter avec Bungie.net".</span>
+        <span id="statusText">Prêt. Clique sur "Se connecter avec Bungie.net" en haut à droite pour charger ton compte.</span>
         <small style="color:#64748b;">Survol = Stats • Clic = Verrouiller & Actions • Glisser-Déposer = Équiper / Coffre</small>
     </div>
 
@@ -402,6 +431,7 @@
         <div id="charBar" class="char-bar"></div>
         <div class="tabs">
             <button class="tab-btn active" id="btn-loadout" onclick="changerOnglet('loadout')">Équipement, Builds & Coffre</button>
+            <button class="tab-btn" id="btn-crafting" onclick="changerOnglet('crafting')">🟥 Modèles & Crafting (<span id="count-crafting">0</span>)</button>
             <button class="tab-btn" id="btn-vendors" onclick="changerOnglet('vendors')">Marchands (<span id="count-vendors">0</span>)</button>
             <button class="tab-btn" id="btn-quests" onclick="changerOnglet('quests')">Quêtes (<span id="count-quests">0</span>)</button>
             <button class="tab-btn" id="btn-exotics" onclick="changerOnglet('exotics')">Collections (<span id="count-exotics">0</span>)</button>
@@ -426,8 +456,8 @@
         <select id="filtreMarchand" onchange="afficherVue()" style="display:none;"></select>
         <select id="filtreEtat" onchange="afficherVue()" style="display:none;">
             <option value="all">État : Tout afficher</option>
-            <option value="missing">À faire / Manquants uniquement</option>
-            <option value="owned">Obtenus / Complétés uniquement</option>
+            <option value="missing">À débloquer / En cours uniquement</option>
+            <option value="owned">Complétés / Façonnables uniquement</option>
         </select>
         <select id="filtreCategorie" onchange="afficherVue()">
             <option value="all">Catégorie : Toutes (Armes & Armures)</option>
@@ -435,15 +465,18 @@
             <option value="armor">Armures uniquement</option>
             <option value="Exotic">Rareté : Exotiques uniquement</option>
         </select>
-        <input type="text" id="rechercheTexte" placeholder="Rechercher une arme, un perk, un marchand, une quête..." oninput="afficherVue()" style="flex:1;">
+        <input type="text" id="rechercheTexte" placeholder="Rechercher une arme, un modèle façonnable, un perk, un marchand..." oninput="afficherVue()" style="flex:1;">
     </div>
 
     <div id="mainView"></div>
     <div id="itemInspector"></div>
 
     <script>
+        // =========================================================================
+        // TES IDENTIFIANTS BUNGIE INTÉGRÉS EN DUR DANS LE CODE :
         const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
         const DEFAULT_CLIENT_ID = "56923";
+        // =========================================================================
 
         const BUCKET_POSTMASTER = 215593132;
         const SLOTS_DESTINY = [
@@ -479,6 +512,7 @@
         let dictGlobal = {};
         let mapPersos = {};
         let listeCoffre = [];
+        let listeCrafting = [];
         let groupesMarchands = {};
         let listeQuetes = [];
         let listeExotiques = [];
@@ -488,18 +522,16 @@
         let inspecteurVerrouille = false;
 
         window.onload = async () => {
+            // Enregistrement immédiat et systématique de tes clés pré-intégrées
+            localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
+            localStorage.setItem('d2_clientId', DEFAULT_CLIENT_ID);
+
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('k')) localStorage.setItem('d2_apiKey', urlParams.get('k'));
-            if (urlParams.get('c')) localStorage.setItem('d2_clientId', urlParams.get('c'));
+            if (urlParams.get('bungieName')) localStorage.setItem('d2_bungieName', urlParams.get('bungieName'));
 
-            if (DEFAULT_API_KEY) localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
-            if (DEFAULT_CLIENT_ID) localStorage.setItem('d2_clientId', DEFAULT_CLIENT_ID);
-
-            ['apiKey', 'clientId', 'bungieName'].forEach(id => {
-                if (localStorage.getItem('d2_' + id)) {
-                    document.getElementById(id).value = localStorage.getItem('d2_' + id);
-                }
-            });
+            if (localStorage.getItem('d2_bungieName')) {
+                document.getElementById('bungieName').value = localStorage.getItem('d2_bungieName');
+            }
 
             document.addEventListener('click', (e) => {
                 const insp = document.getElementById('itemInspector');
@@ -508,6 +540,7 @@
                 }
             });
 
+            // Si retour de connexion OAuth Bungie (?code=...)
             if (urlParams.get('code')) {
                 const code = urlParams.get('code');
                 window.history.replaceState({}, document.title, window.location.pathname);
@@ -515,14 +548,9 @@
                 return;
             }
 
-            if (urlParams.get('k') || urlParams.get('c')) {
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-
-            if (localStorage.getItem('d2_apiKey') && (localStorage.getItem('d2_accessToken') || localStorage.getItem('d2_bungieName'))) {
+            // Si une session OAuth ou un pseudo existe déjà, on lance l'analyse automatiquement sans ouvrir Config
+            if (localStorage.getItem('d2_accessToken') || localStorage.getItem('d2_refreshToken') || localStorage.getItem('d2_bungieName')) {
                 lancerAnalyse();
-            } else {
-                document.getElementById('configDrawer').classList.add('open');
             }
         };
 
@@ -530,53 +558,24 @@
         function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
 
         function enregistrerConfig() {
-            const k = document.getElementById('apiKey').value.trim();
-            const c = document.getElementById('clientId').value.trim();
             const b = document.getElementById('bungieName').value.trim();
-            if (k) localStorage.setItem('d2_apiKey', k);
-            if (c) localStorage.setItem('d2_clientId', c);
             if (b) localStorage.setItem('d2_bungieName', b);
             document.getElementById('configDrawer').classList.remove('open');
-            setStatus("Configuration enregistrée !");
-            if (k && (b || localStorage.getItem('d2_accessToken'))) lancerAnalyse();
-        }
-
-        function copierLienPartage() {
-            const k = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey');
-            const c = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId');
-            if (!k || !c) return alert("Entre d'abord ta Clé API et ton Client ID.");
-            const url = `${window.location.origin}${window.location.pathname}?k=${encodeURIComponent(k)}&c=${encodeURIComponent(c)}`;
-            navigator.clipboard.writeText(url);
-            setStatus("🔗 Lien Ami copié dans le presse-papier !");
+            lancerAnalyse();
         }
 
         function connexionRapideBungie() {
-            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
-            if (!clientId || !apiKey) {
-                document.getElementById('configDrawer').classList.add('open');
-                alert("Entre ta Clé API et ton OAuth Client ID dans ⚙️ Config.");
-                return;
-            }
-            localStorage.setItem('d2_clientId', clientId);
-            localStorage.setItem('d2_apiKey', apiKey);
-            window.location.href = `https://www.bungie.net/fr/OAuth/Authorize?client_id=${clientId}&response_type=code`;
+            window.location.href = `https://www.bungie.net/fr/OAuth/Authorize?client_id=${DEFAULT_CLIENT_ID}&response_type=code`;
         }
 
         async function echangerCodeOAuth(codeRecu) {
-            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
-            if (!clientId || !codeRecu) return;
-
+            if (!codeRecu) return;
             try {
                 setStatus("Connexion OAuth à Bungie.net en cours...");
-                const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-                if (apiKey) headers['X-API-Key'] = apiKey;
-
                 const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
                     method: 'POST',
-                    headers: headers,
-                    body: new URLSearchParams({ grant_type: 'authorization_code', code: codeRecu, client_id: clientId })
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
+                    body: new URLSearchParams({ grant_type: 'authorization_code', code: codeRecu, client_id: DEFAULT_CLIENT_ID })
                 });
                 const data = await resp.json();
                 if (data.access_token) {
@@ -596,22 +595,17 @@
         }
 
         async function obtenirTokenValide() {
-            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             const token = localStorage.getItem('d2_accessToken');
             const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0');
             const refresh = localStorage.getItem('d2_refreshToken');
 
             if (token && Date.now() < expiry) return token;
-            if (refresh && clientId) {
+            if (refresh) {
                 try {
-                    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-                    if (apiKey) headers['X-API-Key'] = apiKey;
-
                     const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
                         method: 'POST',
-                        headers: headers,
-                        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: clientId })
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
+                        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: DEFAULT_CLIENT_ID })
                     });
                     const data = await resp.json();
                     if (data.access_token) {
@@ -627,10 +621,10 @@
             return token;
         }
 
-        async function identifierJoueur(apiKey, accessToken) {
+        async function identifierJoueur(accessToken) {
             if (accessToken) {
                 const resp = await fetch('https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/', {
-                    headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` }
+                    headers: { 'X-API-Key': DEFAULT_API_KEY, 'Authorization': `Bearer ${accessToken}` }
                 });
                 const data = await resp.json();
                 const memberships = data.Response?.destinyMemberships || [];
@@ -642,11 +636,11 @@
                 }
             }
             const fullBungieName = document.getElementById('bungieName').value.trim();
-            if (!fullBungieName.includes('#')) throw new Error("Clique sur 'Se connecter avec Bungie.net' en haut à droite.");
+            if (!fullBungieName.includes('#')) throw new Error("Clique sur le bouton jaune 'Se connecter avec Bungie.net' en haut à droite.");
             const [displayName, displayNameCode] = fullBungieName.split('#');
             const searchResp = await fetch('https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/', {
                 method: 'POST',
-                headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' },
+                headers: { 'X-API-Key': DEFAULT_API_KEY, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ displayName, displayNameCode: parseInt(displayNameCode) })
             });
             const searchData = await searchResp.json();
@@ -740,24 +734,10 @@
         }
 
         async function lancerAnalyse() {
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
-            const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
-            const fullBungieName = document.getElementById('bungieName').value.trim();
-
-            if (!apiKey) {
-                document.getElementById('configDrawer').classList.add('open');
-                setStatus("Renseigne ta Clé API dans ⚙️ Config puis clique sur Enregistrer.");
-                return;
-            }
-
-            localStorage.setItem('d2_apiKey', apiKey);
-            if (clientId) localStorage.setItem('d2_clientId', clientId);
-            if (fullBungieName) localStorage.setItem('d2_bungieName', fullBungieName);
-
             try {
                 const accessToken = await obtenirTokenValide();
                 setStatus("1/3 — Identification du Gardien...");
-                joueurInfo = await identifierJoueur(apiKey, accessToken);
+                joueurInfo = await identifierJoueur(accessToken);
 
                 const nomAffiche = joueurInfo.bungieGlobalDisplayName
                     ? `${joueurInfo.bungieGlobalDisplayName}#${joueurInfo.bungieGlobalDisplayNameCode}`
@@ -768,8 +748,8 @@
                 if (accessToken) document.getElementById('btnMainLogin').textContent = "✓ Compte Bungie Lié";
 
                 if (!dictGlobal.items) {
-                    setStatus("2/3 — Chargement du Manifest FR...");
-                    const manifestResp = await fetch('https://www.bungie.net/Platform/Destiny2/Manifest/', { headers: { 'X-API-Key': apiKey } });
+                    setStatus("2/3 — Chargement du Manifest FR (Armes, Modèles, Perks, Statistiques)...");
+                    const manifestResp = await fetch('https://www.bungie.net/Platform/Destiny2/Manifest/', { headers: { 'X-API-Key': DEFAULT_API_KEY } });
                     const manifestData = await manifestResp.json();
                     const cheminsFR = manifestData.Response.jsonWorldComponentContentPaths.fr;
 
@@ -784,9 +764,9 @@
                     dictGlobal = { items, collectibles, records, perks, vendors, stats };
                 }
 
-                setStatus("3/3 — Lecture en direct : Personnages, Paliers T10, Coffre et Commis des postes...");
+                setStatus("3/3 — Lecture en direct : Personnages, Coffre, Modèles façonnables et Commis des postes...");
                 const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,205,300,302,304,800,900`;
-                const headers = { 'X-API-Key': apiKey };
+                const headers = { 'X-API-Key': DEFAULT_API_KEY };
                 if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
                 const profileResp = await fetch(profileUrl, { headers });
@@ -855,6 +835,15 @@
                 });
                 listeCoffre.sort((a, b) => (b.power || 0) - (a.power || 0));
 
+                // Indexation rapide des armes par nom pour croiser avec les Modèles façonnables (Crafting)
+                const mapArmesParNom = {};
+                for (const itemDef of Object.values(dictGlobal.items)) {
+                    if (itemDef.itemType === 3 && itemDef.displayProperties?.name && itemDef.inventory?.tierType >= 5) {
+                        mapArmesParNom[itemDef.displayProperties.name] = itemDef;
+                    }
+                }
+
+                // Collections (800)
                 const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles || {}) };
                 for (const cId in (resp.characterCollectibles?.data || {})) {
                     Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles);
@@ -885,31 +874,80 @@
                     listeExotiques.push(obj);
                 }
 
-                const recordsJoueur = resp.profileRecords?.data?.records || {};
+                // Triomphes & Modèles d'armes façonnables (Crafting - Composant 900)
+                const recordsJoueur = { ...(resp.profileRecords?.data?.records || {}) };
+                for (const cId in (resp.characterRecords?.data || {})) {
+                    Object.assign(recordsJoueur, resp.characterRecords.data[cId].records);
+                }
+
                 listeTriomphes = [];
+                listeCrafting = [];
+                const nomsCraftingVus = new Set();
+
                 for (const [hash, rec] of Object.entries(recordsJoueur)) {
                     const def = dictGlobal.records[hash];
                     if (!def || !def.displayProperties?.name) continue;
+                    const nomRec = def.displayProperties.name;
+                    const descRec = def.displayProperties.description || "";
                     const complete = (rec.state & 4) === 0;
-                    listeTriomphes.push({
-                        nom: def.displayProperties.name,
-                        source: def.displayProperties.description || "Triomphe",
-                        icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png',
-                        possede: complete,
-                        categorie: 'triumph',
-                        tier: complete ? 'Exotic' : 'Rare',
-                        badgeTexte: complete ? 'Complété' : 'À faire'
-                    });
+
+                    // Détection d'un Modèle d'arme façonnable (Record ayant le même nom qu'une arme et un objectif de modèle <= 5)
+                    const armeMatch = mapArmesParNom[nomRec];
+                    const objZero = rec.objectives && rec.objectives.length > 0 ? rec.objectives[0] : null;
+                    const estModeleArme = armeMatch && objZero && objZero.completionValue >= 1 && objZero.completionValue <= 5 && !nomsCraftingVus.has(nomRec);
+
+                    if (estModeleArme) {
+                        nomsCraftingVus.add(nomRec);
+                        const prog = objZero.progress || 0;
+                        const max = objZero.completionValue || 5;
+                        const ukey = 'craft_' + hash;
+                        const objCraft = {
+                            ukey,
+                            nom: nomRec,
+                            typeNom: armeMatch.itemTypeDisplayName || "Arme façonnable",
+                            flavor: armeMatch.flavorText || "",
+                            source: `${armeMatch.itemTypeDisplayName || 'Arme'} — Extraction : ${prog} / ${max} bordures rouges`,
+                            icone: 'https://www.bungie.net' + armeMatch.displayProperties.icon,
+                            possede: complete,
+                            progActuel: prog,
+                            progMax: max,
+                            categorie: 'weapon',
+                            tier: armeMatch.inventory?.tierType === 6 ? 'Exotic' : 'Superior',
+                            badgeTexte: complete ? '✓ Modèle Débloqué' : `🟥 ${prog} / ${max} Souvenirs`,
+                            stats: extraireStatsObjet(armeMatch, null, null),
+                            perks: []
+                        };
+                        registreObjets[ukey] = objCraft;
+                        listeCrafting.push(objCraft);
+                    } else {
+                        listeTriomphes.push({
+                            nom: nomRec,
+                            source: descRec || "Triomphe",
+                            icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png',
+                            possede: complete,
+                            categorie: 'triumph',
+                            tier: complete ? 'Exotic' : 'Rare',
+                            badgeTexte: complete ? 'Complété' : 'À faire'
+                        });
+                    }
                 }
 
+                // Trier les modèles : ceux en cours (ex: 3/5) tout en haut, puis les non commencés, puis les débloqués
+                listeCrafting.sort((a, b) => {
+                    if (a.possede !== b.possede) return a.possede ? 1 : -1;
+                    return (b.progActuel / b.progMax) - (a.progActuel / a.progMax);
+                });
+
+                document.getElementById('count-crafting').textContent = listeCrafting.length;
                 document.getElementById('count-quests').textContent = listeQuetes.length;
                 document.getElementById('count-exotics').textContent = listeExotiques.length;
                 document.getElementById('count-triumphs').textContent = listeTriomphes.length;
 
                 if (!resp.profileInventory?.data) {
-                    setStatus("⚠️ Ton Coffre nécessite une session OAuth active : clique sur 'Se connecter avec Bungie.net' en haut à droite !");
+                    setStatus("⚠️ Clique sur 'Se connecter avec Bungie.net' en haut à droite pour déverrouiller ton Coffre en temps réel !");
                 } else {
-                    setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — ${listeCoffre.length} objets dans le Coffre.`);
+                    const nbDebloques = listeCrafting.filter(c => c.possede).length;
+                    setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — ${listeCoffre.length} objets au Coffre • ${nbDebloques}/${listeCrafting.length} Modèles d'armes façonnables débloqués.`);
                 }
 
                 if (ongletActif === 'vendors') {
@@ -919,7 +957,7 @@
                 }
 
             } catch (err) {
-                setStatus("Erreur : " + err.message);
+                setStatus("Info : " + err.message);
             }
         }
 
@@ -1067,6 +1105,29 @@
             } catch (e) { setStatus("Erreur Commis des postes : " + e.message); }
         }
 
+        async function toutRecupererDuPostmaster() {
+            const p = mapPersos[persoActifId];
+            if (!p || p.postmaster.length === 0) return;
+
+            try {
+                setStatus(`Récupération globale de ${p.postmaster.length} objets du Commis des postes...`);
+                for (const item of p.postmaster) {
+                    await appelActionBungie('PullFromPostmaster', {
+                        itemReferenceHash: item.itemHash,
+                        stackSize: item.stackSize || 1,
+                        itemId: item.itemInstanceId || "0",
+                        characterId: persoActifId,
+                        membershipType: joueurInfo.membershipType
+                    });
+                }
+                setStatus("Tous les objets du Commis des postes ont été rapatriés dans le Sac !");
+                await lancerAnalyse();
+            } catch (e) {
+                setStatus("Erreur lors de la récupération globale : " + e.message);
+                await lancerAnalyse();
+            }
+        }
+
         function afficherPostmaster() {
             const box = document.getElementById('postmasterBox');
             const p = mapPersos[persoActifId];
@@ -1076,9 +1137,9 @@
             }
             box.style.display = 'block';
             box.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
                     <b style="color:#d8b4fe; font-size:0.9rem;">📬 Commis des postes — Kadi 55-30 (${p.postmaster.length} / 21 objets)</b>
-                    <small style="color:#cbd5e1;">Clique sur un objet puis sur "📥 Récupérer dans le Sac"</small>
+                    <button class="btn-green" onclick="toutRecupererDuPostmaster()">📥 Tout récupérer du Commis des postes</button>
                 </div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     ${p.postmaster.map(rendreTuile).join('')}
@@ -1208,11 +1269,11 @@
 
         function changerOnglet(onglet) {
             ongletActif = onglet;
-            ['loadout', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
+            ['loadout', 'crafting', 'vendors', 'quests', 'exotics', 'triumphs'].forEach(t => {
                 document.getElementById('btn-' + t).classList.toggle('active', t === onglet);
             });
             document.getElementById('filtreMarchand').style.display = onglet === 'vendors' ? 'inline-block' : 'none';
-            document.getElementById('filtreEtat').style.display = ['exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
+            document.getElementById('filtreEtat').style.display = ['crafting', 'exotics', 'triumphs'].includes(onglet) ? 'inline-block' : 'none';
 
             if (onglet === 'vendors' && Object.keys(groupesMarchands).length === 0 && persoActifId) {
                 chargerMarchandsPerso(persoActifId);
@@ -1222,7 +1283,6 @@
         }
 
         async function chargerMarchandsPerso(charId) {
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             const accessToken = await obtenirTokenValide();
             if (!accessToken || !joueurInfo) {
                 setStatus("Clique sur 'Se connecter avec Bungie.net' pour inspecter les Marchands.");
@@ -1232,7 +1292,7 @@
             try {
                 setStatus(`Chargement des Marchands pour ton ${mapPersos[charId].classeNom}...`);
                 const url = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/Character/${charId}/Vendors/?components=400,402,300,302,304`;
-                const resp = await fetch(url, { headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` } });
+                const resp = await fetch(url, { headers: { 'X-API-Key': DEFAULT_API_KEY, 'Authorization': `Bearer ${accessToken}` } });
                 const data = await resp.json();
 
                 const vendorsData = data.Response?.vendors?.data || {};
@@ -1326,11 +1386,10 @@
         }
 
         async function appelActionBungie(endpoint, payload) {
-            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             const accessToken = await obtenirTokenValide();
             const resp = await fetch(`https://www.bungie.net/Platform/Destiny2/Actions/Items/${endpoint}/`, {
                 method: 'POST',
-                headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                headers: { 'X-API-Key': DEFAULT_API_KEY, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             return await resp.json();
@@ -1576,6 +1635,38 @@
                         </div>
                     `;
                 }).join('');
+                return;
+            }
+
+            // VUE MODÈLES & CRAFTING (BORDURES ROUGES)
+            if (ongletActif === 'crafting') {
+                const models = listeCrafting.filter(item => {
+                    if (filtreEtat === 'missing' && item.possede) return false;
+                    if (filtreEtat === 'owned' && !item.possede) return false;
+                    return matchFiltres(item);
+                });
+
+                view.innerHTML = `<div class="grid">` + models.map(item => {
+                    const pct = Math.min(100, Math.round((item.progActuel / item.progMax) * 100));
+                    return `
+                        <div class="item-card ${item.possede ? 'tier-' + item.tier : 'deepsight-active'}"
+                             data-ukey="${item.ukey}"
+                             onmouseenter="afficherInspecteur(event, '${item.ukey}', false)"
+                             onmousemove="bougerInspecteur(event)"
+                             onmouseleave="fermerInspecteur(false)"
+                             onclick="afficherInspecteur(event, '${item.ukey}', true)">
+                            <img class="item-icon ${item.possede ? '' : 'red-border'}" src="${item.icone}" loading="lazy">
+                            <div class="item-info">
+                                <h4>${item.nom}</h4>
+                                <p>${item.source}</p>
+                                <div class="craft-prog-bar">
+                                    <div class="craft-prog-fill ${item.possede ? 'done' : ''}" style="width:${pct}%;"></div>
+                                </div>
+                                <span class="badge ${item.possede ? 'craft-ok' : 'craft-pending'}">${item.badgeTexte}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('') + `</div>`;
                 return;
             }
 
