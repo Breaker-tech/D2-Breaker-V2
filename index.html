@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Destiny 2 — Command Center v8</title>
+    <title>Destiny 2 — Command Center v8.1</title>
     <style>
         :root {
             --bg-dark: #06090e;
@@ -80,7 +80,7 @@
 
         .config-drawer {
             background: var(--bg-panel);
-            border: 1px solid var(--accent);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 14px 18px;
             margin-bottom: 14px;
@@ -381,7 +381,7 @@
     <div id="configDrawer" class="config-drawer">
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
             <div style="font-size:0.82rem; color:#94a3b8;">
-                <b>Configuration rapide :</b> Entre ta Clé API et ton Client ID ici (ou partage un lien pré-configuré avec le bouton Lien Ami).
+                <b>Configuration rapide :</b> Entre ta Clé API et ton Client ID ici.
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <input type="password" id="apiKey" placeholder="Clé API (X-API-Key)" style="width:155px;">
@@ -489,7 +489,6 @@
 
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            // Si un ami ouvre un lien partagé contenant ?k=...&c=..., on enregistre automatiquement les clés !
             if (urlParams.get('k')) localStorage.setItem('d2_apiKey', urlParams.get('k'));
             if (urlParams.get('c')) localStorage.setItem('d2_clientId', urlParams.get('c'));
 
@@ -538,17 +537,17 @@
             if (c) localStorage.setItem('d2_clientId', c);
             if (b) localStorage.setItem('d2_bungieName', b);
             document.getElementById('configDrawer').classList.remove('open');
-            setStatus("Configuration enregistrée ! Tu peux maintenant cliquer sur 'Se connecter avec Bungie.net' ou 'Actualiser'.");
+            setStatus("Configuration enregistrée !");
             if (k && (b || localStorage.getItem('d2_accessToken'))) lancerAnalyse();
         }
 
         function copierLienPartage() {
             const k = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey');
             const c = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId');
-            if (!k || !c) return alert("Entre d'abord ta Clé API et ton Client ID avant de générer le lien pour tes amis.");
+            if (!k || !c) return alert("Entre d'abord ta Clé API et ton Client ID.");
             const url = `${window.location.origin}${window.location.pathname}?k=${encodeURIComponent(k)}&c=${encodeURIComponent(c)}`;
             navigator.clipboard.writeText(url);
-            setStatus("🔗 Lien Ami copié dans le presse-papier ! Envoie-le à tes amis : ils n'auront rien à configurer.");
+            setStatus("🔗 Lien Ami copié dans le presse-papier !");
         }
 
         function connexionRapideBungie() {
@@ -556,7 +555,7 @@
             const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             if (!clientId || !apiKey) {
                 document.getElementById('configDrawer').classList.add('open');
-                alert("Entre ta Clé API et ton OAuth Client ID dans l'encadré ⚙️ Config puis clique sur Enregistrer.");
+                alert("Entre ta Clé API et ton OAuth Client ID dans ⚙️ Config.");
                 return;
             }
             localStorage.setItem('d2_clientId', clientId);
@@ -566,13 +565,17 @@
 
         async function echangerCodeOAuth(codeRecu) {
             const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             if (!clientId || !codeRecu) return;
 
             try {
                 setStatus("Connexion OAuth à Bungie.net en cours...");
+                const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                if (apiKey) headers['X-API-Key'] = apiKey;
+
                 const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: headers,
                     body: new URLSearchParams({ grant_type: 'authorization_code', code: codeRecu, client_id: clientId })
                 });
                 const data = await resp.json();
@@ -581,7 +584,7 @@
                     document.getElementById('configDrawer').classList.remove('open');
                     lancerAnalyse();
                 } else {
-                    setStatus("Erreur OAuth : " + (data.error_description || "Code expiré, reclique sur Se connecter."));
+                    setStatus("Erreur OAuth : " + (data.error_description || "Code expiré."));
                 }
             } catch (e) { setStatus("Erreur OAuth : " + e.message); }
         }
@@ -594,6 +597,7 @@
 
         async function obtenirTokenValide() {
             const clientId = document.getElementById('clientId').value.trim() || localStorage.getItem('d2_clientId') || DEFAULT_CLIENT_ID;
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('d2_apiKey') || DEFAULT_API_KEY;
             const token = localStorage.getItem('d2_accessToken');
             const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0');
             const refresh = localStorage.getItem('d2_refreshToken');
@@ -601,9 +605,12 @@
             if (token && Date.now() < expiry) return token;
             if (refresh && clientId) {
                 try {
+                    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                    if (apiKey) headers['X-API-Key'] = apiKey;
+
                     const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        headers: headers,
                         body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: clientId })
                     });
                     const data = await resp.json();
@@ -612,6 +619,10 @@
                         return data.access_token;
                     }
                 } catch (e) { console.warn(e); }
+            }
+            if (token && Date.now() >= expiry) {
+                localStorage.removeItem('d2_accessToken');
+                return null;
             }
             return token;
         }
@@ -622,9 +633,12 @@
                     headers: { 'X-API-Key': apiKey, 'Authorization': `Bearer ${accessToken}` }
                 });
                 const data = await resp.json();
-                if (data.Response?.destinyMemberships?.length > 0) {
+                const memberships = data.Response?.destinyMemberships || [];
+                if (memberships.length > 0) {
                     const primaryId = data.Response.primaryMembershipId;
-                    return data.Response.destinyMemberships.find(x => x.membershipId === primaryId) || data.Response.destinyMemberships[0];
+                    return memberships.find(x => x.membershipId === primaryId)
+                        || memberships.find(x => x.applicableMembershipTypes && x.applicableMembershipTypes.length > 0)
+                        || memberships[0];
                 }
             }
             const fullBungieName = document.getElementById('bungieName').value.trim();
@@ -892,7 +906,12 @@
                 document.getElementById('count-exotics').textContent = listeExotiques.length;
                 document.getElementById('count-triumphs').textContent = listeTriomphes.length;
 
-                setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — Paliers T10, Builds et Coffre opérationnels.`);
+                if (!resp.profileInventory?.data) {
+                    setStatus("⚠️ Ton Coffre nécessite une session OAuth active : clique sur 'Se connecter avec Bungie.net' en haut à droite !");
+                } else {
+                    setStatus(`Synchronisé à ${new Date().toLocaleTimeString()} — ${listeCoffre.length} objets dans le Coffre.`);
+                }
+
                 if (ongletActif === 'vendors') {
                     chargerMarchandsPerso(persoActifId);
                 } else {
