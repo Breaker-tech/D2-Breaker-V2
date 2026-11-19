@@ -3,7 +3,7 @@
 // =========================================================================
 const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
 const DEFAULT_CLIENT_ID = "56923";
-
+const OAUTH_TOKEN_URL = "d2-oauth-proxy.hvanhove71.workers.dev";
 const BUCKET_POSTMASTER = 215593132;
 const SLOTS_DESTINY = [
     { hash: 1498876634, nom: "Arme Cinétique", type: "weapon" },
@@ -199,7 +199,7 @@ window.onload = async () => {
     if (urlParams.get('code')) {
         const code = urlParams.get('code');
         window.history.replaceState({}, document.title, window.location.pathname);
-        await echangerCodeOAuth(code);
+        const resp = await fetch(OAUTH_TOKEN_URL, {
         return;
     }
 
@@ -248,7 +248,7 @@ function sauvegarderTokens(data) {
     localStorage.setItem('d2_tokenExpiry', Date.now() + (data.expires_in * 1000) - 60000);
 }
 
-async function obtenirTokenValide() {
+const resp = await fetch(OAUTH_TOKEN_URL, {
     const token = localStorage.getItem('d2_accessToken');
     const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0');
     const refresh = localStorage.getItem('d2_refreshToken');
