@@ -1098,7 +1098,7 @@ async function lancerAnalyse() {
         badge.style.display = "inline-block";
         if (accessToken) {
             const hasRefresh = Boolean(localStorage.getItem('d2_refreshToken'));
-            document.getElementById('btnMainLogin').textContent = hasRefresh ? "✓ Session 90j Active" : "✓ Compte Bungie Lié";
+            document.getElementById('btnMainLogin').textContent = hasRefresh ? "✓ Compte Bungie Lié";
         }
 
         await chargerManifestAvecCache();
