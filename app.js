@@ -1,9 +1,10 @@
 // =========================================================================
-// DESTINY 2 COMMAND CENTER v15.0 — Bannières d'Emblèmes & Icônes d'Éléments
+// DESTINY 2 COMMAND CENTER v16.0 — Session Persistante 90 jours (OAuth Proxy)
 // =========================================================================
 const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
 const DEFAULT_CLIENT_ID = "56923";
-const OAUTH_TOKEN_URL = "d2-oauth-proxy.hvanhove71.workers.dev";
+const OAUTH_TOKEN_URL = "https://d2-oauth-proxy.hvanhove71.workers.dev";
+
 const BUCKET_POSTMASTER = 215593132;
 const SLOTS_DESTINY = [
     { hash: 1498876634, nom: "Arme Cinétique", type: "weapon" },
@@ -71,6 +72,7 @@ let itemTags = {};
 let objetGlisse = null;
 let inspecteurVerrouille = false;
 let inspecteurUkeyActif = null;
+let promesseRefreshEnCours = null;
 
 const fileActions = [];
 let traitementFile = false;
@@ -176,7 +178,7 @@ async function chargerManifestAvecCache() {
 }
 
 // =========================================================================
-// INITIALISATION & OAUTH
+// INITIALISATION & OAUTH PERSISTANT (CLOUDFLARE WORKER)
 // =========================================================================
 window.onload = async () => {
     localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
@@ -199,7 +201,7 @@ window.onload = async () => {
     if (urlParams.get('code')) {
         const code = urlParams.get('code');
         window.history.replaceState({}, document.title, window.location.pathname);
-        const resp = await fetch(OAUTH_TOKEN_URL, {
+        await echangerCodeOAuth(code);
         return;
     }
 
@@ -225,8 +227,8 @@ function connexionRapideBungie() {
 async function echangerCodeOAuth(codeRecu) {
     if (!codeRecu) return;
     try {
-        setStatus("Connexion OAuth à Bungie.net en cours...");
-        const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
+        setStatus("Connexion OAuth persistante via ton Worker Cloudflare...");
+        const resp = await fetch(OAUTH_TOKEN_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
             body: new URLSearchParams({ grant_type: 'authorization_code', code: codeRecu, client_id: DEFAULT_CLIENT_ID })
@@ -237,37 +239,60 @@ async function echangerCodeOAuth(codeRecu) {
             document.getElementById('configDrawer').classList.remove('open');
             lancerAnalyse();
         } else {
-            setStatus("Erreur OAuth : " + (data.error_description || "Code expiré."));
+            setStatus("Erreur OAuth : " + (data.error_description || data.error || "Code expiré."));
         }
-    } catch (e) { setStatus("Erreur OAuth : " + e.message); }
+    } catch (e) { setStatus("Erreur OAuth Worker : " + e.message); }
 }
 
 function sauvegarderTokens(data) {
     localStorage.setItem('d2_accessToken', data.access_token);
     if (data.refresh_token) localStorage.setItem('d2_refreshToken', data.refresh_token);
-    localStorage.setItem('d2_tokenExpiry', Date.now() + (data.expires_in * 1000) - 60000);
+    localStorage.setItem('d2_tokenExpiry', Date.now() + ((data.expires_in || 3600) * 1000) - 90000);
+    if (data.refresh_expires_in) {
+        localStorage.setItem('d2_refreshExpiry', Date.now() + (data.refresh_expires_in * 1000));
+    }
 }
 
-const resp = await fetch(OAUTH_TOKEN_URL, {
+async function obtenirTokenValide() {
     const token = localStorage.getItem('d2_accessToken');
-    const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0');
+    const expiry = parseInt(localStorage.getItem('d2_tokenExpiry') || '0', 10);
     const refresh = localStorage.getItem('d2_refreshToken');
 
     if (token && Date.now() < expiry) return token;
+
     if (refresh) {
-        try {
-            const resp = await fetch('https://www.bungie.net/Platform/App/OAuth/Token/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
-                body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: DEFAULT_CLIENT_ID })
-            });
-            const data = await resp.json();
-            if (data.access_token) {
-                sauvegarderTokens(data);
-                return data.access_token;
+        // Verrou anti-concurrence : évite d'envoyer 2 refresh_token identiques en parallèle
+        if (promesseRefreshEnCours) return await promesseRefreshEnCours;
+
+        promesseRefreshEnCours = (async () => {
+            try {
+                const resp = await fetch(OAUTH_TOKEN_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
+                    body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: DEFAULT_CLIENT_ID })
+                });
+                const data = await resp.json();
+                if (data.access_token) {
+                    sauvegarderTokens(data);
+                    return data.access_token;
+                }
+                if (data.error === 'invalid_grant' || data.error === 'invalid_request') {
+                    localStorage.removeItem('d2_refreshToken');
+                    localStorage.removeItem('d2_accessToken');
+                    localStorage.removeItem('d2_tokenExpiry');
+                }
+            } catch (e) {
+                console.warn("Erreur renouvellement session :", e);
+            } finally {
+                promesseRefreshEnCours = null;
             }
-        } catch (e) { console.warn(e); }
+            return null;
+        })();
+
+        const nouveauToken = await promesseRefreshEnCours;
+        if (nouveauToken) return nouveauToken;
     }
+
     if (token && Date.now() >= expiry) {
         localStorage.removeItem('d2_accessToken');
         return null;
@@ -295,7 +320,7 @@ async function identifierJoueur(accessToken) {
     const searchResp = await fetch('https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/', {
         method: 'POST',
         headers: { 'X-API-Key': DEFAULT_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ displayName, displayNameCode: parseInt(displayNameCode) })
+        body: JSON.stringify({ displayName, displayNameCode: parseInt(displayNameCode, 10) })
     });
     const searchData = await searchResp.json();
     return searchData.Response[0];
@@ -1071,7 +1096,10 @@ async function lancerAnalyse() {
         const badge = document.getElementById('userBadge');
         badge.textContent = "✦ " + nomAffiche;
         badge.style.display = "inline-block";
-        if (accessToken) document.getElementById('btnMainLogin').textContent = "✓ Compte Bungie Lié";
+        if (accessToken) {
+            const hasRefresh = Boolean(localStorage.getItem('d2_refreshToken'));
+            document.getElementById('btnMainLogin').textContent = hasRefresh ? "✓ Session 90j Active" : "✓ Compte Bungie Lié";
+        }
 
         await chargerManifestAvecCache();
 
@@ -1221,7 +1249,8 @@ async function lancerAnalyse() {
         if (!resp.profileInventory?.data) {
             setStatus("⚠️ Clique sur 'Se connecter avec Bungie.net' en haut à droite pour accéder au Coffre.");
         } else {
-            setStatus(`Synchronisé en ${duree}s — ${listeCoffre.length} objets au Coffre.`);
+            const hasRefresh = Boolean(localStorage.getItem('d2_refreshToken'));
+            setStatus(`Synchronisé en ${duree}s — ${listeCoffre.length} objets au Coffre${hasRefresh ? ' • Session persistante 90j active' : ''}.`);
         }
 
         if (ongletActif === 'vendors') chargerMarchandsPerso(persoActifId);
