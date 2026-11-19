@@ -1,5 +1,5 @@
 // =========================================================================
-// DESTINY 2 COMMAND CENTER v16.0 — Session Persistante 90 jours (OAuth Proxy)
+// DESTINY 2 COMMAND CENTER v17.0 — Moteur Rapide, Éléments & Session OAuth
 // =========================================================================
 const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
 const DEFAULT_CLIENT_ID = "56923";
@@ -138,7 +138,7 @@ async function viderCacheManifest() {
             tx.objectStore('manifest').clear();
         }
         dictGlobal = {};
-        setStatus("Cache local du Manifest vidé. Clique sur 'Tout actualiser' pour recharger.");
+        setStatus("Cache local du Manifest vidé.");
     } catch (e) { setStatus("Impossible de vider le cache : " + e.message); }
 }
 
@@ -154,11 +154,10 @@ async function chargerManifestAvecCache() {
     const cache = await lireCacheManifest();
     if (cache && cache.version === versionLive && cache.data?.items && cache.data?.damageTypes) {
         dictGlobal = cache.data;
-        setStatus("2/3 — Manifest FR chargé instantanément depuis le cache local ⚡");
         return;
     }
 
-    setStatus("2/3 — Téléchargement du Manifest FR (mis en cache automatiquement ensuite)...");
+    setStatus("Chargement du Manifest FR...");
     const fr = manifestData.Response.jsonWorldComponentContentPaths.fr;
     const [items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities, damageTypes] = await Promise.all([
         fetch('https://www.bungie.net' + fr.DestinyInventoryItemDefinition).then(r => r.json()),
@@ -178,7 +177,7 @@ async function chargerManifestAvecCache() {
 }
 
 // =========================================================================
-// INITIALISATION & OAUTH PERSISTANT (CLOUDFLARE WORKER)
+// INITIALISATION & OAUTH
 // =========================================================================
 window.onload = async () => {
     localStorage.setItem('d2_apiKey', DEFAULT_API_KEY);
@@ -227,7 +226,7 @@ function connexionRapideBungie() {
 async function echangerCodeOAuth(codeRecu) {
     if (!codeRecu) return;
     try {
-        setStatus("Connexion OAuth persistante via ton Worker Cloudflare...");
+        setStatus("Connexion à Bungie.net en cours...");
         const resp = await fetch(OAUTH_TOKEN_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-API-Key': DEFAULT_API_KEY },
@@ -241,7 +240,7 @@ async function echangerCodeOAuth(codeRecu) {
         } else {
             setStatus("Erreur OAuth : " + (data.error_description || data.error || "Code expiré."));
         }
-    } catch (e) { setStatus("Erreur OAuth Worker : " + e.message); }
+    } catch (e) { setStatus("Erreur OAuth : " + e.message); }
 }
 
 function sauvegarderTokens(data) {
@@ -261,7 +260,6 @@ async function obtenirTokenValide() {
     if (token && Date.now() < expiry) return token;
 
     if (refresh) {
-        // Verrou anti-concurrence : évite d'envoyer 2 refresh_token identiques en parallèle
         if (promesseRefreshEnCours) return await promesseRefreshEnCours;
 
         promesseRefreshEnCours = (async () => {
@@ -379,7 +377,7 @@ async function executerFileActions() {
 
 async function appelActionBungie(endpoint, payload) {
     const accessToken = await obtenirTokenValide();
-    if (!accessToken) throw new Error("Session OAuth expirée. Reconnecte-toi avec Bungie.net.");
+    if (!accessToken) throw new Error("Session expirée. Clique sur 'Se connecter avec Bungie.net'.");
     const resp = await fetch(`https://www.bungie.net/Platform/Destiny2/Actions/Items/${endpoint}/`, {
         method: 'POST',
         headers: {
@@ -558,7 +556,7 @@ async function synchroniserInventaireRapide() {
     if (!joueurInfo || !dictGlobal.items) return lancerAnalyse();
     try {
         const t0 = performance.now();
-        setStatus("⚡ Synchronisation rapide du Coffre et des Personnages...");
+        setStatus("Synchronisation en cours...");
         const accessToken = await obtenirTokenValide();
         const url = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,205,300,302,304`;
         const headers = { 'X-API-Key': DEFAULT_API_KEY };
@@ -571,7 +569,7 @@ async function synchroniserInventaireRapide() {
 
         appliquerDonneesInventaire(r);
         const ms = Math.round(performance.now() - t0);
-        setStatus(`⚡ Inventaire synchronisé en ${ms} ms — ${listeCoffre.length} objets au Coffre.`);
+        setStatus(`${listeCoffre.length} objets au Coffre • ${ms} ms`);
         if (ongletActif === 'optimizer') calculerOptimisationArmures(false);
         afficherVue();
         mettreAJourComparateurUI();
@@ -606,15 +604,15 @@ function executerMouvement(cibleMode, itemHash, itemInstanceId, lieuActuel, sour
     enfilerAction(labelAction, [item.itemInstanceId], async () => {
         if (cibleMode === 'vault') {
             await apiTransfererAuCoffre(item);
-            return { statsChanged: lieuActuel === 'equipped', msg: `✓ "${item.nom}" rangé dans le Coffre.` };
+            return { statsChanged: lieuActuel === 'equipped', msg: `"${item.nom}" rangé dans le Coffre.` };
         }
         if (cibleMode === 'inventory') {
             await apiTransfererVersSac(item, persoActifId);
-            return { statsChanged: lieuActuel === 'equipped', msg: `✓ "${item.nom}" transféré dans le Sac (${nomPerso}).` };
+            return { statsChanged: lieuActuel === 'equipped', msg: `"${item.nom}" transféré dans le Sac (${nomPerso}).` };
         }
         if (cibleMode === 'equipped') {
             await apiEquiperDirect(item, persoActifId);
-            return { statsChanged: true, msg: `✓ "${item.nom}" équipé sur ${nomPerso}.` };
+            return { statsChanged: true, msg: `"${item.nom}" équipé sur ${nomPerso}.` };
         }
     });
 }
@@ -629,7 +627,7 @@ function transfererVersAutrePerso(itemHash, itemInstanceId, lieuActuel, sourceCh
     enfilerAction(`Transfert de "${item.nom}" vers ${nomCible}...`, [item.itemInstanceId], async () => {
         const wasEq = item.lieuType === 'equipped';
         await apiTransfererVersSac(item, targetCharId);
-        return { statsChanged: wasEq, msg: `✓ "${item.nom}" livré dans le Sac de ton ${nomCible}.` };
+        return { statsChanged: wasEq, msg: `"${item.nom}" livré dans le Sac de ${nomCible}.` };
     });
 }
 
@@ -638,7 +636,7 @@ function recupererDuPostmaster(itemHash, itemInstanceId, stackSize) {
     const item = registreObjets[itemInstanceId];
     const nom = item ? item.nom : 'Objet';
 
-    enfilerAction(`Récupération de "${nom}" chez le Commis des postes...`, [itemInstanceId], async () => {
+    enfilerAction(`Récupération de "${nom}"...`, [itemInstanceId], async () => {
         if (item) await apiLibererPlaceSacSiPlein(persoActifId, item.bucketHash);
         await appelActionBungie('PullFromPostmaster', {
             itemReferenceHash: itemHash, stackSize: stackSize || 1,
@@ -646,7 +644,7 @@ function recupererDuPostmaster(itemHash, itemInstanceId, stackSize) {
         });
         if (item && BUCKETS_CONNUS.has(item.bucketHash)) placerLocalement(item, 'inventory', persoActifId);
         else if (item) retirerDeSaListeLocale(item);
-        return { statsChanged: false, msg: `✓ "${nom}" récupéré dans le Sac !` };
+        return { statsChanged: false, msg: `"${nom}" récupéré dans le Sac.` };
     });
 }
 
@@ -669,7 +667,7 @@ function toutRecupererDuPostmaster() {
                 ok++;
             } catch (e) { console.warn("Postmaster skip:", item.nom, e.message); }
         }
-        return { statsChanged: false, msg: `✓ ${ok}/${items.length} objets récupérés du Commis des postes.` };
+        return { statsChanged: false, msg: `${ok}/${items.length} objets récupérés.` };
     });
 }
 
@@ -728,13 +726,13 @@ function rapatrierObjetsADemanteler() {
     if (junkVault.length === 0 || !persoActifId) return;
     const nomPerso = mapPersos[persoActifId]?.classeNom || 'Perso';
 
-    enfilerAction(`Rapatriement de ${junkVault.length} objets 🗑️ vers ${nomPerso}...`, junkVault.map(i => i.itemInstanceId), async () => {
+    enfilerAction(`Rapatriement de ${junkVault.length} objets 🗑️...`, junkVault.map(i => i.itemInstanceId), async () => {
         let ok = 0;
         for (const item of junkVault) {
             try { await apiTransfererVersSac(item, persoActifId); ok++; }
             catch (e) { console.warn("Skip junk:", item.nom, e.message); }
         }
-        return { statsChanged: false, msg: `✓ ${ok}/${junkVault.length} objets 🗑️ rapatriés dans le Sac (${nomPerso}).` };
+        return { statsChanged: false, msg: `${ok}/${junkVault.length} objets 🗑️ rapatriés (${nomPerso}).` };
     });
 }
 
@@ -1087,7 +1085,7 @@ async function lancerAnalyse() {
     try {
         const t0 = performance.now();
         const accessToken = await obtenirTokenValide();
-        setStatus("1/3 — Identification du Gardien...");
+        setStatus("Identification en cours...");
         joueurInfo = await identifierJoueur(accessToken);
 
         const nomAffiche = joueurInfo.bungieGlobalDisplayName
@@ -1096,14 +1094,11 @@ async function lancerAnalyse() {
         const badge = document.getElementById('userBadge');
         badge.textContent = "✦ " + nomAffiche;
         badge.style.display = "inline-block";
-        if (accessToken) {
-            const hasRefresh = Boolean(localStorage.getItem('d2_refreshToken'));
-            document.getElementById('btnMainLogin').textContent = hasRefresh ? "✓ Compte Bungie Lié";
-        }
+        if (accessToken) document.getElementById('btnMainLogin').textContent = "✓ Compte Bungie Lié";
 
         await chargerManifestAvecCache();
 
-        setStatus("3/3 — Lecture complète du compte Destiny 2...");
+        setStatus("Synchronisation des données...");
         const profileUrl = `https://www.bungie.net/Platform/Destiny2/${joueurInfo.membershipType}/Profile/${joueurInfo.membershipId}/?components=102,200,201,202,205,300,302,304,800,900`;
         const headers = { 'X-API-Key': DEFAULT_API_KEY };
         if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
@@ -1249,8 +1244,7 @@ async function lancerAnalyse() {
         if (!resp.profileInventory?.data) {
             setStatus("⚠️ Clique sur 'Se connecter avec Bungie.net' en haut à droite pour accéder au Coffre.");
         } else {
-            const hasRefresh = Boolean(localStorage.getItem('d2_refreshToken'));
-            setStatus(`Synchronisé en ${duree}s — ${listeCoffre.length} objets au Coffre${hasRefresh ? ' • Session persistante 90j active' : ''}.`);
+            setStatus(`${listeCoffre.length} objets au Coffre • ${duree}s`);
         }
 
         if (ongletActif === 'vendors') chargerMarchandsPerso(persoActifId);
@@ -1460,7 +1454,7 @@ function equiperEnsembleOptimise(idx) {
             const live = registreObjets[piece.itemInstanceId];
             if (live) await apiEquiperDirect(live, persoActifId);
         }
-        return { statsChanged: true, msg: `✓ Ensemble T${set.totalTiers} équipé sur ${nomPerso} !` };
+        return { statsChanged: true, msg: `Ensemble T${set.totalTiers} équipé sur ${nomPerso}.` };
     });
 }
 
@@ -1780,7 +1774,7 @@ function sauvegarderBuildActuel() {
     localStorage.setItem(getCleBuilds(), JSON.stringify(builds));
     champNom.value = "";
     afficherBarreBuilds();
-    setStatus(`Build "${nom}" sauvegardé !`);
+    setStatus(`Build "${nom}" sauvegardé.`);
 }
 
 function supprimerBuild(id) {
@@ -1797,7 +1791,7 @@ function equiperBuildComplet(id) {
         const liveItems = build.items.map(b => registreObjets[b.itemInstanceId]).filter(Boolean);
         liveItems.sort((a, b) => (a.tier === 'Exotic' ? 1 : 0) - (b.tier === 'Exotic' ? 1 : 0));
         for (const item of liveItems) await apiEquiperDirect(item, persoActifId);
-        return { statsChanged: true, msg: `✓ Build "${build.nom}" équipé !` };
+        return { statsChanged: true, msg: `Build "${build.nom}" équipé.` };
     });
 }
 
@@ -2327,14 +2321,14 @@ function afficherVue() {
             const eqItem = p.equipped.find(i => i.bucketHash === slot.hash && matchFiltres(i));
             const bagItems = p.inventory.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
             const bagContentHtml = bagItems.length === 0
-                ? '<small style="color:#475569; font-size:0.74rem;">Vide</small>'
+                ? '<small style="color:#334155; font-size:0.74rem;">Vide</small>'
                 : (slot.type === 'weapon' ? regrouperArmesParType(bagItems, 'bag') : bagItems.map(rendreTuile).join(''));
 
             return `
                 <div class="slot-row">
                     <div class="slot-label">${slot.nom}</div>
                     <div class="drop-zone equipped-zone" ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'equipped', ${slot.hash})">
-                        ${eqItem ? rendreCarteEquipee(eqItem) : '<small style="color:#475569; font-size:0.74rem;">—</small>'}
+                        ${eqItem ? rendreCarteEquipee(eqItem) : '<small style="color:#334155; font-size:0.74rem;">—</small>'}
                     </div>
                     <div class="drop-zone" ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'inventory', ${slot.hash})">
                         ${bagContentHtml}
