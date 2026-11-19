@@ -1,5 +1,5 @@
 // =========================================================================
-// DESTINY 2 COMMAND CENTER v14.0 — Moteur Rapide & Anti-Bug
+// DESTINY 2 COMMAND CENTER v15.0 — Bannières d'Emblèmes & Icônes d'Éléments
 // =========================================================================
 const DEFAULT_API_KEY = "b5ca5b2b28314f6785135d45d6a5e981";
 const DEFAULT_CLIENT_ID = "56923";
@@ -19,11 +19,19 @@ const BUCKETS_CONNUS = new Set(SLOTS_DESTINY.map(s => s.hash));
 const ARMOR_SLOTS_4 = [3448274439, 3551918588, 14239492, 20886954];
 const BUCKET_CLASS_ITEM = 1585787867;
 
+const ELEMENTS_META = {
+    2: { nom: "Cryo-électrique", court: "Cryo",      color: "#85c5ec" },
+    3: { nom: "Solaire",         court: "Solaire",   color: "#f2721b" },
+    4: { nom: "Abyssal",         court: "Abyssal",   color: "#b184c5" },
+    6: { nom: "Stase",           court: "Stase",     color: "#4d88ff" },
+    7: { nom: "Filobscur",       court: "Filobscur", color: "#35e366" }
+};
+
 const TAGS_CONFIG = {
-    godroll: { id: 'godroll', icon: '⭐', label: 'God Roll',   bg: '#422006', border: '#eab308' },
-    keep:    { id: 'keep',    icon: '🔒', label: 'À garder',   bg: '#0c4a6e', border: '#38bdf8' },
-    infuse:  { id: 'infuse',  icon: '⚡', label: 'Infuser',    bg: '#3b0764', border: '#a855f7' },
-    junk:    { id: 'junk',    icon: '🗑️', label: 'Démanteler', bg: '#450a0a', border: '#ef4444' }
+    godroll: { id: 'godroll', icon: '⭐', label: 'God Roll',   bg: '#422006', border: '#ceae33' },
+    keep:    { id: 'keep',    icon: '🔒', label: 'À garder',   bg: '#1c3547', border: '#7ab0d8' },
+    infuse:  { id: 'infuse',  icon: '⚡', label: 'Infuser',    bg: '#382045', border: '#8b5ca3' },
+    junk:    { id: 'junk',    icon: '🗑️', label: 'Démanteler', bg: '#451515', border: '#c43e3e' }
 };
 
 const STATS_ARMES_ORDRE = [
@@ -43,7 +51,6 @@ const STATS_GARDIEN_6 = [
 const STATS_ARMURES_ORDRE = STATS_GARDIEN_6.map(s => s.hash);
 const classesNom = { 0: 'Titan', 1: 'Chasseur', 2: 'Arcaniste' };
 
-// État global
 let ongletActif = 'loadout';
 let filtreDoublonsActif = false;
 let joueurInfo = null;
@@ -65,12 +72,10 @@ let objetGlisse = null;
 let inspecteurVerrouille = false;
 let inspecteurUkeyActif = null;
 
-// File d'attente séquentielle pour les transferts (anti-collision)
 const fileActions = [];
 let traitementFile = false;
 const busyItems = new Set();
 
-// État de l'Optimiseur d'armures
 let optState = {
     exotic: 'any',
     targets: [0, 10, 0, 10, 0, 0],
@@ -82,10 +87,10 @@ let optState = {
 };
 
 // =========================================================================
-// CACHE LOCAL INDEXEDDB POUR LE MANIFEST (Démarrage < 1 seconde)
+// CACHE LOCAL INDEXEDDB POUR LE MANIFEST (v15 avec DamageTypes)
 // =========================================================================
 function ouvrirManifestDB() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         if (!window.indexedDB) return resolve(null);
         const req = indexedDB.open('D2CommandCenterDB', 1);
         req.onupgradeneeded = (e) => {
@@ -103,7 +108,7 @@ async function lireCacheManifest() {
         if (!db) return null;
         return await new Promise((resolve) => {
             const tx = db.transaction('manifest', 'readonly');
-            const req = tx.objectStore('manifest').get('fr_v14');
+            const req = tx.objectStore('manifest').get('fr_v15');
             req.onsuccess = () => resolve(req.result || null);
             req.onerror = () => resolve(null);
         });
@@ -116,7 +121,7 @@ async function ecrireCacheManifest(version, data) {
         if (!db) return;
         await new Promise((resolve) => {
             const tx = db.transaction('manifest', 'readwrite');
-            tx.objectStore('manifest').put({ version, data }, 'fr_v14');
+            tx.objectStore('manifest').put({ version, data }, 'fr_v15');
             tx.oncomplete = () => resolve();
             tx.onerror = () => resolve();
         });
@@ -131,12 +136,12 @@ async function viderCacheManifest() {
             tx.objectStore('manifest').clear();
         }
         dictGlobal = {};
-        setStatus("Cache local du Manifest vidé. Le prochain rafraîchissement téléchargera la dernière version.");
+        setStatus("Cache local du Manifest vidé. Clique sur 'Tout actualiser' pour recharger.");
     } catch (e) { setStatus("Impossible de vider le cache : " + e.message); }
 }
 
 async function chargerManifestAvecCache() {
-    if (dictGlobal.items) return;
+    if (dictGlobal.items && dictGlobal.damageTypes) return;
 
     const manifestResp = await fetch('https://www.bungie.net/Platform/Destiny2/Manifest/', {
         headers: { 'X-API-Key': DEFAULT_API_KEY }
@@ -145,7 +150,7 @@ async function chargerManifestAvecCache() {
     const versionLive = manifestData.Response.version;
 
     const cache = await lireCacheManifest();
-    if (cache && cache.version === versionLive && cache.data?.items) {
+    if (cache && cache.version === versionLive && cache.data?.items && cache.data?.damageTypes) {
         dictGlobal = cache.data;
         setStatus("2/3 — Manifest FR chargé instantanément depuis le cache local ⚡");
         return;
@@ -153,7 +158,7 @@ async function chargerManifestAvecCache() {
 
     setStatus("2/3 — Téléchargement du Manifest FR (mis en cache automatiquement ensuite)...");
     const fr = manifestData.Response.jsonWorldComponentContentPaths.fr;
-    const [items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities] = await Promise.all([
+    const [items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities, damageTypes] = await Promise.all([
         fetch('https://www.bungie.net' + fr.DestinyInventoryItemDefinition).then(r => r.json()),
         fetch('https://www.bungie.net' + fr.DestinyCollectibleDefinition).then(r => r.json()),
         fetch('https://www.bungie.net' + fr.DestinyRecordDefinition).then(r => r.json()),
@@ -163,9 +168,10 @@ async function chargerManifestAvecCache() {
         fetch('https://www.bungie.net' + fr.DestinyPresentationNodeDefinition).then(r => r.json()),
         fetch('https://www.bungie.net' + fr.DestinyMilestoneDefinition).then(r => r.json()),
         fetch('https://www.bungie.net' + fr.DestinyObjectiveDefinition).then(r => r.json()),
-        fetch('https://www.bungie.net' + fr.DestinyActivityDefinition).then(r => r.json())
+        fetch('https://www.bungie.net' + fr.DestinyActivityDefinition).then(r => r.json()),
+        fetch('https://www.bungie.net' + fr.DestinyDamageTypeDefinition).then(r => r.json())
     ]);
-    dictGlobal = { items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities };
+    dictGlobal = { items, collectibles, records, perks, vendors, stats, nodes, milestones, objectives, activities, damageTypes };
     ecrireCacheManifest(versionLive, dictGlobal);
 }
 
@@ -343,11 +349,7 @@ async function executerFileActions() {
 
     traitementFile = false;
     majBadgeFile();
-
-    // Micro-requête légère (~1 Ko) pour mettre à jour Puissance & Paliers T10 après équipement
-    if (besoinStatsSync) {
-        await rafraichirStatsPersosRapide();
-    }
+    if (besoinStatsSync) await rafraichirStatsPersosRapide();
 }
 
 async function appelActionBungie(endpoint, payload) {
@@ -363,13 +365,10 @@ async function appelActionBungie(endpoint, payload) {
         body: JSON.stringify(payload)
     });
     const data = await resp.json();
-    if (data.ErrorCode !== 1) {
-        throw new Error(data.Message || `Erreur Bungie #${data.ErrorCode}`);
-    }
+    if (data.ErrorCode !== 1) throw new Error(data.Message || `Erreur Bungie #${data.ErrorCode}`);
     return data;
 }
 
-// Mise à jour locale instantanée (sans recharger tout le profil)
 function retirerDeSaListeLocale(item) {
     if (item.lieuType === 'vault') {
         listeCoffre = listeCoffre.filter(x => x.itemInstanceId !== item.itemInstanceId);
@@ -397,20 +396,14 @@ function placerLocalement(item, lieuType, charId) {
     }
 }
 
-// Primitives bas niveau (envoient à Bungie ET mettent à jour l'état local immédiatement)
 async function apiTransfererAuCoffre(item) {
     if (item.lieuType === 'vault') return;
-    if (item.lieuType === 'equipped') {
-        await apiDesequiperObjet(item);
-    }
+    if (item.lieuType === 'equipped') await apiDesequiperObjet(item);
     const charId = item.charIdOwner;
     await appelActionBungie('TransferItem', {
-        itemReferenceHash: item.itemHash,
-        stackSize: item.stackSize || 1,
-        transferToVault: true,
-        itemId: item.itemInstanceId,
-        characterId: charId,
-        membershipType: joueurInfo.membershipType
+        itemReferenceHash: item.itemHash, stackSize: item.stackSize || 1,
+        transferToVault: true, itemId: item.itemInstanceId,
+        characterId: charId, membershipType: joueurInfo.membershipType
     });
     placerLocalement(item, 'vault', null);
 }
@@ -421,17 +414,15 @@ async function apiLibererPlaceSacSiPlein(charId, bucketHash, excludeInstanceId =
     const dansBucket = p.inventory.filter(x => x.bucketHash === bucketHash);
     if (dansBucket.length < 9) return;
 
-    // Choisir l'objet le moins important à ranger au coffre (priorité aux non-favoris / plus basse puissance)
     const candidat = dansBucket
         .filter(x => x.itemInstanceId !== excludeInstanceId)
         .sort((a, b) => {
             const ta = obtenirTag(a) === 'godroll' || obtenirTag(a) === 'keep' ? 1 : 0;
             const tb = obtenirTag(b) === 'godroll' || obtenirTag(b) === 'keep' ? 1 : 0;
-            if (ta !== tb) return ta - tb;
-            return (a.power || 0) - (b.power || 0);
+            return ta !== tb ? ta - tb : (a.power || 0) - (b.power || 0);
         })[0];
 
-    if (!candidat) throw new Error("Sac plein (9/9) sur cet emplacement et aucun objet déplaçable.");
+    if (!candidat) throw new Error("Sac plein (9/9) sur cet emplacement.");
     setStatus(`Sac plein (9/9) — Rangement auto de "${candidat.nom}" au Coffre...`);
     await apiTransfererAuCoffre(candidat);
 }
@@ -439,35 +430,25 @@ async function apiLibererPlaceSacSiPlein(charId, bucketHash, excludeInstanceId =
 async function apiTransfererVersSac(item, targetCharId) {
     const targetPerso = mapPersos[targetCharId];
     if (!targetPerso) throw new Error("Personnage cible introuvable.");
-
-    // Vérification de classe pour les armures
     if (item.categorie === 'armor' && item.classType !== 3 && item.classType !== targetPerso.classType) {
         throw new Error(`Impossible : "${item.nom}" est réservé à la classe ${classesNom[item.classType] || 'autre'}.`);
     }
-
     if (item.lieuType === 'inventory' && item.charIdOwner === targetCharId) return;
 
     if (item.lieuType === 'equipped') {
-        if (item.charIdOwner === targetCharId) {
-            await apiDesequiperObjet(item);
-            return;
-        }
+        const memePerso = item.charIdOwner === targetCharId;
         await apiDesequiperObjet(item);
+        if (memePerso) return;
     }
-
     if (item.lieuType === 'inventory' && item.charIdOwner !== targetCharId) {
         await apiTransfererAuCoffre(item);
     }
 
     await apiLibererPlaceSacSiPlein(targetCharId, item.bucketHash, item.itemInstanceId);
-
     await appelActionBungie('TransferItem', {
-        itemReferenceHash: item.itemHash,
-        stackSize: item.stackSize || 1,
-        transferToVault: false,
-        itemId: item.itemInstanceId,
-        characterId: targetCharId,
-        membershipType: joueurInfo.membershipType
+        itemReferenceHash: item.itemHash, stackSize: item.stackSize || 1,
+        transferToVault: false, itemId: item.itemInstanceId,
+        characterId: targetCharId, membershipType: joueurInfo.membershipType
     });
     placerLocalement(item, 'inventory', targetCharId);
 }
@@ -478,12 +459,10 @@ async function apiDesequiperObjet(item) {
     const p = mapPersos[charId];
     if (!p) return;
 
-    // Chercher une pièce Légendaire/Rare de remplacement dans le sac, sinon dans le coffre
     let rempla = p.inventory.find(x => x.bucketHash === item.bucketHash && x.tier !== 'Exotic');
     if (!rempla) {
         rempla = listeCoffre.find(x =>
-            x.bucketHash === item.bucketHash &&
-            x.tier !== 'Exotic' &&
+            x.bucketHash === item.bucketHash && x.tier !== 'Exotic' &&
             (x.categorie !== 'armor' || x.classType === 3 || x.classType === p.classType)
         );
         if (rempla) {
@@ -491,9 +470,7 @@ async function apiDesequiperObjet(item) {
             await apiTransfererVersSac(rempla, charId);
         }
     }
-    if (!rempla) {
-        throw new Error(`Impossible de déséquiper "${item.nom}" : aucun objet Légendaire disponible pour cet emplacement.`);
-    }
+    if (!rempla) throw new Error(`Aucun objet Légendaire disponible pour remplacer "${item.nom}".`);
     await apiEquiperDirect(rempla, charId);
 }
 
@@ -501,13 +478,7 @@ async function apiResoudreConflitExotique(item, targetCharId) {
     if (item.tier !== 'Exotic') return;
     const p = mapPersos[targetCharId];
     if (!p) return;
-
-    // Chercher un autre Exotique de même catégorie (arme ou armure) porté dans un AUTRE emplacement
-    const autreExo = p.equipped.find(x =>
-        x.tier === 'Exotic' &&
-        x.categorie === item.categorie &&
-        x.bucketHash !== item.bucketHash
-    );
+    const autreExo = p.equipped.find(x => x.tier === 'Exotic' && x.categorie === item.categorie && x.bucketHash !== item.bucketHash);
     if (autreExo) {
         setStatus(`Conflit Exotique — Déséquipement auto de "${autreExo.nom}"...`);
         await apiDesequiperObjet(autreExo);
@@ -517,35 +488,24 @@ async function apiResoudreConflitExotique(item, targetCharId) {
 async function apiEquiperDirect(item, targetCharId) {
     const p = mapPersos[targetCharId];
     if (!p) return;
-
     if (item.categorie === 'armor' && item.classType !== 3 && item.classType !== p.classType) {
         throw new Error(`Impossible : "${item.nom}" est réservé à la classe ${classesNom[item.classType] || 'autre'}.`);
     }
-
     if (item.lieuType === 'equipped' && item.charIdOwner === targetCharId) return;
 
-    // Si on équipe un Exotique, libérer l'autre slot exotique avant
     await apiResoudreConflitExotique(item, targetCharId);
-
-    // Amener d'abord l'objet dans le sac du personnage cible
     if (item.lieuType !== 'inventory' || item.charIdOwner !== targetCharId) {
         await apiTransfererVersSac(item, targetCharId);
     }
 
     const ancienEquipe = p.equipped.find(x => x.bucketHash === item.bucketHash);
-
     await appelActionBungie('EquipItem', {
-        itemId: item.itemInstanceId,
-        characterId: targetCharId,
-        membershipType: joueurInfo.membershipType
+        itemId: item.itemInstanceId, characterId: targetCharId, membershipType: joueurInfo.membershipType
     });
-
-    // Permuter instantanément localement
     if (ancienEquipe) placerLocalement(ancienEquipe, 'inventory', targetCharId);
     placerLocalement(item, 'equipped', targetCharId);
 }
 
-// Micro-rafraîchissement des stats globales et de la Puissance (1 Ko seulement !)
 async function rafraichirStatsPersosRapide() {
     if (!joueurInfo) return;
     try {
@@ -560,6 +520,8 @@ async function rafraichirStatsPersosRapide() {
             if (mapPersos[cId]) {
                 mapPersos[cId].light = c.light;
                 mapPersos[cId].statsGlobales = c.stats || {};
+                if (c.emblemPath) mapPersos[cId].emblem = 'https://www.bungie.net' + c.emblemPath;
+                if (c.emblemBackgroundPath) mapPersos[cId].emblemBg = 'https://www.bungie.net' + c.emblemBackgroundPath;
             }
         }
         afficherBarrePersos();
@@ -567,7 +529,6 @@ async function rafraichirStatsPersosRapide() {
     } catch (e) { console.warn("Sync stats rapide :", e); }
 }
 
-// Synchronisation rapide uniquement Inventaire & Coffre (pas de Triomphes ni Collections)
 async function synchroniserInventaireRapide() {
     if (!joueurInfo || !dictGlobal.items) return lancerAnalyse();
     try {
@@ -589,20 +550,13 @@ async function synchroniserInventaireRapide() {
         if (ongletActif === 'optimizer') calculerOptimisationArmures(false);
         afficherVue();
         mettreAJourComparateurUI();
-    } catch (e) {
-        setStatus("Erreur synchro rapide : " + e.message);
-    }
+    } catch (e) { setStatus("Erreur synchro rapide : " + e.message); }
 }
 
 function recalculerDoublonsEtTags() {
     compteDoublons = {};
-    const compter = (item) => {
-        if (item?.itemHash) compteDoublons[item.itemHash] = (compteDoublons[item.itemHash] || 0) + 1;
-    };
-    Object.values(mapPersos).forEach(p => {
-        p.equipped.forEach(compter);
-        p.inventory.forEach(compter);
-    });
+    const compter = (item) => { if (item?.itemHash) compteDoublons[item.itemHash] = (compteDoublons[item.itemHash] || 0) + 1; };
+    Object.values(mapPersos).forEach(p => { p.equipped.forEach(compter); p.inventory.forEach(compter); });
     listeCoffre.forEach(compter);
 
     let nbDoublons = 0;
@@ -612,7 +566,6 @@ function recalculerDoublonsEtTags() {
     mettreAJourOptionsTags();
 }
 
-// Actions utilisateur empilées dans la file séquentielle
 function executerMouvement(cibleMode, itemHash, itemInstanceId, lieuActuel, sourceCharId = '') {
     fermerInspecteur(true);
     const item = registreObjets[itemInstanceId];
@@ -663,17 +616,11 @@ function recupererDuPostmaster(itemHash, itemInstanceId, stackSize) {
     enfilerAction(`Récupération de "${nom}" chez le Commis des postes...`, [itemInstanceId], async () => {
         if (item) await apiLibererPlaceSacSiPlein(persoActifId, item.bucketHash);
         await appelActionBungie('PullFromPostmaster', {
-            itemReferenceHash: itemHash,
-            stackSize: stackSize || 1,
-            itemId: itemInstanceId || "0",
-            characterId: persoActifId,
-            membershipType: joueurInfo.membershipType
+            itemReferenceHash: itemHash, stackSize: stackSize || 1,
+            itemId: itemInstanceId || "0", characterId: persoActifId, membershipType: joueurInfo.membershipType
         });
-        if (item && BUCKETS_CONNUS.has(item.bucketHash)) {
-            placerLocalement(item, 'inventory', persoActifId);
-        } else if (item) {
-            retirerDeSaListeLocale(item);
-        }
+        if (item && BUCKETS_CONNUS.has(item.bucketHash)) placerLocalement(item, 'inventory', persoActifId);
+        else if (item) retirerDeSaListeLocale(item);
         return { statsChanged: false, msg: `✓ "${nom}" récupéré dans le Sac !` };
     });
 }
@@ -682,21 +629,15 @@ function toutRecupererDuPostmaster() {
     const p = mapPersos[persoActifId];
     if (!p || p.postmaster.length === 0) return;
     const items = [...p.postmaster];
-    const ids = items.map(i => i.itemInstanceId);
 
-    enfilerAction(`Vidage du Commis des postes (${items.length} objets)...`, ids, async () => {
+    enfilerAction(`Vidage du Commis des postes (${items.length} objets)...`, items.map(i => i.itemInstanceId), async () => {
         let ok = 0;
         for (const item of items) {
             try {
-                if (BUCKETS_CONNUS.has(item.bucketHash)) {
-                    await apiLibererPlaceSacSiPlein(persoActifId, item.bucketHash);
-                }
+                if (BUCKETS_CONNUS.has(item.bucketHash)) await apiLibererPlaceSacSiPlein(persoActifId, item.bucketHash);
                 await appelActionBungie('PullFromPostmaster', {
-                    itemReferenceHash: item.itemHash,
-                    stackSize: item.stackSize || 1,
-                    itemId: item.itemInstanceId || "0",
-                    characterId: persoActifId,
-                    membershipType: joueurInfo.membershipType
+                    itemReferenceHash: item.itemHash, stackSize: item.stackSize || 1,
+                    itemId: item.itemInstanceId || "0", characterId: persoActifId, membershipType: joueurInfo.membershipType
                 });
                 if (BUCKETS_CONNUS.has(item.bucketHash)) placerLocalement(item, 'inventory', persoActifId);
                 else retirerDeSaListeLocale(item);
@@ -714,15 +655,8 @@ function chargerTagsLocale() {
     try { itemTags = JSON.parse(localStorage.getItem('d2_itemTags') || '{}'); }
     catch { itemTags = {}; }
 }
-
-function sauvegarderTagsLocale() {
-    localStorage.setItem('d2_itemTags', JSON.stringify(itemTags));
-}
-
-function obtenirTag(item) {
-    if (!item || !item.itemInstanceId) return null;
-    return itemTags[item.itemInstanceId] || null;
-}
+function sauvegarderTagsLocale() { localStorage.setItem('d2_itemTags', JSON.stringify(itemTags)); }
+function obtenirTag(item) { return (item && item.itemInstanceId) ? (itemTags[item.itemInstanceId] || null) : null; }
 
 function definirTag(itemInstanceId, tagId) {
     if (!itemInstanceId) return;
@@ -772,10 +706,8 @@ function rapatrierObjetsADemanteler() {
     enfilerAction(`Rapatriement de ${junkVault.length} objets 🗑️ vers ${nomPerso}...`, junkVault.map(i => i.itemInstanceId), async () => {
         let ok = 0;
         for (const item of junkVault) {
-            try {
-                await apiTransfererVersSac(item, persoActifId);
-                ok++;
-            } catch (e) { console.warn("Skip junk:", item.nom, e.message); }
+            try { await apiTransfererVersSac(item, persoActifId); ok++; }
+            catch (e) { console.warn("Skip junk:", item.nom, e.message); }
         }
         return { statsChanged: false, msg: `✓ ${ok}/${junkVault.length} objets 🗑️ rapatriés dans le Sac (${nomPerso}).` };
     });
@@ -788,8 +720,34 @@ function basculerFiltreDoublons() {
 }
 
 // =========================================================================
-// PARSING DES DONNÉES BUNGIE (Inventaire, Stats, Jalons, Modèles, Catalyseurs)
+// ÉLÉMENTS & PARSING DES DONNÉES BUNGIE
 // =========================================================================
+function extraireElement(def, inst) {
+    if (!def || def.itemType !== 3) return null;
+    const dType = inst?.damageType || def.defaultDamageType;
+    const meta = ELEMENTS_META[dType];
+    if (!meta) return null;
+    const dHash = inst?.damageTypeHash || def.defaultDamageTypeHash;
+    const dDef = dHash ? dictGlobal.damageTypes?.[dHash] : null;
+    const iconPath = dDef?.displayProperties?.icon || dDef?.transparentIconPath || '';
+    return {
+        type: dType,
+        nom: dDef?.displayProperties?.name || meta.nom,
+        court: meta.court,
+        color: meta.color,
+        icone: iconPath ? 'https://www.bungie.net' + iconPath : ''
+    };
+}
+
+function rendreElementInline(item, afficherNom = true) {
+    if (!item?.element) return '';
+    const e = item.element;
+    const imgHtml = e.icone
+        ? `<img class="elem-icon-sm" src="${e.icone}" alt="${e.court}" title="${e.nom}">`
+        : `<span class="elem-dot" style="background:${e.color};"></span>`;
+    return `<span class="elem-inline" style="color:${e.color};">${imgHtml}${afficherNom ? `<span>${e.court}</span>` : ''}</span>`;
+}
+
 function calculerCompteAReboursReset() {
     const now = new Date();
     const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 17, 0, 0, 0));
@@ -840,9 +798,7 @@ function extraireStatsObjet(def, instanceId, itemStatsMap) {
                 .replace('Vitesse de rechargement', 'Rechargement')
                 .replace('Coups par minute', 'Cadence (CPM)');
             resultat.push({
-                hash: statHash,
-                nom: nomCourt,
-                val: val,
+                hash: statHash, nom: nomCourt, val: val,
                 isBar: ![4284893193, 3871231066, 2961396640, 447667954].includes(statHash)
             });
             if (!estArme) totalArmure += val;
@@ -876,6 +832,7 @@ function formaterEquipement(item, lieuType, charIdOwner, instances, itemPerks, i
     const perks = extrairePerksDetails(instanceId, itemPerks);
     const stats = extraireStatsObjet(def, instanceId, itemStatsMap);
     const armorStats6 = extraireVecteur6Armure(def, instanceId, itemStatsMap);
+    const element = extraireElement(def, inst);
     const ukey = instanceId || ('hash_' + item.itemHash + '_' + Math.random().toString(36).substring(2, 7));
 
     const obj = {
@@ -893,6 +850,7 @@ function formaterEquipement(item, lieuType, charIdOwner, instances, itemPerks, i
         charIdOwner: charIdOwner,
         icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : '',
         power: power,
+        element: element,
         perks: perks,
         stats: stats,
         armorStats6: armorStats6,
@@ -908,7 +866,6 @@ function appliquerDonneesInventaire(resp, charProgressions = null) {
     const itemPerks = resp.itemComponents?.perks?.data || {};
     const itemStatsMap = resp.itemComponents?.stats?.data || {};
 
-    // Conserver les objets non-instances (Collections, Crafting, Catalyseurs, Marchands)
     const nouveauRegistre = {};
     for (const [k, v] of Object.entries(registreObjets)) {
         if (!v.itemInstanceId) nouveauRegistre[k] = v;
@@ -928,6 +885,7 @@ function appliquerDonneesInventaire(resp, charProgressions = null) {
             light: c.light,
             statsGlobales: c.stats || {},
             emblem: c.emblemPath ? 'https://www.bungie.net' + c.emblemPath : '',
+            emblemBg: c.emblemBackgroundPath ? 'https://www.bungie.net' + c.emblemBackgroundPath : '',
             equipped: [],
             inventory: [],
             postmaster: [],
@@ -1040,9 +998,7 @@ function extraireJalonsPerso(milestonesData) {
                     const oDef = dictGlobal.objectives?.[o.objectiveHash];
                     objectifs.push({
                         texte: oDef?.progressDescription || "Objectif hebdomadaire",
-                        progress: o.progress || 0,
-                        max: o.completionValue || 1,
-                        complete: !!o.complete
+                        progress: o.progress || 0, max: o.completionValue || 1, complete: !!o.complete
                     });
                 });
             });
@@ -1061,9 +1017,7 @@ function extraireJalonsPerso(milestonesData) {
                     const oDef = dictGlobal.objectives?.[o.objectiveHash];
                     objectifs.push({
                         texte: oDef?.progressDescription || "Défi hebdomadaire",
-                        progress: o.progress || 0,
-                        max: o.completionValue || 1,
-                        complete: !!o.complete
+                        progress: o.progress || 0, max: o.completionValue || 1, complete: !!o.complete
                     });
                 });
             });
@@ -1092,12 +1046,7 @@ function extraireJalonsPerso(milestonesData) {
             desc: descJalon,
             icone: icone || 'https://www.bungie.net/img/misc/missing_icon_d2.png',
             recompense: recompenseLabel || (estPrestige ? 'Équipement de prestige' : (estPuissant ? 'Équipement puissant' : 'Récompense hebdomadaire')),
-            estPrestige,
-            estPuissant,
-            groupe,
-            objectifs,
-            phases,
-            possede: complete
+            estPrestige, estPuissant, groupe, objectifs, phases, possede: complete
         });
     }
 
@@ -1137,7 +1086,6 @@ async function lancerAnalyse() {
 
         appliquerDonneesInventaire(resp, resp.characterProgressions?.data || {});
 
-        // Index armes pour Crafting
         const mapArmesParNom = {};
         for (const itemDef of Object.values(dictGlobal.items)) {
             if (itemDef.itemType === 3 && itemDef.displayProperties?.name && itemDef.inventory?.tierType >= 5) {
@@ -1145,7 +1093,6 @@ async function lancerAnalyse() {
             }
         }
 
-        // Collections (800)
         const collectiblesJoueur = { ...(resp.profileCollectibles?.data?.collectibles || {}) };
         for (const cId in (resp.characterCollectibles?.data || {})) {
             Object.assign(collectiblesJoueur, resp.characterCollectibles.data[cId].collectibles);
@@ -1165,9 +1112,8 @@ async function lancerAnalyse() {
                 flavor: itemDef?.flavorText || "",
                 source: def.sourceString || "Collection Destiny 2",
                 icone: 'https://www.bungie.net' + def.displayProperties.icon,
-                possede,
-                categorie: cat,
-                tier: isExo ? 'Exotic' : 'Superior',
+                element: itemDef ? extraireElement(itemDef, null) : null,
+                possede, categorie: cat, tier: isExo ? 'Exotic' : 'Superior',
                 badgeTexte: possede ? 'Débloqué' : 'Manquant',
                 stats: itemDef ? extraireStatsObjet(itemDef, null, null) : [],
                 perks: []
@@ -1176,7 +1122,6 @@ async function lancerAnalyse() {
             listeExotiques.push(obj);
         }
 
-        // Triomphes, Modèles & Catalyseurs (900)
         const recordsJoueur = { ...(resp.profileRecords?.data?.records || {}) };
         for (const cId in (resp.characterRecords?.data || {})) {
             Object.assign(recordsJoueur, resp.characterRecords.data[cId].records);
@@ -1215,21 +1160,13 @@ async function lancerAnalyse() {
 
                 const ukey = 'cat_' + hash;
                 const objCat = {
-                    ukey,
-                    nom: nomRec,
-                    typeNom: "Catalyseur Exotique",
-                    flavor: descRec,
+                    ukey, nom: nomRec, typeNom: "Catalyseur Exotique", flavor: descRec,
                     source: descRec || "Catalyseur d'arme exotique",
                     icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png',
-                    possede: complete,
-                    enCours: enCours,
-                    progActuel: prog,
-                    progMax: max,
-                    categorie: 'weapon',
-                    tier: 'Exotic',
+                    possede: complete, enCours, progActuel: prog, progMax: max,
+                    categorie: 'weapon', tier: 'Exotic',
                     badgeTexte: complete ? '✓ Complété' : (enCours ? `⚡ En cours (${prog} / ${max})` : '🔒 Manquant / Non commencé'),
-                    stats: [],
-                    perks: []
+                    stats: [], perks: []
                 };
                 registreObjets[ukey] = objCat;
                 listeCatalyseurs.push(objCat);
@@ -1246,31 +1183,24 @@ async function lancerAnalyse() {
                 const max = objZero.completionValue || 5;
                 const ukey = 'craft_' + hash;
                 const objCraft = {
-                    ukey,
-                    nom: nomRec,
+                    ukey, nom: nomRec,
                     typeNom: armeMatch.itemTypeDisplayName || "Arme façonnable",
                     flavor: armeMatch.flavorText || "",
                     source: `${armeMatch.itemTypeDisplayName || 'Arme'} — ${prog} / ${max} bordures rouges`,
                     icone: 'https://www.bungie.net' + armeMatch.displayProperties.icon,
-                    possede: complete,
-                    progActuel: prog,
-                    progMax: max,
-                    categorie: 'weapon',
-                    tier: armeMatch.inventory?.tierType === 6 ? 'Exotic' : 'Superior',
+                    element: extraireElement(armeMatch, null),
+                    possede: complete, progActuel: prog, progMax: max,
+                    categorie: 'weapon', tier: armeMatch.inventory?.tierType === 6 ? 'Exotic' : 'Superior',
                     badgeTexte: complete ? '✓ Modèle Débloqué' : `🟥 ${prog} / ${max} Souvenirs`,
-                    stats: extraireStatsObjet(armeMatch, null, null),
-                    perks: []
+                    stats: extraireStatsObjet(armeMatch, null, null), perks: []
                 };
                 registreObjets[ukey] = objCraft;
                 listeCrafting.push(objCraft);
             } else {
                 listeTriomphes.push({
-                    nom: nomRec,
-                    source: descRec || "Triomphe",
+                    nom: nomRec, source: descRec || "Triomphe",
                     icone: def.displayProperties.icon ? 'https://www.bungie.net' + def.displayProperties.icon : 'https://www.bungie.net/img/misc/missing_icon_d2.png',
-                    possede: complete,
-                    categorie: 'triumph',
-                    tier: complete ? 'Exotic' : 'Rare',
+                    possede: complete, categorie: 'triumph', tier: complete ? 'Exotic' : 'Rare',
                     badgeTexte: complete ? 'Complété' : 'À faire'
                 });
             }
@@ -1291,7 +1221,7 @@ async function lancerAnalyse() {
         if (!resp.profileInventory?.data) {
             setStatus("⚠️ Clique sur 'Se connecter avec Bungie.net' en haut à droite pour accéder au Coffre.");
         } else {
-            setStatus(`Synchronisé en ${duree}s — ${listeCoffre.length} objets au Coffre • Moteur de transfert instantané actif ⚡`);
+            setStatus(`Synchronisé en ${duree}s — ${listeCoffre.length} objets au Coffre.`);
         }
 
         if (ongletActif === 'vendors') chargerMarchandsPerso(persoActifId);
@@ -1306,7 +1236,7 @@ async function lancerAnalyse() {
 }
 
 // =========================================================================
-// OPTIMISEUR D'ARMURES (DOUBLE / TRIPLE 100)
+// OPTIMISEUR D'ARMURES
 // =========================================================================
 function collecterArmuresClasseActive() {
     const p = mapPersos[persoActifId];
@@ -1381,9 +1311,7 @@ function calculerOptimisationArmures(rerender = true) {
         });
 
         enriched.sort((a, b) => b.scoreHeuristique - a.scoreHeuristique);
-        if (enriched.length > 16) {
-            return [...enriched.slice(0, 14), ...enriched.slice(14).filter(e => e.isExo).slice(0, 4)];
-        }
+        if (enriched.length > 16) return [...enriched.slice(0, 14), ...enriched.slice(14).filter(e => e.isExo).slice(0, 4)];
         return enriched;
     });
 
@@ -1395,9 +1323,7 @@ function calculerOptimisationArmures(rerender = true) {
     }
 
     const ordrePriorite = [0, 1, 2, 3, 4, 5].sort((a, b) => optState.targets[b] - optState.targets[a]);
-    let tested = 0;
-    let exactMatches = [];
-    let fallbackMatches = [];
+    let tested = 0, exactMatches = [], fallbackMatches = [];
 
     const [p0, p1, p2, p3] = pools;
     for (let i0 = 0; i0 < p0.length; i0++) {
@@ -1567,13 +1493,7 @@ function rendreVueOptimiseur() {
                 const val = res.finalStats[sIdx];
                 const tier = Math.min(10, Math.floor(val / 10));
                 const hitTarget = optState.targets[sIdx] > 0 && tier >= optState.targets[sIdx];
-                return `
-                    <div class="opt-stat-pill ${tier === 10 ? 't10' : (hitTarget ? 'target-ok' : '')}">
-                        <small>${st.court}</small>
-                        <b>T${tier}</b>
-                        <small style="color:#64748b;">${val}</small>
-                    </div>
-                `;
+                return `<div class="opt-stat-pill ${tier === 10 ? 't10' : (hitTarget ? 'target-ok' : '')}"><small>${st.court}</small><b>T${tier}</b><small style="color:#64748b;">${val}</small></div>`;
             }).join('');
 
             const modsTexte = res.modsDetail.length > 0
@@ -1584,16 +1504,14 @@ function rendreVueOptimiseur() {
                 <div class="opt-set-card ${res.exact ? 'perfect' : ''}">
                     <div>
                         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                            <b style="font-size:1rem; color:var(--gold);">#${idx + 1} — Total T${res.totalTiers}</b>
+                            <b style="font-size:1rem; color:var(--light);">#${idx + 1} — Total T${res.totalTiers}</b>
                             <span class="badge">${res.wasted} pts perdus</span>
                             ${res.exact ? `<span class="badge badge-done">✓ Objectifs atteints</span>` : ''}
                         </div>
                         <div class="opt-set-stats">${statsPills}</div>
                         <div class="opt-mods-note">${modsTexte}</div>
                     </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                        ${res.pieces.map(rendreTuile).join('')}
-                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">${res.pieces.map(rendreTuile).join('')}</div>
                     <div style="display:flex; flex-direction:column; gap:6px; min-width:155px;">
                         <button class="btn-green" onclick="equiperEnsembleOptimise(${idx})">⚡ Équiper cet ensemble</button>
                         <button class="btn-compare" onclick="sauvegarderSetOptimiseEnBuild(${idx})">💾 Sauver en Build</button>
@@ -1606,7 +1524,7 @@ function rendreVueOptimiseur() {
     return `
         <div class="opt-controls">
             <div class="opt-top-row">
-                <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">🛡️ Optimiseur d'Armures — ${p.classeNom} (${armuresClasse.length} pièces)</h3>
+                <h3 style="margin:0; font-size:1.02rem; color:#ffffff; text-transform:uppercase; letter-spacing:1px;">🛡️ Optimiseur d'Armures — ${p.classeNom} (${armuresClasse.length} pièces)</h3>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                     <select id="optExotic" onchange="majParamOptimiseur()" style="min-width:260px;">${optionsExosHtml}</select>
                     <button class="btn-ghost" onclick="appliquerPresetOptimiseur('triple_pve')">Triple 100 PvE</button>
@@ -1632,10 +1550,7 @@ function rendreVueOptimiseur() {
 // =========================================================================
 // COMPARATEUR CÔTE-À-CÔTE
 // =========================================================================
-function basculerComparateur() {
-    document.getElementById('compareDrawer').classList.toggle('open');
-    mettreAJourComparateurUI();
-}
+function basculerComparateur() { document.getElementById('compareDrawer').classList.toggle('open'); mettreAJourComparateurUI(); }
 function fermerComparateur() { document.getElementById('compareDrawer').classList.remove('open'); }
 function viderComparateur() { comparateurKeys = []; mettreAJourComparateurUI(); afficherVue(); }
 
@@ -1739,7 +1654,7 @@ function mettreAJourComparateurUI() {
             }
             return `
                 <div class="cmp-stat-row ${clsDiff}">
-                    <span style="color:${st.isTotal ? 'var(--gold)' : '#94a3b8'}; font-weight:${st.isTotal ? '700' : '400'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${st.nom}</span>
+                    <span style="color:${st.isTotal ? 'var(--light)' : '#98a2ad'}; font-weight:${st.isTotal ? '700' : '400'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${st.nom}</span>
                     ${st.isBar && val !== null ? `<div class="cmp-stat-bar"><div class="cmp-stat-fill" style="width:${Math.min(100, val)}%;"></div></div>` : `<span></span>`}
                     <span class="cmp-stat-val">${val !== null ? val : '—'}</span>
                 </div>
@@ -1768,8 +1683,8 @@ function mettreAJourComparateurUI() {
                     <img src="${item.icone}">
                     <div class="compare-col-title">
                         <h4 title="${item.nom}">${item.nom}</h4>
-                        <small>${item.typeNom} ${item.power ? `• <b style="color:var(--gold);">✦ ${item.power}</b>` : ''}</small>
-                        <small style="color:#7dd3fc;">${libelleLieu(item)}</small>
+                        <small>${rendreElementInline(item, false)} ${item.typeNom} ${item.power ? `• <b style="color:var(--light);">✦ ${item.power}</b>` : ''}</small>
+                        <small style="color:#b8c7d6;">${libelleLieu(item)}</small>
                     </div>
                     <button class="compare-remove" onclick="retirerDuComparateur('${item.ukey}')" title="Retirer">✕</button>
                 </div>
@@ -1851,11 +1766,8 @@ function equiperBuildComplet(id) {
 
     enfilerAction(`Équipement du Build "${build.nom}"...`, ids, async () => {
         const liveItems = build.items.map(b => registreObjets[b.itemInstanceId]).filter(Boolean);
-        // Légendaires d'abord, puis Exotiques pour éviter tout conflit
         liveItems.sort((a, b) => (a.tier === 'Exotic' ? 1 : 0) - (b.tier === 'Exotic' ? 1 : 0));
-        for (const item of liveItems) {
-            await apiEquiperDirect(item, persoActifId);
-        }
+        for (const item of liveItems) await apiEquiperDirect(item, persoActifId);
         return { statsChanged: true, msg: `✓ Build "${build.nom}" équipé !` };
     });
 }
@@ -1886,12 +1798,10 @@ function afficherPostmaster() {
     box.style.display = 'block';
     box.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-            <b style="color:#d8b4fe; font-size:0.9rem;">📬 Commis des postes (${p.postmaster.length} / 21)</b>
+            <b style="color:#e9d5ff; font-size:0.9rem;">📬 Commis des postes (${p.postmaster.length} / 21)</b>
             <button class="btn-green" onclick="toutRecupererDuPostmaster()">📥 Tout récupérer</button>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            ${p.postmaster.map(rendreTuile).join('')}
-        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">${p.postmaster.map(rendreTuile).join('')}</div>
     `;
 }
 
@@ -1899,9 +1809,9 @@ function rendreContenuInspecteur(item) {
     const insp = document.getElementById('itemInspector');
     const statsHtml = (item.stats || []).map(s => `
         <div class="insp-stat-row">
-            <span style="color:${s.isTotal ? 'var(--gold)' : '#cbd5e1'}; font-weight:${s.isTotal ? '700' : '400'};">${s.nom}</span>
+            <span style="color:${s.isTotal ? 'var(--light)' : '#cfd6de'}; font-weight:${s.isTotal ? '700' : '400'};">${s.nom}</span>
             ${s.isBar ? `<div class="insp-stat-bar"><div class="insp-stat-fill" style="width:${Math.min(100, s.val)}%;"></div></div>` : `<span></span>`}
-            <span style="text-align:right; font-weight:700; color:${s.isTotal ? 'var(--gold)' : '#fff'};">${s.val}</span>
+            <span style="text-align:right; font-weight:700; color:${s.isTotal ? 'var(--light)' : '#fff'};">${s.val}</span>
         </div>
     `).join('');
 
@@ -1965,13 +1875,14 @@ function rendreContenuInspecteur(item) {
 
     const tagActuel = obtenirTag(item);
     const tagPillHeader = tagActuel ? `<span class="badge" style="background:${TAGS_CONFIG[tagActuel].bg}; border:1px solid ${TAGS_CONFIG[tagActuel].border}; color:#fff; margin-top:3px;">${TAGS_CONFIG[tagActuel].icon} ${TAGS_CONFIG[tagActuel].label}</span>` : '';
+    const elemHeaderHtml = item.element ? ` • ${rendreElementInline(item, true)}` : '';
 
     insp.innerHTML = `
         <div class="insp-banner tier-${item.tier}">
             <img class="insp-icon" src="${item.icone}">
             <div class="insp-title">
                 <h3>${item.nom}</h3>
-                <small>${item.typeNom}${item.isMasterwork ? ' • ★ Pièce Maîtresse' : ''}</small>
+                <small>${item.typeNom}${elemHeaderHtml}${item.isMasterwork ? ' • ★ PM' : ''}</small>
                 ${tagPillHeader}
             </div>
             ${item.power ? `<div class="insp-power">✦ ${item.power}</div>` : ''}
@@ -2023,7 +1934,7 @@ function fermerInspecteur(force = false) {
 }
 
 // =========================================================================
-// NAVIGATION, MARCHANDS & GLISSER-DÉPOSER
+// NAVIGATION, BANNIÈRES D'EMBLÈMES, MARCHANDS & GLISSER-DÉPOSER
 // =========================================================================
 function selectionnerPerso(charId) {
     persoActifId = charId;
@@ -2037,19 +1948,26 @@ function selectionnerPerso(charId) {
 
 function afficherBarrePersos() {
     const bar = document.getElementById('charBar');
-    bar.innerHTML = Object.entries(mapPersos).map(([cId, p]) => `
-        <div class="char-card ${cId === persoActifId ? 'active' : ''}"
-             onclick="selectionnerPerso('${cId}')"
-             ondragover="onDragOverZone(event)"
-             ondragleave="onDragLeaveZone(event)"
-             ondrop="onDropSurPerso(event, '${cId}')">
-            <img class="char-emblem" src="${p.emblem}">
-            <div class="char-meta">
-                <h4>${p.classeNom}</h4>
-                <span>✦ ${p.light}</span>
+    bar.innerHTML = Object.entries(mapPersos).map(([cId, p]) => {
+        const hasBg = !!p.emblemBg;
+        const bgStyle = hasBg
+            ? `style="background-image: linear-gradient(90deg, rgba(10,14,20,0.05) 0%, rgba(10,14,20,0.42) 28%, rgba(10,14,20,0.82) 100%), url('${p.emblemBg}');"`
+            : '';
+        return `
+            <div class="char-card ${hasBg ? 'has-banner' : ''} ${cId === persoActifId ? 'active' : ''}"
+                 ${bgStyle}
+                 onclick="selectionnerPerso('${cId}')"
+                 ondragover="onDragOverZone(event)"
+                 ondragleave="onDragLeaveZone(event)"
+                 ondrop="onDropSurPerso(event, '${cId}')">
+                ${!hasBg && p.emblem ? `<img class="char-emblem" src="${p.emblem}">` : ''}
+                <div class="char-meta">
+                    <h4>${p.classeNom}</h4>
+                    <span>✦ ${p.light}</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function changerOnglet(onglet) {
@@ -2099,6 +2017,7 @@ async function chargerMarchandsPerso(charId) {
             const descMarchand = vDef.displayProperties.subtitle || vDef.displayProperties.description || "";
             const statsMarchand = vendorStats[vHash]?.stats?.data || {};
             const perksMarchand = vendorStats[vHash]?.perks?.data || {};
+            const instMarchand = vendorStats[vHash]?.instances?.data || {};
 
             const armes = [], armures = [], autres = [];
             const dejaVu = new Set();
@@ -2120,6 +2039,7 @@ async function chargerMarchandsPerso(charId) {
                     flavor: itemDef.flavorText || "",
                     source: itemDef.itemTypeDisplayName || "Objet",
                     icone: itemDef.displayProperties.icon ? 'https://www.bungie.net' + itemDef.displayProperties.icon : '',
+                    element: extraireElement(itemDef, instMarchand[sKey] || null),
                     categorie: itemDef.itemType === 3 ? 'weapon' : (itemDef.itemType === 2 ? 'armor' : 'other'),
                     tier: tierKey,
                     badgeTexte: nomMarchand,
@@ -2185,7 +2105,7 @@ function onDropZone(ev, cibleMode, targetBucketHash) {
 }
 
 // =========================================================================
-// RENDU DES VUES
+// RENDU DES TUILES & VUES
 // =========================================================================
 function badgeTagTuile(item) {
     const t = obtenirTag(item);
@@ -2194,12 +2114,22 @@ function badgeTagTuile(item) {
     return `<span class="tile-tag-badge" style="background:${cfg.bg}; border-color:${cfg.border};">${cfg.icon}</span>`;
 }
 
+function rendreBarrePuissanceTuile(item) {
+    if (!item.power && !item.element) return '';
+    const elemIcon = item.element
+        ? (item.element.icone
+            ? `<img class="tile-elem-icon" src="${item.element.icone}" alt="${item.element.court}">`
+            : `<span class="elem-dot" style="background:${item.element.color};"></span>`)
+        : '';
+    return `<span class="tile-power">${elemIcon}${item.power || ''}</span>`;
+}
+
 function rendreCarteEquipee(item) {
     const statsPrincipales = (item.stats || []).slice(0, 6).map(s => `
         <div class="mini-stat">
-            <span class="mini-stat-name" style="color:${s.isTotal ? 'var(--gold)' : '#94a3b8'};">${s.nom}</span>
+            <span class="mini-stat-name" style="color:${s.isTotal ? 'var(--light)' : '#98a2ad'};">${s.nom}</span>
             ${s.isBar ? `<div class="mini-stat-bar-wrap"><div class="mini-stat-bar" style="width:${Math.min(100, s.val)}%;"></div></div>` : ''}
-            <span class="mini-stat-val" style="color:${s.isTotal ? 'var(--gold)' : '#f1f5f9'};">${s.val}</span>
+            <span class="mini-stat-val" style="color:${s.isTotal ? 'var(--light)' : '#f2f4f7'};">${s.val}</span>
         </div>
     `).join('');
 
@@ -2225,11 +2155,11 @@ function rendreCarteEquipee(item) {
                     <img src="${item.icone}" loading="lazy">
                     ${badgeTagTuile(item)}
                     ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
-                    ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
+                    ${rendreBarrePuissanceTuile(item)}
                 </div>
                 <div class="eq-title">
                     <h4>${item.nom}</h4>
-                    <span>${item.typeNom}</span>
+                    <span>${item.typeNom}${item.element ? ` • ${rendreElementInline(item, true)}` : ''}</span>
                 </div>
             </div>
             ${statsPrincipales ? `<div class="eq-stats-grid">${statsPrincipales}</div>` : ''}
@@ -2255,7 +2185,7 @@ function rendreTuile(item) {
             <img src="${item.icone}" loading="lazy">
             ${badgeTagTuile(item)}
             ${nbExemplaires > 1 && filtreDoublonsActif ? `<span class="dupe-tag">×${nbExemplaires}</span>` : ''}
-            ${item.power ? `<span class="tile-power">${item.power}</span>` : ''}
+            ${rendreBarrePuissanceTuile(item)}
         </div>
     `;
 }
@@ -2275,19 +2205,9 @@ function regrouperArmesParType(items, mode) {
         else arr.sort((a, b) => (b.power || 0) - (a.power || 0) || a.nom.localeCompare(b.nom, 'fr'));
 
         if (mode === 'bag') {
-            return `
-                <div class="bag-type-cluster">
-                    <span class="bag-type-label">${typeNom}</span>
-                    <div class="bag-type-tiles">${arr.map(rendreTuile).join('')}</div>
-                </div>
-            `;
+            return `<div class="bag-type-cluster"><span class="bag-type-label">${typeNom}</span><div class="bag-type-tiles">${arr.map(rendreTuile).join('')}</div></div>`;
         }
-        return `
-            <div class="vault-type-group">
-                <div class="vault-type-label">${typeNom} <span>(${arr.length})</span></div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px;">${arr.map(rendreTuile).join('')}</div>
-            </div>
-        `;
+        return `<div class="vault-type-group"><div class="vault-type-label">${typeNom} <span>(${arr.length})</span></div><div style="display:flex; flex-wrap:wrap; gap:6px;">${arr.map(rendreTuile).join('')}</div></div>`;
     }).join('');
 }
 
@@ -2295,7 +2215,7 @@ function rendreCarteJalon(m) {
     const phasesHtml = m.phases.length > 0 ? `
         <div class="phases-row" title="Rencontres validées cette semaine">
             ${m.phases.map(p => `<span class="phase-dot ${p.complete ? 'done' : ''}"></span>`).join('')}
-            <small style="color:#94a3b8; font-size:0.7rem;">${m.phases.filter(p => p.complete).length} / ${m.phases.length} étapes</small>
+            <small style="color:#98a2ad; font-size:0.7rem;">${m.phases.filter(p => p.complete).length} / ${m.phases.length} étapes</small>
         </div>
     ` : '';
 
@@ -2303,9 +2223,7 @@ function rendreCarteJalon(m) {
         const pct = o.complete ? 100 : Math.min(100, Math.round((o.progress / Math.max(1, o.max)) * 100));
         return `
             <div class="milestone-obj">
-                <div style="display:flex; justify-content:space-between; gap:6px;">
-                    <span>${o.texte}</span><b>${o.progress} / ${o.max}</b>
-                </div>
+                <div style="display:flex; justify-content:space-between; gap:6px;"><span>${o.texte}</span><b>${o.progress} / ${o.max}</b></div>
                 <div class="craft-prog-bar"><div class="craft-prog-fill ${o.complete ? 'done' : 'blue'}" style="width:${pct}%;"></div></div>
             </div>
         `;
@@ -2364,36 +2282,32 @@ function afficherVue() {
         if (recherche) {
             const mNom = item.nom.toLowerCase().includes(recherche);
             const mType = (item.typeNom || "").toLowerCase().includes(recherche);
+            const mElem = (item.element?.nom || "").toLowerCase().includes(recherche) || (item.element?.court || "").toLowerCase().includes(recherche);
             const mPerk = item.perks && item.perks.some(p => p.nom.toLowerCase().includes(recherche));
             const mSource = (item.source || item.sousTitre || item.recompense || "").toLowerCase().includes(recherche);
-            if (!mNom && !mType && !mPerk && !mSource) return false;
+            if (!mNom && !mType && !mElem && !mPerk && !mSource) return false;
         }
         return true;
     };
 
     if (ongletActif === 'loadout') {
         const p = mapPersos[persoActifId];
-        if (!p) {
-            view.innerHTML = `<p style="color:#64748b;">Clique sur "Se connecter avec Bungie.net" en haut à droite.</p>`;
-            return;
-        }
+        if (!p) { view.innerHTML = `<p style="color:#64748b;">Clique sur "Se connecter avec Bungie.net" en haut à droite.</p>`; return; }
 
         const lignesSlotsHtml = SLOTS_DESTINY.filter(s => !(filtreCat === 'weapon' && s.type !== 'weapon') && !(filtreCat === 'armor' && s.type !== 'armor')).map(slot => {
             const eqItem = p.equipped.find(i => i.bucketHash === slot.hash && matchFiltres(i));
             const bagItems = p.inventory.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
             const bagContentHtml = bagItems.length === 0
-                ? '<small style="color:#334155; font-size:0.74rem;">Vide</small>'
+                ? '<small style="color:#475569; font-size:0.74rem;">Vide</small>'
                 : (slot.type === 'weapon' ? regrouperArmesParType(bagItems, 'bag') : bagItems.map(rendreTuile).join(''));
 
             return `
                 <div class="slot-row">
                     <div class="slot-label">${slot.nom}</div>
-                    <div class="drop-zone equipped-zone"
-                         ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'equipped', ${slot.hash})">
-                        ${eqItem ? rendreCarteEquipee(eqItem) : '<small style="color:#334155; font-size:0.74rem;">—</small>'}
+                    <div class="drop-zone equipped-zone" ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'equipped', ${slot.hash})">
+                        ${eqItem ? rendreCarteEquipee(eqItem) : '<small style="color:#475569; font-size:0.74rem;">—</small>'}
                     </div>
-                    <div class="drop-zone"
-                         ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'inventory', ${slot.hash})">
+                    <div class="drop-zone" ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'inventory', ${slot.hash})">
                         ${bagContentHtml}
                     </div>
                 </div>
@@ -2403,9 +2317,7 @@ function afficherVue() {
         const coffreGroupesHtml = SLOTS_DESTINY.filter(s => !(filtreCat === 'weapon' && s.type !== 'weapon') && !(filtreCat === 'armor' && s.type !== 'armor')).map(slot => {
             const itemsSlot = listeCoffre.filter(i => i.bucketHash === slot.hash && matchFiltres(i));
             if (itemsSlot.length === 0) return '';
-            if (slot.type === 'weapon') {
-                return `<div class="vault-slot-group"><h5>${slot.nom} (${itemsSlot.length})</h5>${regrouperArmesParType(itemsSlot, 'vault')}</div>`;
-            }
+            if (slot.type === 'weapon') return `<div class="vault-slot-group"><h5>${slot.nom} (${itemsSlot.length})</h5>${regrouperArmesParType(itemsSlot, 'vault')}</div>`;
             if (filtreDoublonsActif) itemsSlot.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
             return `<div class="vault-slot-group"><h5>${slot.nom} (${itemsSlot.length})</h5><div style="display:flex; flex-wrap:wrap; gap:6px;">${itemsSlot.map(rendreTuile).join('')}</div></div>`;
         }).join('');
@@ -2413,14 +2325,14 @@ function afficherVue() {
         view.innerHTML = `
             <div class="loadout-workspace">
                 <div class="slots-column">
-                    <div style="display:grid; grid-template-columns:120px 310px 1fr; gap:12px; padding:0 10px 8px 10px; color:#38bdf8; font-size:0.76rem; font-weight:700; text-transform:uppercase;">
+                    <div style="display:grid; grid-template-columns:120px 310px 1fr; gap:12px; padding:0 10px 8px 10px; font-size:0.74rem; font-weight:700; text-transform:uppercase;">
                         <span>Emplacement</span><span>Équipé</span><span>Sac — ${p.classeNom}</span>
                     </div>
                     ${lignesSlotsHtml}
                 </div>
                 <div class="vault-column" ondragover="onDragOverZone(event)" ondragleave="onDragLeaveZone(event)" ondrop="onDropZone(event, 'vault', null)">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <h3 style="margin:0; font-size:1rem; color:#38bdf8;">🏦 Coffre (${listeCoffre.length} / 700)</h3>
+                        <h3 style="margin:0;">🏦 Coffre (${listeCoffre.length} / 700)</h3>
                     </div>
                     ${coffreGroupesHtml || '<p style="color:#64748b; font-size:0.85rem;">Aucun objet pour ce filtre.</p>'}
                 </div>
@@ -2432,25 +2344,16 @@ function afficherVue() {
     if (ongletActif === 'milestones') {
         const p = mapPersos[persoActifId];
         if (!p) { view.innerHTML = `<p style="color:#64748b;">Connecte-toi pour voir tes jalons hebdomadaires.</p>`; return; }
-
-        const liste = (p.milestones || []).filter(m => {
-            if (filtreEtat === 'missing' && m.possede) return false;
-            if (filtreEtat === 'owned' && !m.possede) return false;
-            return matchFiltres(m);
-        });
+        const liste = (p.milestones || []).filter(m => !(filtreEtat === 'missing' && m.possede) && !(filtreEtat === 'owned' && !m.possede) && matchFiltres(m));
         const nbRestants = (p.milestones || []).filter(m => !m.possede).length;
         const nbTotal = (p.milestones || []).length;
-
-        const blocSection = (titre, arr) => {
-            if (arr.length === 0) return '';
-            return `<div class="milestone-group-title"><span>${titre}</span><small style="color:#94a3b8;">${arr.filter(x => !x.possede).length} à faire / ${arr.length}</small></div><div class="grid">${arr.map(rendreCarteJalon).join('')}</div>`;
-        };
+        const blocSection = (titre, arr) => arr.length === 0 ? '' : `<div class="milestone-group-title"><span>${titre}</span><small style="color:#98a2ad;">${arr.filter(x => !x.possede).length} à faire / ${arr.length}</small></div><div class="grid">${arr.map(rendreCarteJalon).join('')}</div>`;
 
         view.innerHTML = `
             <div class="reset-banner">
                 <div>
                     <h3 style="margin:0; font-size:1.05rem; color:var(--text);">📅 Activités de la semaine — ${p.classeNom} (✦ ${p.light})</h3>
-                    <small style="color:#94a3b8;">${nbRestants} jalons restants sur ${nbTotal} avant le reset du mardi</small>
+                    <small style="color:#98a2ad;">${nbRestants} jalons restants sur ${nbTotal} avant le reset du mardi</small>
                 </div>
                 <div class="reset-timer">⏳ Reset dans ${calculerCompteAReboursReset()}</div>
             </div>
@@ -2471,7 +2374,11 @@ function afficherVue() {
                  onmouseenter="afficherInspecteur(event, '${item.ukey}', false)" onmousemove="bougerInspecteur(event)"
                  onmouseleave="fermerInspecteur(false)" onclick="afficherInspecteur(event, '${item.ukey}', true)">
                 <img class="item-icon" src="${item.icone}" loading="lazy">
-                <div class="item-info"><h4>${item.nom}</h4><p>${item.source}</p><span class="badge">${item.badgeTexte}</span></div>
+                <div class="item-info">
+                    <h4>${rendreElementInline(item, false)} ${item.nom}</h4>
+                    <p>${item.source}</p>
+                    <span class="badge">${item.badgeTexte}</span>
+                </div>
             </div>
         `;
 
@@ -2482,7 +2389,7 @@ function afficherVue() {
                 <div class="vendor-section">
                     <div class="vendor-header">
                         ${v.icone ? `<img class="vendor-icon" src="${v.icone}">` : ''}
-                        <div><h3 style="margin:0;">${v.nom}</h3>${v.desc ? `<small style="color:#94a3b8;">${v.desc}</small>` : ''}</div>
+                        <div><h3 style="margin:0;">${v.nom}</h3>${v.desc ? `<small style="color:#98a2ad;">${v.desc}</small>` : ''}</div>
                     </div>
                     ${armes.length ? `<div class="vendor-cat-title">🔫 Armes (${armes.length})</div><div class="grid">${armes.map(rendreCarteMarchand).join('')}</div>` : ''}
                     ${armures.length ? `<div class="vendor-cat-title">🛡️ Armures (${armures.length})</div><div class="grid">${armures.map(rendreCarteMarchand).join('')}</div>` : ''}
@@ -2503,7 +2410,8 @@ function afficherVue() {
                      onmouseleave="fermerInspecteur(false)" onclick="afficherInspecteur(event, '${item.ukey}', true)">
                     <img class="item-icon ${item.possede ? '' : 'red-border'}" src="${item.icone}" loading="lazy">
                     <div class="item-info">
-                        <h4>${item.nom}</h4><p>${item.source}</p>
+                        <h4>${rendreElementInline(item, false)} ${item.nom}</h4>
+                        <p>${item.source}</p>
                         <div class="craft-prog-bar"><div class="craft-prog-fill ${item.possede ? 'done' : ''}" style="width:${pct}%;"></div></div>
                         <span class="badge ${item.possede ? 'craft-ok' : 'craft-pending'}">${item.badgeTexte}</span>
                     </div>
@@ -2542,7 +2450,11 @@ function afficherVue() {
         <div class="item-card ${item.possede === false && ongletActif !== 'quests' ? 'missing' : 'tier-' + item.tier}"
              ${item.ukey ? `data-ukey="${item.ukey}" onmouseenter="afficherInspecteur(event, '${item.ukey}', false)" onmousemove="bougerInspecteur(event)" onmouseleave="fermerInspecteur(false)" onclick="afficherInspecteur(event, '${item.ukey}', true)"` : ''}>
             <img class="item-icon" src="${item.icone}" loading="lazy">
-            <div class="item-info"><h4>${item.nom}</h4><p>${item.source.substring(0, 85)}</p><span class="badge">${item.badgeTexte}</span></div>
+            <div class="item-info">
+                <h4>${rendreElementInline(item, false)} ${item.nom}</h4>
+                <p>${item.source.substring(0, 85)}</p>
+                <span class="badge">${item.badgeTexte}</span>
+            </div>
         </div>
     `).join('') + `</div>`;
 }
